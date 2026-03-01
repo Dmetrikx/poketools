@@ -19,24 +19,24 @@ func (s Section) Valid() bool {
 }
 
 type CardEntry struct {
-	ID       string
-	DeckID   string
-	CardID   string // TCGdex card ID
-	Name     string
-	SetCode  string
-	Number   string
-	Count    int
-	Section  Section
-	Position int
+	ID       string  `json:"id"`
+	DeckID   string  `json:"deckId"`
+	CardID   string  `json:"cardId"` // TCGdex card ID
+	Name     string  `json:"name"`
+	SetCode  string  `json:"setCode"`
+	Number   string  `json:"number"`
+	Count    int     `json:"count"`
+	Section  Section `json:"section"`
+	Position int     `json:"position"`
 }
 
 type Deck struct {
-	ID        string
-	Name      string
-	Format    string // "standard", "expanded"
-	Entries   []CardEntry
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        string      `json:"id"`
+	Name      string      `json:"name"`
+	Format    string      `json:"format"` // "standard", "expanded"
+	Entries   []CardEntry `json:"entries"`
+	CreatedAt time.Time   `json:"created_at"`
+	UpdatedAt time.Time   `json:"updated_at"`
 }
 
 // TotalCards returns the sum of all entry counts.

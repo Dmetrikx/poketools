@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"time"
 
 	"github.com/dariomendez/poketools/internal/deck"
 )
@@ -142,16 +141,6 @@ func (r *SQLiteDeckRepository) ReplaceEntries(ctx context.Context, deckID string
 		}); err != nil {
 			return fmt.Errorf("insert entry: %w", err)
 		}
-	}
-
-	if err := q.UpdateDeck(ctx, UpdateDeckParams{
-		Name:      "", // will be filled by caller; using separate Update for deck meta
-		Format:    "",
-		UpdatedAt: time.Now().UTC(),
-		ID:        deckID,
-	}); err != nil {
-		// Non-fatal; just means updated_at won't refresh here
-		_ = err
 	}
 
 	return tx.Commit()
