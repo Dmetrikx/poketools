@@ -11,6 +11,7 @@ type Card struct {
 	Rarity      string   `json:"rarity,omitempty"`
 	HP          int      `json:"hp,omitempty"`
 	Types       []string `json:"types,omitempty"`
+	Stage       string   `json:"stage,omitempty"`
 	Set         SetBrief `json:"set"`
 }
 

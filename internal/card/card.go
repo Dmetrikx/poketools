@@ -11,6 +11,7 @@ type Card struct {
 	HP      int      `json:"hp,omitempty"`
 	Rarity  string   `json:"rarity,omitempty"`
 	Image   string   `json:"image,omitempty"`
+	Stage   string   `json:"stage,omitempty"`
 }
 
 // Brief is a lightweight card summary used in search results.

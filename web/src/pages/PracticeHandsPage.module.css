@@ -1,0 +1,253 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.warning {
+  margin: 8px 0 0 0;
+  font-size: 14px;
+  color: #f97316;
+}
+
+.headerActions {
+  display: flex;
+  gap: 10px;
+}
+
+.refreshBtn,
+.backBtn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.refreshBtn {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.refreshBtn:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.refreshBtn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.backBtn {
+  background: none;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.backBtn:hover {
+  color: var(--color-text);
+  border-color: var(--color-text-muted);
+}
+
+.basicConfig {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.basicConfigTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+
+.pokemonList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pokemonItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 5px 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  font-size: 13px;
+  user-select: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.pokemonItem:hover {
+  border-color: var(--color-primary);
+}
+
+.pokemonItemChecked {
+  border-color: var(--color-primary);
+  background: rgba(99, 102, 241, 0.15);
+}
+
+.pokemonName {
+  color: var(--color-text);
+}
+
+.stageBadge {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+.stageBasic {
+  background: rgba(34, 197, 94, 0.2);
+  color: #86efac;
+}
+
+.stageEvolved {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+.handsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .handsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.handPanel {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px;
+  background-color: var(--color-surface);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.handHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.handNumber {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-text);
+}
+
+.mulliganBadge {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.cardRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.cardThumbnail {
+  width: 70px;
+  height: 100px;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.cardThumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px dashed var(--color-border);
+  padding: 4px;
+}
+
+.placeholderText {
+  font-size: 10px;
+  text-align: center;
+  color: var(--color-text-muted);
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.prizeCard {
+  opacity: 0.65;
+  border-style: dashed;
+}
+
+.prizeSection {
+  border-top: 1px solid var(--color-border);
+  padding-top: 12px;
+}
+
+.prizeLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.status,
+.error {
+  padding: 16px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.status {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+}
+
+.error {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}

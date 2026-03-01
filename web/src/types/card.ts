@@ -11,4 +11,5 @@ export interface Card extends CardBrief {
   types?: string[]
   hp?: number
   rarity?: string
+  stage?: string
 }
