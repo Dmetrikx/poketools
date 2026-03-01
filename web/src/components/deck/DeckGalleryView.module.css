@@ -1,0 +1,158 @@
+.section {
+  margin-bottom: 28px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-muted);
+}
+
+.sectionCount {
+  background: var(--color-border);
+  color: var(--color-text);
+  font-size: 0.75rem;
+  padding: 1px 7px;
+  border-radius: 10px;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tile {
+  position: relative;
+  width: 110px;
+  border-radius: 8px;
+  cursor: grab;
+  transition: transform 0.15s, box-shadow 0.15s;
+  user-select: none;
+}
+
+.tile:active {
+  cursor: grabbing;
+}
+
+.tile:hover {
+  transform: translateY(-3px);
+  z-index: 2;
+}
+
+.tile.dragOver {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+.imgWrapper {
+  position: relative;
+  cursor: pointer;
+}
+
+.cardImg {
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  object-fit: cover;
+  border-radius: 7px;
+  display: block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.placeholder {
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 6px;
+}
+
+.placeholderSet {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  opacity: 0.7;
+}
+
+.badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+
+/* Controls shown on hover */
+.controls {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  justify-content: space-between;
+  padding: 4px;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.tile:hover .controls {
+  display: flex;
+  pointer-events: all;
+}
+
+.ctrlBtn {
+  background: rgba(0, 0, 0, 0.75);
+  border: none;
+  color: white;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  backdrop-filter: blur(4px);
+  transition: background 0.1s;
+  flex-shrink: 0;
+}
+
+.ctrlBtn:hover {
+  background: rgba(99, 102, 241, 0.9);
+}
+
+.removeCtrl:hover {
+  background: rgba(239, 68, 68, 0.9);
+}
+
+.label {
+  font-size: 0.65rem;
+  text-align: center;
+  padding: 3px 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-text-muted);
+}

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useDeck } from '@/hooks/useDeck'
-import { useCardImages } from '@/hooks/useCardImages'
+import { useCardImages, imageKey } from '@/hooks/useCardImages'
 import CardSearch from '@/components/card/CardSearch'
 import SectionGroup from '@/components/deck/SectionGroup'
 import DeckGalleryView from '@/components/deck/DeckGalleryView'
@@ -23,7 +23,7 @@ export default function DeckEditorPage() {
 
   // Always call hooks before early returns
   const entries = deck?.entries ?? []
-  const imageMap = useCardImages(entries)
+  const [imageMap, overrideImage] = useCardImages(entries)
 
   if (loading) return <p className={styles.status}>Loading deck…</p>
   if (error) return <p className={styles.error}>{error}</p>
@@ -133,6 +133,7 @@ export default function DeckEditorPage() {
               onIncrement={handleIncrement}
               onDecrement={handleDecrement}
               onRemove={e => deleteEntry(e.id)}
+              onSelectArt={(entry, url) => overrideImage(imageKey(entry), url)}
             />
           )}
         </div>
