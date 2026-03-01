@@ -125,6 +125,23 @@ func (h *DeckHandler) UpdateEntry(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// UpdateEntryArt handles PUT /api/decks/{id}/entries/{eid}/art
+func (h *DeckHandler) UpdateEntryArt(w http.ResponseWriter, r *http.Request) {
+	entryID := chi.URLParam(r, "eid")
+	var body struct {
+		ImageURL string `json:"imageUrl"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+	if err := h.svc.UpdateEntryImageURL(r.Context(), entryID, body.ImageURL); err != nil {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
 // DeleteEntry handles DELETE /api/decks/{id}/entries/{eid}
 func (h *DeckHandler) DeleteEntry(w http.ResponseWriter, r *http.Request) {
 	entryID := chi.URLParam(r, "eid")

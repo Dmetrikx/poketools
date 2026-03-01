@@ -18,6 +18,7 @@ type Repository interface {
 
 	AddEntry(ctx context.Context, entry *CardEntry) error
 	UpdateEntry(ctx context.Context, id string, count int) error
+	UpdateEntryImageURL(ctx context.Context, id string, imageURL string) error
 	DeleteEntry(ctx context.Context, id string) error
 	ReplaceEntries(ctx context.Context, deckID string, entries []CardEntry) error
 }
@@ -106,6 +107,10 @@ func (s *Service) UpdateEntry(ctx context.Context, id string, count int) error {
 		return fmt.Errorf("count must be >= 0")
 	}
 	return s.repo.UpdateEntry(ctx, id, count)
+}
+
+func (s *Service) UpdateEntryImageURL(ctx context.Context, id string, imageURL string) error {
+	return s.repo.UpdateEntryImageURL(ctx, id, imageURL)
 }
 
 func (s *Service) DeleteEntry(ctx context.Context, id string) error {

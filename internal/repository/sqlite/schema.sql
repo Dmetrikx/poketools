@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS deck_entries (
     number   TEXT NOT NULL,
     count    INTEGER NOT NULL DEFAULT 1,
     section  TEXT NOT NULL CHECK(section IN ('pokemon','trainer','energy')),
-    position INTEGER NOT NULL DEFAULT 0
+    position INTEGER NOT NULL DEFAULT 0,
+    image_url TEXT NOT NULL DEFAULT ''
 );
 
 CREATE INDEX IF NOT EXISTS idx_deck_entries_deck_id ON deck_entries(deck_id);

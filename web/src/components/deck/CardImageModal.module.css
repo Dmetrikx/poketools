@@ -127,3 +127,27 @@
   opacity: 1;
   border-color: var(--color-primary);
 }
+
+.saveBtn {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 0;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.saveBtn:hover {
+  opacity: 0.85;
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

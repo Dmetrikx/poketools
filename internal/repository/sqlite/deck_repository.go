@@ -87,9 +87,21 @@ func (r *SQLiteDeckRepository) AddEntry(ctx context.Context, entry *deck.CardEnt
 		Count:    int64(entry.Count),
 		Section:  string(entry.Section),
 		Position: int64(entry.Position),
+		ImageUrl: entry.ImageURL,
 	})
 	if err != nil {
 		return fmt.Errorf("add entry: %w", err)
+	}
+	return nil
+}
+
+func (r *SQLiteDeckRepository) UpdateEntryImageURL(ctx context.Context, id string, imageURL string) error {
+	err := r.q.UpdateEntryImageUrl(ctx, UpdateEntryImageUrlParams{
+		ImageUrl: imageURL,
+		ID:       id,
+	})
+	if err != nil {
+		return fmt.Errorf("update entry image url: %w", err)
 	}
 	return nil
 }
@@ -138,6 +150,7 @@ func (r *SQLiteDeckRepository) ReplaceEntries(ctx context.Context, deckID string
 			Count:    int64(e.Count),
 			Section:  string(e.Section),
 			Position: int64(e.Position),
+			ImageUrl: e.ImageURL,
 		}); err != nil {
 			return fmt.Errorf("insert entry: %w", err)
 		}
@@ -167,6 +180,7 @@ func deckFromRow(row Deck, entries []DeckEntry) *deck.Deck {
 			Count:    int(e.Count),
 			Section:  deck.Section(e.Section),
 			Position: int(e.Position),
+			ImageURL: e.ImageUrl,
 		})
 	}
 	return d

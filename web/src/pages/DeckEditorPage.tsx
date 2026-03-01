@@ -15,7 +15,7 @@ type ViewMode = 'list' | 'gallery'
 export default function DeckEditorPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { deck, loading, error, addEntry, updateEntry, deleteEntry, exportDeck } = useDeck(id!)
+  const { deck, loading, error, addEntry, updateEntry, updateEntryArt, deleteEntry, exportDeck } = useDeck(id!)
 
   const [exportText, setExportText] = useState('')
   const [exporting, setExporting] = useState(false)
@@ -134,6 +134,10 @@ export default function DeckEditorPage() {
               onDecrement={handleDecrement}
               onRemove={e => deleteEntry(e.id)}
               onSelectArt={(entry, url) => overrideImage(imageKey(entry), url)}
+              onSaveArt={async (entry, url) => {
+                await updateEntryArt(entry.id, url)
+                overrideImage(imageKey(entry), url)
+              }}
             />
           )}
         </div>

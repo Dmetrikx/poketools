@@ -26,4 +26,5 @@ type DeckEntry struct {
 	Count    int64  `db:"count" json:"count"`
 	Section  string `db:"section" json:"section"`
 	Position int64  `db:"position" json:"position"`
+	ImageUrl string `db:"image_url" json:"image_url"`
 }

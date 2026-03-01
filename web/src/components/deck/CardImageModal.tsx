@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { CardEntry } from '@/types/deck'
 import type { CardBrief } from '@/types/card'
 import { cardsApi } from '@/api/cards'
@@ -10,11 +10,14 @@ interface Props {
   imageUrl: string | undefined
   onClose: () => void
   onSelectArt: (imageUrl: string) => void
+  onSaveArt: (imageUrl: string) => void | Promise<void>
 }
 
-export default function CardImageModal({ entry, imageUrl, onClose, onSelectArt }: Props) {
+export default function CardImageModal({ entry, imageUrl, onClose, onSelectArt, onSaveArt }: Props) {
   const [alts, setAlts] = useState<CardBrief[]>([])
   const [activeUrl, setActiveUrl] = useState<string | undefined>(imageUrl)
+  const [saving, setSaving] = useState(false)
+  const originalUrl = useRef(imageUrl)
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -79,6 +82,23 @@ export default function CardImageModal({ entry, imageUrl, onClose, onSelectArt }
               ))}
             </div>
           </div>
+        )}
+
+        {activeUrl && activeUrl !== originalUrl.current && (
+          <button
+            className={styles.saveBtn}
+            disabled={saving}
+            onClick={async () => {
+              setSaving(true)
+              try {
+                await onSaveArt(activeUrl)
+              } finally {
+                setSaving(false)
+              }
+            }}
+          >
+            {saving ? 'Saving…' : 'Save'}
+          </button>
         )}
       </div>
     </div>

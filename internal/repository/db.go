@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	_ "embed"
 	"fmt"
+	"strings"
 
 	_ "modernc.org/sqlite"
 )
@@ -26,10 +27,17 @@ func Open(path string) (*sql.DB, error) {
 	return db, nil
 }
 
-// Migrate applies the embedded schema DDL.
+// Migrate applies the embedded schema DDL and any incremental migrations.
 func Migrate(db *sql.DB) error {
 	if _, err := db.Exec(schema); err != nil {
 		return fmt.Errorf("migrate: %w", err)
 	}
+
+	// Add image_url column for existing databases (idempotent).
+	_, err := db.Exec(`ALTER TABLE deck_entries ADD COLUMN image_url TEXT NOT NULL DEFAULT ''`)
+	if err != nil && !strings.Contains(err.Error(), "duplicate column") {
+		return fmt.Errorf("migrate image_url: %w", err)
+	}
+
 	return nil
 }

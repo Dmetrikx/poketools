@@ -10,6 +10,7 @@ export interface CardEntry {
   count: number
   section: Section
   position: number
+  imageUrl: string
 }
 
 export interface Deck {

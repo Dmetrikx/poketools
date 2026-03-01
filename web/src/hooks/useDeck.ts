@@ -47,10 +47,21 @@ export function useDeck(id: string) {
     })
   }, [id])
 
+  const updateEntryArt = useCallback(async (entryId: string, imageUrl: string) => {
+    await decksApi.updateEntryArt(id, entryId, imageUrl)
+    setDeck(prev => {
+      if (!prev) return prev
+      return {
+        ...prev,
+        entries: prev.entries.map(e => e.id === entryId ? { ...e, imageUrl } : e),
+      }
+    })
+  }, [id])
+
   const exportDeck = useCallback(
     (formatter: 'ptcglive' | 'limitless' = 'ptcglive') => decksApi.export(id, formatter),
     [id],
   )
 
-  return { deck, loading, error, reload: load, addEntry, updateEntry, deleteEntry, exportDeck }
+  return { deck, loading, error, reload: load, addEntry, updateEntry, updateEntryArt, deleteEntry, exportDeck }
 }

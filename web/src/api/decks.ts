@@ -41,6 +41,9 @@ export const decksApi = {
   updateEntry: (deckId: string, entryId: string, count: number) =>
     api.put<void>(`/decks/${deckId}/entries/${entryId}`, { count }),
 
+  updateEntryArt: (deckId: string, entryId: string, imageUrl: string) =>
+    api.put<void>(`/decks/${deckId}/entries/${entryId}/art`, { imageUrl }),
+
   deleteEntry: (deckId: string, entryId: string) =>
     api.delete(`/decks/${deckId}/entries/${entryId}`),
 }

@@ -28,6 +28,7 @@ type CardEntry struct {
 	Count    int     `json:"count"`
 	Section  Section `json:"section"`
 	Position int     `json:"position"`
+	ImageURL string  `json:"imageUrl"`
 }
 
 type Deck struct {

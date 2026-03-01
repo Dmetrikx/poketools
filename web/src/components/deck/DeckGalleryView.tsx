@@ -18,6 +18,7 @@ interface Props {
   onDecrement: (entry: CardEntry) => void
   onRemove: (entry: CardEntry) => void
   onSelectArt: (entry: CardEntry, imageUrl: string) => void
+  onSaveArt: (entry: CardEntry, imageUrl: string) => void | Promise<void>
 }
 
 export default function DeckGalleryView({
@@ -27,6 +28,7 @@ export default function DeckGalleryView({
   onDecrement,
   onRemove,
   onSelectArt,
+  onSaveArt,
 }: Props) {
   const [modalEntry, setModalEntry] = useState<CardEntry | null>(null)
   const [orderedEntries, setOrderedEntries] = useState<CardEntry[]>(entries)
@@ -169,6 +171,7 @@ export default function DeckGalleryView({
           onSelectArt={url => {
             onSelectArt(modalEntry, url)
           }}
+          onSaveArt={url => onSaveArt(modalEntry, url)}
         />
       )}
     </>

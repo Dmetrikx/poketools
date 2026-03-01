@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { cardsApi } from '@/api/cards'
 import type { CardEntry } from '@/types/deck'
 
-type EntryRef = Pick<CardEntry, 'cardId' | 'name' | 'setCode' | 'number' | 'section'>
+type EntryRef = Pick<CardEntry, 'cardId' | 'name' | 'setCode' | 'number' | 'section' | 'imageUrl'>
 
 /** Stable key used to look up an image for a card entry */
 export function imageKey(entry: EntryRef): string {
@@ -63,6 +63,11 @@ export function useCardImages(
       fetchedRef.current.add(key)
 
       const fetchImage = async (): Promise<string | undefined> => {
+        // Use persisted image URL if available
+        if (entry.imageUrl) {
+          return entry.imageUrl
+        }
+
         if (entry.cardId) {
           const card = await cardsApi.get(entry.cardId)
           return card.image

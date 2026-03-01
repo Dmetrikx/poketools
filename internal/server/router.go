@@ -41,6 +41,7 @@ func NewRouter(deckHandler *api.DeckHandler, cardHandler *api.CardHandler) http.
 				// Entry sub-routes
 				r.Post("/entries", deckHandler.AddEntry)
 				r.Put("/entries/{eid}", deckHandler.UpdateEntry)
+				r.Put("/entries/{eid}/art", deckHandler.UpdateEntryArt)
 				r.Delete("/entries/{eid}", deckHandler.DeleteEntry)
 			})
 		})

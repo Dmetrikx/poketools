@@ -10,8 +10,8 @@ import (
 )
 
 const createEntry = `-- name: CreateEntry :exec
-INSERT INTO deck_entries (id, deck_id, card_id, name, set_code, number, count, section, position)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO deck_entries (id, deck_id, card_id, name, set_code, number, count, section, position, image_url)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 type CreateEntryParams struct {
@@ -24,6 +24,7 @@ type CreateEntryParams struct {
 	Count    int64  `db:"count" json:"count"`
 	Section  string `db:"section" json:"section"`
 	Position int64  `db:"position" json:"position"`
+	ImageUrl string `db:"image_url" json:"image_url"`
 }
 
 func (q *Queries) CreateEntry(ctx context.Context, arg CreateEntryParams) error {
@@ -37,6 +38,7 @@ func (q *Queries) CreateEntry(ctx context.Context, arg CreateEntryParams) error 
 		arg.Count,
 		arg.Section,
 		arg.Position,
+		arg.ImageUrl,
 	)
 	return err
 }
@@ -60,7 +62,7 @@ func (q *Queries) DeleteEntry(ctx context.Context, id string) error {
 }
 
 const getEntry = `-- name: GetEntry :one
-SELECT id, deck_id, card_id, name, set_code, number, count, section, position
+SELECT id, deck_id, card_id, name, set_code, number, count, section, position, image_url
 FROM deck_entries
 WHERE id = ?
 `
@@ -78,12 +80,13 @@ func (q *Queries) GetEntry(ctx context.Context, id string) (DeckEntry, error) {
 		&i.Count,
 		&i.Section,
 		&i.Position,
+		&i.ImageUrl,
 	)
 	return i, err
 }
 
 const listEntriesByDeck = `-- name: ListEntriesByDeck :many
-SELECT id, deck_id, card_id, name, set_code, number, count, section, position
+SELECT id, deck_id, card_id, name, set_code, number, count, section, position, image_url
 FROM deck_entries
 WHERE deck_id = ?
 ORDER BY section, position
@@ -108,6 +111,7 @@ func (q *Queries) ListEntriesByDeck(ctx context.Context, deckID string) ([]DeckE
 			&i.Count,
 			&i.Section,
 			&i.Position,
+			&i.ImageUrl,
 		); err != nil {
 			return nil, err
 		}
@@ -138,9 +142,25 @@ func (q *Queries) UpdateEntryCount(ctx context.Context, arg UpdateEntryCountPara
 	return err
 }
 
+const updateEntryImageUrl = `-- name: UpdateEntryImageUrl :exec
+UPDATE deck_entries
+SET image_url = ?
+WHERE id = ?
+`
+
+type UpdateEntryImageUrlParams struct {
+	ImageUrl string `db:"image_url" json:"image_url"`
+	ID       string `db:"id" json:"id"`
+}
+
+func (q *Queries) UpdateEntryImageUrl(ctx context.Context, arg UpdateEntryImageUrlParams) error {
+	_, err := q.db.ExecContext(ctx, updateEntryImageUrl, arg.ImageUrl, arg.ID)
+	return err
+}
+
 const upsertEntry = `-- name: UpsertEntry :exec
-INSERT INTO deck_entries (id, deck_id, card_id, name, set_code, number, count, section, position)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO deck_entries (id, deck_id, card_id, name, set_code, number, count, section, position, image_url)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON CONFLICT(id) DO UPDATE SET count = excluded.count, position = excluded.position
 `
 
@@ -154,6 +174,7 @@ type UpsertEntryParams struct {
 	Count    int64  `db:"count" json:"count"`
 	Section  string `db:"section" json:"section"`
 	Position int64  `db:"position" json:"position"`
+	ImageUrl string `db:"image_url" json:"image_url"`
 }
 
 func (q *Queries) UpsertEntry(ctx context.Context, arg UpsertEntryParams) error {
@@ -167,6 +188,7 @@ func (q *Queries) UpsertEntry(ctx context.Context, arg UpsertEntryParams) error 
 		arg.Count,
 		arg.Section,
 		arg.Position,
+		arg.ImageUrl,
 	)
 	return err
 }
