@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { cardsApi } from '@/api/cards'
 import type { CardEntry } from '@/types/deck'
 
-type EntryRef = Pick<CardEntry, 'cardId' | 'name' | 'setCode' | 'number'>
+type EntryRef = Pick<CardEntry, 'cardId' | 'name' | 'setCode' | 'number' | 'section'>
 
 /** Stable key used to look up an image for a card entry */
 export function imageKey(entry: EntryRef): string {
@@ -68,8 +68,18 @@ export function useCardImages(
           return card.image
         }
 
-        // Try search with set first
-        if (entry.setCode) {
+        // For energy cards, always try swsh set first (set-agnostic)
+        if (entry.section === 'energy') {
+          try {
+            const results = await cardsApi.search(entry.name, 'swsh')
+            if (results.length > 0) return results[0].image
+          } catch {
+            // 502 or other — fall through to fallback
+          }
+        }
+
+        // Try search with set if it's not energy (or swsh didn't work)
+        if (entry.setCode && entry.section !== 'energy') {
           try {
             const results = await cardsApi.search(entry.name, entry.setCode)
             if (results.length > 0) return results[0].image

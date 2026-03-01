@@ -22,6 +22,11 @@ func NewService(client TCGdexClient) *Service {
 	return &Service{client: client}
 }
 
+// isBasicEnergy checks if a card is a basic energy card.
+func isBasicEnergy(category string) bool {
+	return category == "Energy"
+}
+
 // Search returns cards matching the query and optional set filter.
 func (s *Service) Search(ctx context.Context, query, setID string) ([]Brief, error) {
 	raw, err := s.client.SearchCards(ctx, query, setID)
@@ -40,12 +45,14 @@ func (s *Service) Search(ctx context.Context, query, setID string) ([]Brief, err
 }
 
 // Get returns the full detail for a single card.
+// For basic energy cards, it fetches the swsh set version to ensure image availability.
 func (s *Service) Get(ctx context.Context, id string) (*Card, error) {
 	raw, err := s.client.GetCard(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("get card %s: %w", id, err)
 	}
-	return &Card{
+
+	card := &Card{
 		ID:      raw.ID,
 		Name:    raw.Name,
 		SetID:   raw.Set.ID,
@@ -55,5 +62,15 @@ func (s *Service) Get(ctx context.Context, id string) (*Card, error) {
 		HP:      raw.HP,
 		Rarity:  raw.Rarity,
 		Image:   raw.Image,
-	}, nil
+	}
+
+	// For basic energy cards, fetch the swsh version to get a reliable image
+	if isBasicEnergy(raw.Category) && raw.Set.ID != "swsh" {
+		swshResults, err := s.client.SearchCards(ctx, raw.Name, "swsh")
+		if err == nil && len(swshResults) > 0 {
+			card.Image = swshResults[0].Image
+		}
+	}
+
+	return card, nil
 }
