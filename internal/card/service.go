@@ -62,6 +62,7 @@ func (s *Service) Get(ctx context.Context, id string) (*Card, error) {
 		HP:      raw.HP,
 		Rarity:  raw.Rarity,
 		Image:   raw.Image,
+		Stage:   raw.Stage,
 	}
 
 	// For basic energy cards, fetch the swsh version to get a reliable image

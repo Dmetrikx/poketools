@@ -98,6 +98,9 @@ export default function DeckEditorPage() {
                 onClick={() => setViewMode('gallery')}
               >Gallery</button>
             </div>
+            <button className={styles.actionBtn} onClick={() => navigate(`/decks/${id}/practice`)}>
+              Practice Hands
+            </button>
             <button className={styles.actionBtn} onClick={() => handleExport('ptcglive')} disabled={exporting}>
               Export PTCG Live
             </button>
