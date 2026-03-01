@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useDeck } from '@/hooks/useDeck'
+import { useCardImages } from '@/hooks/useCardImages'
 import CardSearch from '@/components/card/CardSearch'
 import SectionGroup from '@/components/deck/SectionGroup'
+import DeckGalleryView from '@/components/deck/DeckGalleryView'
 import type { CardBrief } from '@/types/card'
 import type { CardEntry, Section } from '@/types/deck'
 import styles from './DeckEditorPage.module.css'
 
 const SECTIONS: Section[] = ['pokemon', 'trainer', 'energy']
+type ViewMode = 'list' | 'gallery'
 
 export default function DeckEditorPage() {
   const { id } = useParams<{ id: string }>()
@@ -16,15 +19,22 @@ export default function DeckEditorPage() {
 
   const [exportText, setExportText] = useState('')
   const [exporting, setExporting] = useState(false)
+  const [viewMode, setViewMode] = useState<ViewMode>('list')
+
+  // Always call hooks before early returns
+  const entries = deck?.entries ?? []
+  const imageMap = useCardImages(entries)
 
   if (loading) return <p className={styles.status}>Loading deck…</p>
   if (error) return <p className={styles.error}>{error}</p>
   if (!deck) return null
 
-  const totalCards = (deck.entries ?? []).reduce((s, e) => s + e.count, 0)
+  const totalCards = entries.reduce((s, e) => s + e.count, 0)
 
   const handleCardSelect = async (card: CardBrief, section: Section = 'pokemon') => {
-    const existing = deck.entries?.find(e => e.cardId === card.id || (e.name === card.name && e.setCode === (card.setId ?? '')))
+    const existing = entries.find(e =>
+      e.cardId === card.id || (e.name === card.name && e.setCode === (card.setId ?? ''))
+    )
     if (existing) {
       await updateEntry(existing.id, existing.count + 1)
     } else {
@@ -35,7 +45,7 @@ export default function DeckEditorPage() {
         number: card.number ?? '',
         count: 1,
         section,
-        position: deck.entries?.length ?? 0,
+        position: entries.length,
       })
     }
   }
@@ -70,7 +80,7 @@ export default function DeckEditorPage() {
         <CardSearch onSelect={card => handleCardSelect(card)} />
       </div>
 
-      {/* Right: Deck list */}
+      {/* Right: Deck panel */}
       <div className={styles.deckPanel}>
         <div className={styles.deckHeader}>
           <div>
@@ -78,6 +88,16 @@ export default function DeckEditorPage() {
             <span className={styles.deckCount}>{totalCards} / 60 cards</span>
           </div>
           <div className={styles.actions}>
+            <div className={styles.viewToggle}>
+              <button
+                className={`${styles.toggleBtn} ${viewMode === 'list' ? styles.toggleActive : ''}`}
+                onClick={() => setViewMode('list')}
+              >List</button>
+              <button
+                className={`${styles.toggleBtn} ${viewMode === 'gallery' ? styles.toggleActive : ''}`}
+                onClick={() => setViewMode('gallery')}
+              >Gallery</button>
+            </div>
             <button className={styles.actionBtn} onClick={() => handleExport('ptcglive')} disabled={exporting}>
               Export PTCG Live
             </button>
@@ -91,18 +111,29 @@ export default function DeckEditorPage() {
         </div>
 
         <div className={styles.entries}>
-          {SECTIONS.map(section => (
+          {entries.length === 0 && (
+            <p className={styles.empty}>Search for cards on the left to build your deck.</p>
+          )}
+
+          {viewMode === 'list' && entries.length > 0 && SECTIONS.map(section => (
             <SectionGroup
               key={section}
               section={section}
-              entries={(deck.entries ?? []).filter(e => e.section === section)}
+              entries={entries.filter(e => e.section === section)}
               onIncrement={handleIncrement}
               onDecrement={handleDecrement}
               onRemove={e => deleteEntry(e.id)}
             />
           ))}
-          {(deck.entries ?? []).length === 0 && (
-            <p className={styles.empty}>Search for cards on the left to build your deck.</p>
+
+          {viewMode === 'gallery' && entries.length > 0 && (
+            <DeckGalleryView
+              entries={entries}
+              imageMap={imageMap}
+              onIncrement={handleIncrement}
+              onDecrement={handleDecrement}
+              onRemove={e => deleteEntry(e.id)}
+            />
           )}
         </div>
 
