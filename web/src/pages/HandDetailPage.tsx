@@ -21,15 +21,58 @@ function shuffle<T>(arr: T[]): T[] {
   return a
 }
 
+type Destination = 'board' | 'discard'
+
+function HoverCard({
+  onBoard,
+  onDiscard,
+  children,
+}: {
+  onBoard: () => void
+  onDiscard: () => void
+  children: React.ReactNode
+}) {
+  const [hovered, setHovered] = useState(false)
+  return (
+    <div
+      className={styles.hoverCardWrapper}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {children}
+      {hovered && (
+        <div className={styles.cardActions}>
+          <button
+            className={styles.boardBtn}
+            onClick={(e) => { e.stopPropagation(); onBoard() }}
+          >
+            Board
+          </button>
+          <button
+            className={styles.discardBtn}
+            onClick={(e) => { e.stopPropagation(); onDiscard() }}
+          >
+            Discard
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function HandDetailPage() {
   const { id, handIndex } = useParams<{ id: string; handIndex: string }>()
   const navigate = useNavigate()
   const location = useLocation()
   const state = location.state as LocationState | null
 
+  const [handCards, setHandCards] = useState<CardEntry[]>(state?.hand.hand ?? [])
+  const [nextCard, setNextCard] = useState<CardEntry | null>(state?.hand.nextCard ?? null)
   const [remainingDeck, setRemainingDeck] = useState<CardEntry[]>(state?.hand.remainingDeck ?? [])
   const [drawnCards, setDrawnCards] = useState<CardEntry[]>([])
   const [thinnedCards, setThinnedCards] = useState<CardEntry[]>([])
+  const [boardCards, setBoardCards] = useState<CardEntry[]>([])
+  const [discardCards, setDiscardCards] = useState<CardEntry[]>([])
 
   const [imageMap] = useCardImages(state?.entries ?? [])
 
@@ -46,6 +89,38 @@ export default function HandDetailPage() {
     setRemainingDeck(shuffle(next))
     setThinnedCards(prev => [...prev, card])
   }, [remainingDeck])
+
+  const moveHandCard = useCallback((idx: number, dest: Destination) => {
+    const card = handCards[idx]
+    if (!card) return
+    setHandCards(prev => [...prev.slice(0, idx), ...prev.slice(idx + 1)])
+    if (dest === 'board') setBoardCards(prev => [...prev, card])
+    else setDiscardCards(prev => [...prev, card])
+  }, [handCards])
+
+  const moveDrawnCard = useCallback((idx: number, dest: Destination) => {
+    const card = drawnCards[idx]
+    if (!card) return
+    setDrawnCards(prev => [...prev.slice(0, idx), ...prev.slice(idx + 1)])
+    if (dest === 'board') setBoardCards(prev => [...prev, card])
+    else setDiscardCards(prev => [...prev, card])
+  }, [drawnCards])
+
+  const moveThinnedCard = useCallback((idx: number, dest: Destination) => {
+    const card = thinnedCards[idx]
+    if (!card) return
+    setThinnedCards(prev => [...prev.slice(0, idx), ...prev.slice(idx + 1)])
+    if (dest === 'board') setBoardCards(prev => [...prev, card])
+    else setDiscardCards(prev => [...prev, card])
+  }, [thinnedCards])
+
+  const moveNextCard = useCallback((dest: Destination) => {
+    if (!nextCard) return
+    const card = nextCard
+    setNextCard(null)
+    if (dest === 'board') setBoardCards(prev => [...prev, card])
+    else setDiscardCards(prev => [...prev, card])
+  }, [nextCard])
 
   if (!state) {
     return (
@@ -105,14 +180,56 @@ export default function HandDetailPage() {
         </div>
       </div>
 
+      {/* Board & Discard zones */}
+      <div className={styles.boardDiscardRow}>
+        <div className={`${styles.zonePanel} ${styles.zonePanelBoard}`}>
+          <div className={`${styles.zoneLabel} ${styles.zoneLabelBoard}`}>
+            Board ({boardCards.length})
+          </div>
+          {boardCards.length === 0 ? (
+            <p className={styles.zoneEmpty}>No cards on board yet</p>
+          ) : (
+            <div className={styles.zoneCards}>
+              {boardCards.map((card, i) => (
+                <div key={i} className={styles.zoneCard}>{renderCard(card)}</div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className={`${styles.zonePanel} ${styles.zonePanelDiscard}`}>
+          <div className={`${styles.zoneLabel} ${styles.zoneLabelDiscard}`}>
+            Discard ({discardCards.length})
+          </div>
+          {discardCards.length === 0 ? (
+            <p className={styles.zoneEmpty}>No cards discarded yet</p>
+          ) : (
+            <div className={styles.zoneCards}>
+              {discardCards.map((card, i) => (
+                <div key={i} className={styles.zoneCard}>{renderCard(card)}</div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Compact top strip: opening hand, prizes, next card */}
       <div className={styles.dealStrip}>
         <div className={styles.stripGroup}>
           <div className={styles.stripLabel}>Hand</div>
           <div className={styles.stripCards}>
-            {hand.hand.map((card, i) => (
-              <div key={i} className={styles.stripCard}>{renderCard(card)}</div>
+            {handCards.map((card, i) => (
+              <HoverCard
+                key={i}
+                onBoard={() => moveHandCard(i, 'board')}
+                onDiscard={() => moveHandCard(i, 'discard')}
+              >
+                <div className={styles.stripCard}>{renderCard(card)}</div>
+              </HoverCard>
             ))}
+            {handCards.length === 0 && (
+              <span className={styles.zoneEmpty}>Empty</span>
+            )}
           </div>
         </div>
         <div className={styles.stripDivider} />
@@ -128,7 +245,16 @@ export default function HandDetailPage() {
         <div className={styles.stripGroup}>
           <div className={styles.stripLabel}>Next</div>
           <div className={styles.stripCards}>
-            <div className={styles.stripCard}>{renderCard(hand.nextCard)}</div>
+            {nextCard ? (
+              <HoverCard
+                onBoard={() => moveNextCard('board')}
+                onDiscard={() => moveNextCard('discard')}
+              >
+                <div className={styles.stripCard}>{renderCard(nextCard)}</div>
+              </HoverCard>
+            ) : (
+              <span className={styles.zoneEmpty}>—</span>
+            )}
           </div>
         </div>
       </div>
@@ -149,7 +275,13 @@ export default function HandDetailPage() {
             </div>
             <div className={styles.cardRow}>
               {drawnCards.map((card, i) => (
-                <div key={i} className={`${styles.cardThumbnail} ${styles.drawnCardEntry}`}>{renderCard(card)}</div>
+                <HoverCard
+                  key={i}
+                  onBoard={() => moveDrawnCard(i, 'board')}
+                  onDiscard={() => moveDrawnCard(i, 'discard')}
+                >
+                  <div className={`${styles.cardThumbnail} ${styles.drawnCardEntry}`}>{renderCard(card)}</div>
+                </HoverCard>
               ))}
               {drawnCards.length === 0 && (
                 <p className={styles.emptyHint}>Click "Draw" to pull from the top of the deck</p>
@@ -162,7 +294,13 @@ export default function HandDetailPage() {
               <div className={styles.sectionLabel}>Thinned Cards ({thinnedCards.length})</div>
               <div className={styles.cardRow}>
                 {thinnedCards.map((card, i) => (
-                  <div key={i} className={`${styles.cardThumbnail} ${styles.thinnedCard}`}>{renderCard(card)}</div>
+                  <HoverCard
+                    key={i}
+                    onBoard={() => moveThinnedCard(i, 'board')}
+                    onDiscard={() => moveThinnedCard(i, 'discard')}
+                  >
+                    <div className={`${styles.cardThumbnail} ${styles.thinnedCard}`}>{renderCard(card)}</div>
+                  </HoverCard>
                 ))}
               </div>
             </div>
