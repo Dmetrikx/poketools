@@ -6,10 +6,11 @@ import { cardsApi } from '@/api/cards'
 import type { CardEntry } from '@/types/deck'
 import styles from './PracticeHandsPage.module.css'
 
-interface Hand {
+export interface Hand {
   hand: CardEntry[]
   prizes: CardEntry[]
   nextCard: CardEntry
+  remainingDeck: CardEntry[]
   mulligans: number
 }
 
@@ -131,7 +132,7 @@ export default function PracticeHandsPage() {
         }
       }
 
-      generatedHands.push({ hand, prizes, nextCard: shuffled[13], mulligans })
+      generatedHands.push({ hand, prizes, nextCard: shuffled[13], remainingDeck: shuffled.slice(14), mulligans })
       handIndex++
       setTimeout(generateNextHand, 0)
     }
@@ -214,7 +215,11 @@ export default function PracticeHandsPage() {
 
       <div className={styles.handsGrid}>
         {hands.map((h, idx) => (
-          <div key={idx} className={styles.handPanel}>
+          <div
+            key={idx}
+            className={styles.handPanel}
+            onClick={() => navigate(`/decks/${id}/practice/${idx}`, { state: { hand: h, entries } })}
+          >
             <div className={styles.handHeader}>
               <span className={styles.handNumber}>Hand {idx + 1}</span>
               {h.mulligans > 0 && (
