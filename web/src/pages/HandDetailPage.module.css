@@ -1,0 +1,233 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.deckCount {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.backBtn {
+  padding: 8px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background: none;
+  color: var(--color-text-muted);
+  transition: all 0.2s;
+}
+
+.backBtn:hover {
+  color: var(--color-text);
+  border-color: var(--color-text-muted);
+}
+
+.mulliganBadge {
+  display: inline-block;
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  width: fit-content;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.cardRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.cardThumbnail {
+  width: 80px;
+  height: 112px;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.cardThumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.prizeCard {
+  opacity: 0.65;
+  border-style: dashed;
+}
+
+.prizesRow {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.cardPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px dashed var(--color-border);
+  padding: 4px;
+}
+
+.placeholderText {
+  font-size: 10px;
+  text-align: center;
+  color: var(--color-text-muted);
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+/* Two-column layout: hand/prizes/draw on left, thin/thinned on right */
+.mainLayout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.leftColumn,
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (max-width: 1000px) {
+  .mainLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.actionPanel {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px;
+  background-color: var(--color-surface);
+}
+
+.actionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.drawBtn {
+  padding: 6px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: #3b82f6;
+  color: white;
+  transition: background-color 0.2s;
+}
+
+.drawBtn:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.drawBtn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.emptyHint {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin: 0 0 8px 0;
+}
+
+/* Thin grid: smaller cards, sorted */
+.thinGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.thinCard {
+  width: 64px;
+  height: 90px;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+
+.thinCard:hover {
+  border-color: #ef4444;
+  transform: scale(1.05);
+}
+
+.thinCard img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thinnedCard {
+  opacity: 0.5;
+  border-color: #ef4444;
+}
+
+.error {
+  padding: 16px;
+  border-radius: 6px;
+  text-align: center;
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
