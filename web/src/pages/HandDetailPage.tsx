@@ -186,6 +186,58 @@ export default function HandDetailPage() {
     })
   }, [apply])
 
+  const handleReshuffle = useCallback(() => {
+    apply(prev => {
+      const toReshuffle = [
+        ...prev.handCards,
+        ...prev.drawnCards,
+        ...prev.thinnedCards,
+        ...(prev.nextCard ? [prev.nextCard] : []),
+        ...prev.remainingDeck,
+      ]
+      return {
+        ...prev,
+        handCards: [],
+        drawnCards: [],
+        thinnedCards: [],
+        nextCard: null,
+        remainingDeck: shuffle(toReshuffle),
+      }
+    })
+  }, [apply])
+
+  const handleShuffleToBottom = useCallback(() => {
+    apply(prev => {
+      const toBottom = shuffle([
+        ...prev.handCards,
+        ...prev.drawnCards,
+        ...prev.thinnedCards,
+        ...(prev.nextCard ? [prev.nextCard] : []),
+      ])
+      return {
+        ...prev,
+        handCards: [],
+        drawnCards: [],
+        thinnedCards: [],
+        nextCard: null,
+        remainingDeck: [...prev.remainingDeck, ...toBottom],
+      }
+    })
+  }, [apply])
+
+  const handleDrawToHand = useCallback((count: number) => {
+    apply(prev => {
+      const available = Math.min(count, prev.remainingDeck.length)
+      if (available === 0) return prev
+      const drawn = prev.remainingDeck.slice(0, available)
+      return {
+        ...prev,
+        handCards: [...prev.handCards, ...drawn],
+        remainingDeck: prev.remainingDeck.slice(available),
+      }
+    })
+  }, [apply])
+
   if (!state) {
     return (
       <div className={styles.page}>
@@ -240,6 +292,36 @@ export default function HandDetailPage() {
         </div>
         <div className={styles.headerActions}>
           <span className={styles.deckCount}>{remainingDeck.length} cards remaining</span>
+          <button
+            className={styles.reshuffleBtn}
+            onClick={handleReshuffle}
+            title="Shuffle all non-boarded, non-discarded cards back into the deck"
+          >
+            Reshuffle
+          </button>
+          <button
+            className={styles.shuffleBottomBtn}
+            onClick={handleShuffleToBottom}
+            title="Shuffle hand and drawn/thinned cards to the bottom of the deck"
+          >
+            Shuffle to Bottom
+          </button>
+          <button
+            className={styles.drawHandBtn}
+            onClick={() => handleDrawToHand(6)}
+            disabled={remainingDeck.length === 0}
+            title="Draw 6 cards to hand"
+          >
+            Draw 6
+          </button>
+          <button
+            className={styles.drawHandBtn}
+            onClick={() => handleDrawToHand(8)}
+            disabled={remainingDeck.length === 0}
+            title="Draw 8 cards to hand"
+          >
+            Draw 8
+          </button>
           <button
             className={styles.undoBtn}
             onClick={handleUndo}
