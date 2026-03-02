@@ -340,9 +340,9 @@
 
 /* Thinned cards */
 .thinnedCard {
-  opacity: 0.4;
+  opacity: 1.0;
   border-color: var(--color-danger);
-  filter: saturate(0.4) brightness(0.8);
+  /*filter: saturate(0.4) brightness(0.8);*/
 }
 
 /* ── Error state ────────────────────────────────────── */
