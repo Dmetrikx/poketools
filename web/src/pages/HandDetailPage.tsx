@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useCardImages, imageKey, cardImageUrl } from '@/hooks/useCardImages'
 import type { CardEntry } from '@/types/deck'
@@ -22,6 +22,16 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 type Destination = 'board' | 'discard'
+
+type GameState = {
+  handCards: CardEntry[]
+  nextCard: CardEntry | null
+  remainingDeck: CardEntry[]
+  drawnCards: CardEntry[]
+  thinnedCards: CardEntry[]
+  boardCards: CardEntry[]
+  discardCards: CardEntry[]
+}
 
 function HoverCard({
   onBoard,
@@ -66,61 +76,115 @@ export default function HandDetailPage() {
   const location = useLocation()
   const state = location.state as LocationState | null
 
-  const [handCards, setHandCards] = useState<CardEntry[]>(state?.hand.hand ?? [])
-  const [nextCard, setNextCard] = useState<CardEntry | null>(state?.hand.nextCard ?? null)
-  const [remainingDeck, setRemainingDeck] = useState<CardEntry[]>(state?.hand.remainingDeck ?? [])
-  const [drawnCards, setDrawnCards] = useState<CardEntry[]>([])
-  const [thinnedCards, setThinnedCards] = useState<CardEntry[]>([])
-  const [boardCards, setBoardCards] = useState<CardEntry[]>([])
-  const [discardCards, setDiscardCards] = useState<CardEntry[]>([])
+  const [{ current: game, history }, setStates] = useState<{ current: GameState; history: GameState[] }>(() => ({
+    current: {
+      handCards: state?.hand.hand ?? [],
+      nextCard: state?.hand.nextCard ?? null,
+      remainingDeck: state?.hand.remainingDeck ?? [],
+      drawnCards: [],
+      thinnedCards: [],
+      boardCards: [],
+      discardCards: [],
+    },
+    history: [],
+  }))
 
   const [imageMap] = useCardImages(state?.entries ?? [])
 
+  const apply = useCallback((updater: (prev: GameState) => GameState) => {
+    setStates(prev => ({
+      history: [...prev.history, prev.current],
+      current: updater(prev.current),
+    }))
+  }, [])
+
+  const handleUndo = useCallback(() => {
+    setStates(prev => {
+      if (prev.history.length === 0) return prev
+      return {
+        history: prev.history.slice(0, -1),
+        current: prev.history[prev.history.length - 1],
+      }
+    })
+  }, [])
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault()
+        handleUndo()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [handleUndo])
+
   const handleDraw = useCallback(() => {
-    if (remainingDeck.length === 0) return
-    const [drawn, ...rest] = remainingDeck
-    setDrawnCards(prev => [...prev, drawn])
-    setRemainingDeck(rest)
-  }, [remainingDeck])
+    apply(prev => {
+      if (prev.remainingDeck.length === 0) return prev
+      const [drawn, ...rest] = prev.remainingDeck
+      return { ...prev, drawnCards: [...prev.drawnCards, drawn], remainingDeck: rest }
+    })
+  }, [apply])
 
   const handleThin = useCallback((index: number) => {
-    const card = remainingDeck[index]
-    const next = [...remainingDeck.slice(0, index), ...remainingDeck.slice(index + 1)]
-    setRemainingDeck(shuffle(next))
-    setThinnedCards(prev => [...prev, card])
-  }, [remainingDeck])
+    apply(prev => {
+      const card = prev.remainingDeck[index]
+      const rest = [...prev.remainingDeck.slice(0, index), ...prev.remainingDeck.slice(index + 1)]
+      return { ...prev, remainingDeck: shuffle(rest), thinnedCards: [...prev.thinnedCards, card] }
+    })
+  }, [apply])
 
   const moveHandCard = useCallback((idx: number, dest: Destination) => {
-    const card = handCards[idx]
-    if (!card) return
-    setHandCards(prev => [...prev.slice(0, idx), ...prev.slice(idx + 1)])
-    if (dest === 'board') setBoardCards(prev => [...prev, card])
-    else setDiscardCards(prev => [...prev, card])
-  }, [handCards])
+    apply(prev => {
+      const card = prev.handCards[idx]
+      if (!card) return prev
+      return {
+        ...prev,
+        handCards: [...prev.handCards.slice(0, idx), ...prev.handCards.slice(idx + 1)],
+        boardCards: dest === 'board' ? [...prev.boardCards, card] : prev.boardCards,
+        discardCards: dest === 'discard' ? [...prev.discardCards, card] : prev.discardCards,
+      }
+    })
+  }, [apply])
 
   const moveDrawnCard = useCallback((idx: number, dest: Destination) => {
-    const card = drawnCards[idx]
-    if (!card) return
-    setDrawnCards(prev => [...prev.slice(0, idx), ...prev.slice(idx + 1)])
-    if (dest === 'board') setBoardCards(prev => [...prev, card])
-    else setDiscardCards(prev => [...prev, card])
-  }, [drawnCards])
+    apply(prev => {
+      const card = prev.drawnCards[idx]
+      if (!card) return prev
+      return {
+        ...prev,
+        drawnCards: [...prev.drawnCards.slice(0, idx), ...prev.drawnCards.slice(idx + 1)],
+        boardCards: dest === 'board' ? [...prev.boardCards, card] : prev.boardCards,
+        discardCards: dest === 'discard' ? [...prev.discardCards, card] : prev.discardCards,
+      }
+    })
+  }, [apply])
 
   const moveThinnedCard = useCallback((idx: number, dest: Destination) => {
-    const card = thinnedCards[idx]
-    if (!card) return
-    setThinnedCards(prev => [...prev.slice(0, idx), ...prev.slice(idx + 1)])
-    if (dest === 'board') setBoardCards(prev => [...prev, card])
-    else setDiscardCards(prev => [...prev, card])
-  }, [thinnedCards])
+    apply(prev => {
+      const card = prev.thinnedCards[idx]
+      if (!card) return prev
+      return {
+        ...prev,
+        thinnedCards: [...prev.thinnedCards.slice(0, idx), ...prev.thinnedCards.slice(idx + 1)],
+        boardCards: dest === 'board' ? [...prev.boardCards, card] : prev.boardCards,
+        discardCards: dest === 'discard' ? [...prev.discardCards, card] : prev.discardCards,
+      }
+    })
+  }, [apply])
 
   const moveNextCard = useCallback((dest: Destination) => {
-    if (!nextCard) return
-    const card = nextCard
-    setNextCard(null)
-    if (dest === 'board') setBoardCards(prev => [...prev, card])
-    else setDiscardCards(prev => [...prev, card])
-  }, [nextCard])
+    apply(prev => {
+      if (!prev.nextCard) return prev
+      return {
+        ...prev,
+        nextCard: null,
+        boardCards: dest === 'board' ? [...prev.boardCards, prev.nextCard] : prev.boardCards,
+        discardCards: dest === 'discard' ? [...prev.discardCards, prev.nextCard] : prev.discardCards,
+      }
+    })
+  }, [apply])
 
   if (!state) {
     return (
@@ -135,6 +199,8 @@ export default function HandDetailPage() {
 
   const { hand } = state
   const handNum = Number(handIndex) + 1
+
+  const { handCards, nextCard, remainingDeck, drawnCards, thinnedCards, boardCards, discardCards } = game
 
   // Map sorted indices back to actual remainingDeck indices
   const sortedWithOriginalIndex = [...remainingDeck]
@@ -174,6 +240,14 @@ export default function HandDetailPage() {
         </div>
         <div className={styles.headerActions}>
           <span className={styles.deckCount}>{remainingDeck.length} cards remaining</span>
+          <button
+            className={styles.undoBtn}
+            onClick={handleUndo}
+            disabled={history.length === 0}
+            title="Undo last action (⌘Z)"
+          >
+            Undo
+          </button>
           <button className={styles.backBtn} onClick={() => navigate(`/decks/${id}/practice`)}>
             Back
           </button>
