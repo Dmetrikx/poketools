@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useDeck } from '@/hooks/useDeck'
 import { useCardImages, imageKey, cardImageUrl } from '@/hooks/useCardImages'
@@ -6,10 +6,11 @@ import { cardsApi } from '@/api/cards'
 import type { CardEntry } from '@/types/deck'
 import styles from './PracticeHandsPage.module.css'
 
-interface Hand {
+export interface Hand {
   hand: CardEntry[]
   prizes: CardEntry[]
   nextCard: CardEntry
+  remainingDeck: CardEntry[]
   mulligans: number
 }
 
@@ -17,16 +18,32 @@ interface Hand {
 // Unknown/empty stage is treated as potentially basic (graceful degradation).
 const EVOLVED_STAGES = new Set(['Stage1', 'Stage2', 'MEGA', 'BREAK'])
 
+function loadSessionJSON<T>(key: string): T | null {
+  try {
+    const raw = sessionStorage.getItem(key)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
 export default function PracticeHandsPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { deck, loading, error } = useDeck(id!)
 
-  const [hands, setHands] = useState<Hand[]>([])
+  const handsKey = `practice-hands-${id}`
+  const overridesKey = `practice-overrides-${id}`
+
+  const [hands, setHands] = useState<Hand[]>(() => loadSessionJSON<Hand[]>(handsKey) ?? [])
   const [generatingHands, setGeneratingHands] = useState(false)
   const [stageMap, setStageMap] = useState<Record<string, string>>({})
-  const [basicOverrides, setBasicOverrides] = useState<Set<string>>(new Set())
+  const [basicOverrides, setBasicOverrides] = useState<Set<string>>(() => {
+    const saved = loadSessionJSON<string[]>(overridesKey)
+    return saved ? new Set(saved) : new Set()
+  })
   const [overridesInitialized, setOverridesInitialized] = useState(false)
+  const hadSavedOverrides = useRef(sessionStorage.getItem(overridesKey) !== null)
 
   const entries = deck?.entries ?? []
   const [imageMap] = useCardImages(entries)
@@ -66,13 +83,16 @@ export default function PracticeHandsPage() {
 
       setStageMap(stages)
 
-      // Seed overrides: check all Pokémon that are not known evolved stages
-      const initialBasics = new Set(
-        pokemonEntries
-          .filter(e => !EVOLVED_STAGES.has(stages[imageKey(e)]))
-          .map(e => imageKey(e))
-      )
-      setBasicOverrides(initialBasics)
+      // Only seed overrides from stage data if no saved overrides exist
+      if (!hadSavedOverrides.current) {
+        const initialBasics = new Set(
+          pokemonEntries
+            .filter(e => !EVOLVED_STAGES.has(stages[imageKey(e)]))
+            .map(e => imageKey(e))
+        )
+        setBasicOverrides(initialBasics)
+        sessionStorage.setItem(overridesKey, JSON.stringify([...initialBasics]))
+      }
       setOverridesInitialized(true)
     }
 
@@ -84,9 +104,10 @@ export default function PracticeHandsPage() {
       const next = new Set(prev)
       if (next.has(cardId)) next.delete(cardId)
       else next.add(cardId)
+      sessionStorage.setItem(overridesKey, JSON.stringify([...next]))
       return next
     })
-  }, [])
+  }, [overridesKey])
 
   const generateHands = useCallback(() => {
     if (!deck) return
@@ -104,6 +125,7 @@ export default function PracticeHandsPage() {
     const generateNextHand = () => {
       if (handIndex >= 10) {
         setHands(generatedHands)
+        sessionStorage.setItem(handsKey, JSON.stringify(generatedHands))
         setGeneratingHands(false)
         return
       }
@@ -131,17 +153,17 @@ export default function PracticeHandsPage() {
         }
       }
 
-      generatedHands.push({ hand, prizes, nextCard: shuffled[13], mulligans })
+      generatedHands.push({ hand, prizes, nextCard: shuffled[13], remainingDeck: shuffled.slice(14), mulligans })
       handIndex++
       setTimeout(generateNextHand, 0)
     }
 
     generateNextHand()
-  }, [deck, entries, basicOverrides])
+  }, [deck, entries, basicOverrides, handsKey])
 
-  // Generate initial hands once overrides are ready
+  // Generate initial hands once overrides are ready (skip if hands restored from session)
   useEffect(() => {
-    if (deck && overridesInitialized) {
+    if (deck && overridesInitialized && hands.length === 0) {
       generateHands()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -214,7 +236,11 @@ export default function PracticeHandsPage() {
 
       <div className={styles.handsGrid}>
         {hands.map((h, idx) => (
-          <div key={idx} className={styles.handPanel}>
+          <div
+            key={idx}
+            className={styles.handPanel}
+            onClick={() => navigate(`/decks/${id}/practice/${idx}`, { state: { hand: h, entries } })}
+          >
             <div className={styles.handHeader}>
               <span className={styles.handNumber}>Hand {idx + 1}</span>
               {h.mulligans > 0 && (

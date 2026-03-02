@@ -1,0 +1,374 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── Header ─────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.mulliganBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.deckCount {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--color-border);
+}
+
+.backBtn {
+  padding: 6px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: none;
+  color: var(--color-text-muted);
+  transition: all 0.15s ease;
+}
+
+.backBtn:hover {
+  color: var(--color-text);
+  border-color: var(--color-text-muted);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* ── Deal strip (hand + prizes + next) ──────────────── */
+
+.dealStrip {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  padding: 12px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+.stripGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.stripLabel {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.stripCards {
+  display: flex;
+  gap: 4px;
+}
+
+.stripCard {
+  width: 56px;
+  height: 78px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.stripCard img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.stripDivider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--color-border);
+  flex-shrink: 0;
+}
+
+/* Prize cards (used in strip) */
+.prizeCard {
+  opacity: 0.5;
+  border-style: dashed;
+  filter: saturate(0.6);
+}
+
+/* ── Main layout (draw + thin) ──────────────────────── */
+
+.mainLayout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.leftColumn,
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (max-width: 1000px) {
+  .mainLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Sections & Panels ──────────────────────────────── */
+
+.sectionLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.actionPanel {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  background: var(--color-surface);
+}
+
+.actionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+/* ── Card rendering ─────────────────────────────────── */
+
+.cardRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.cardThumbnail {
+  width: 80px;
+  height: 112px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cardThumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Placeholder for cards without images */
+.cardPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 6px;
+}
+
+.placeholderText {
+  font-size: 0.6rem;
+  text-align: center;
+  color: var(--color-text-muted);
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+/* ── Draw button ────────────────────────────────────── */
+
+.drawBtn {
+  padding: 7px 24px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--color-primary);
+  color: white;
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  letter-spacing: 0.02em;
+}
+
+.drawBtn:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.drawBtn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.drawBtn:disabled {
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+/* ── Drawn cards area ───────────────────────────────── */
+
+.drawnCardEntry {
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.emptyHint {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  margin: 0 0 8px 0;
+  font-style: italic;
+}
+
+/* ── Thin grid ──────────────────────────────────────── */
+
+.thinGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 320px;
+  overflow-y: auto;
+  align-content: flex-start;
+  padding-right: 4px;
+}
+
+.thinCard {
+  width: 64px;
+  height: 90px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.thinCard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  border-radius: 4px;
+  transition: background 0.15s ease;
+  pointer-events: none;
+}
+
+.thinCard:hover {
+  border-color: var(--color-danger);
+  transform: scale(1.08);
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.2);
+  z-index: 1;
+}
+
+.thinCard:hover::after {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.thinCard img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Thinned cards */
+.thinnedCard {
+  opacity: 1.0;
+  border-color: var(--color-danger);
+  /*filter: saturate(0.4) brightness(0.8);*/
+}
+
+/* ── Error state ────────────────────────────────────── */
+
+.error {
+  padding: 20px;
+  border-radius: var(--radius);
+  text-align: center;
+  background: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* ── Responsive: deal strip wrapping ────────────────── */
+
+@media (max-width: 700px) {
+  .dealStrip {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .stripDivider {
+    display: none;
+  }
+}
