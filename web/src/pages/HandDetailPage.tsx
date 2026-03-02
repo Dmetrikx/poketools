@@ -89,51 +89,53 @@ export default function HandDetailPage() {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Hand {handNum}</h1>
+        <div className={styles.headerLeft}>
+          <h1 className={styles.title}>Hand {handNum}</h1>
+          {hand.mulligans > 0 && (
+            <span className={styles.mulliganBadge}>
+              {hand.mulligans} {hand.mulligans === 1 ? 'mulligan' : 'mulligans'}
+            </span>
+          )}
+        </div>
         <div className={styles.headerActions}>
           <span className={styles.deckCount}>{remainingDeck.length} cards remaining</span>
           <button className={styles.backBtn} onClick={() => navigate(`/decks/${id}/practice`)}>
-            ← Back to Practice Hands
+            Back
           </button>
         </div>
       </div>
 
-      {hand.mulligans > 0 && (
-        <span className={styles.mulliganBadge}>
-          {hand.mulligans} {hand.mulligans === 1 ? 'mulligan' : 'mulligans'}
-        </span>
-      )}
+      {/* Compact top strip: opening hand, prizes, next card */}
+      <div className={styles.dealStrip}>
+        <div className={styles.stripGroup}>
+          <div className={styles.stripLabel}>Hand</div>
+          <div className={styles.stripCards}>
+            {hand.hand.map((card, i) => (
+              <div key={i} className={styles.stripCard}>{renderCard(card)}</div>
+            ))}
+          </div>
+        </div>
+        <div className={styles.stripDivider} />
+        <div className={styles.stripGroup}>
+          <div className={styles.stripLabel}>Prizes</div>
+          <div className={styles.stripCards}>
+            {hand.prizes.map((card, i) => (
+              <div key={i} className={`${styles.stripCard} ${styles.prizeCard}`}>{renderCard(card)}</div>
+            ))}
+          </div>
+        </div>
+        <div className={styles.stripDivider} />
+        <div className={styles.stripGroup}>
+          <div className={styles.stripLabel}>Next</div>
+          <div className={styles.stripCards}>
+            <div className={styles.stripCard}>{renderCard(hand.nextCard)}</div>
+          </div>
+        </div>
+      </div>
 
+      {/* Two-column layout: draw + thin */}
       <div className={styles.mainLayout}>
-        {/* Left column: hand, prizes, draw */}
         <div className={styles.leftColumn}>
-          {/* Opening hand */}
-          <div className={styles.section}>
-            <div className={styles.sectionLabel}>Opening Hand</div>
-            <div className={styles.cardRow}>
-              {hand.hand.map((card, i) => (
-                <div key={i} className={styles.cardThumbnail}>{renderCard(card)}</div>
-              ))}
-            </div>
-          </div>
-
-          {/* Prizes + Next Card */}
-          <div className={styles.prizesRow}>
-            <div className={styles.section}>
-              <div className={styles.sectionLabel}>Prize Cards</div>
-              <div className={styles.cardRow}>
-                {hand.prizes.map((card, i) => (
-                  <div key={i} className={`${styles.cardThumbnail} ${styles.prizeCard}`}>{renderCard(card)}</div>
-                ))}
-              </div>
-            </div>
-            <div className={styles.section}>
-              <div className={styles.sectionLabel}>Next Card</div>
-              <div className={styles.cardThumbnail}>{renderCard(hand.nextCard)}</div>
-            </div>
-          </div>
-
-          {/* Draw area */}
           <div className={styles.actionPanel}>
             <div className={styles.actionHeader}>
               <span className={styles.sectionLabel}>Drawn Cards ({drawnCards.length})</span>
@@ -147,16 +149,26 @@ export default function HandDetailPage() {
             </div>
             <div className={styles.cardRow}>
               {drawnCards.map((card, i) => (
-                <div key={i} className={styles.cardThumbnail}>{renderCard(card)}</div>
+                <div key={i} className={`${styles.cardThumbnail} ${styles.drawnCardEntry}`}>{renderCard(card)}</div>
               ))}
               {drawnCards.length === 0 && (
                 <p className={styles.emptyHint}>Click "Draw" to pull from the top of the deck</p>
               )}
             </div>
           </div>
+
+          {thinnedCards.length > 0 && (
+            <div className={styles.actionPanel}>
+              <div className={styles.sectionLabel}>Thinned Cards ({thinnedCards.length})</div>
+              <div className={styles.cardRow}>
+                {thinnedCards.map((card, i) => (
+                  <div key={i} className={`${styles.cardThumbnail} ${styles.thinnedCard}`}>{renderCard(card)}</div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Right column: remaining deck (thin) + thinned */}
         <div className={styles.rightColumn}>
           <div className={styles.actionPanel}>
             <div className={styles.actionHeader}>
@@ -178,17 +190,6 @@ export default function HandDetailPage() {
               ))}
             </div>
           </div>
-
-          {thinnedCards.length > 0 && (
-            <div className={styles.actionPanel}>
-              <div className={styles.sectionLabel}>Thinned Cards ({thinnedCards.length})</div>
-              <div className={styles.cardRow}>
-                {thinnedCards.map((card, i) => (
-                  <div key={i} className={`${styles.cardThumbnail} ${styles.thinnedCard}`}>{renderCard(card)}</div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
