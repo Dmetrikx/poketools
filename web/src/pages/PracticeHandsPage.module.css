@@ -222,9 +222,17 @@
   border-style: dashed;
 }
 
-.prizeSection {
+.bottomSection {
+  display: flex;
+  gap: 16px;
   border-top: 1px solid var(--color-border);
   padding-top: 12px;
+  align-items: flex-start;
+}
+
+.prizeSection {
+  flex: 1;
+  min-width: 0;
 }
 
 .prizeLabel {
@@ -233,6 +241,39 @@
   color: var(--color-text-muted);
   text-transform: uppercase;
   margin-bottom: 8px;
+}
+
+.nextCardSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.nextCardLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.nextCardDisplay {
+  width: 70px;
+  height: 100px;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: var(--color-surface);
+  border: 2px solid rgba(59, 130, 246, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nextCardDisplay img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .status,

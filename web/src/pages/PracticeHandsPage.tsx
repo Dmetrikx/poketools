@@ -9,6 +9,7 @@ import styles from './PracticeHandsPage.module.css'
 interface Hand {
   hand: CardEntry[]
   prizes: CardEntry[]
+  nextCard: CardEntry
   mulligans: number
 }
 
@@ -92,42 +93,50 @@ export default function PracticeHandsPage() {
 
     setGeneratingHands(true)
 
-    setTimeout(() => {
-      const pool = entries.flatMap(e => Array(e.count).fill(e))
+    const pool = entries.flatMap(e => Array(e.count).fill(e))
 
-      const isBasicPokemon = (entry: CardEntry): boolean =>
-        entry.section === 'pokemon' && basicOverrides.has(imageKey(entry))
+    const isBasicPokemon = (entry: CardEntry): boolean =>
+      entry.section === 'pokemon' && basicOverrides.has(imageKey(entry))
 
-      const generatedHands: Hand[] = []
-      for (let i = 0; i < 10; i++) {
-        let mulligans = 0
-        let hand: CardEntry[] = []
-        let prizes: CardEntry[] = []
-        let valid = false
+    const generatedHands: Hand[] = []
+    let handIndex = 0
 
-        while (!valid && mulligans < 500) {
-          const shuffled = [...pool]
-          for (let j = shuffled.length - 1; j > 0; j--) {
-            const k = Math.floor(Math.random() * (j + 1));
-            [shuffled[j], shuffled[k]] = [shuffled[k], shuffled[j]]
-          }
-
-          hand = shuffled.slice(0, 7)
-          prizes = shuffled.slice(7, 13)
-
-          if (hand.some(c => isBasicPokemon(c))) {
-            valid = true
-          } else {
-            mulligans++
-          }
-        }
-
-        generatedHands.push({ hand, prizes, mulligans })
+    const generateNextHand = () => {
+      if (handIndex >= 10) {
+        setHands(generatedHands)
+        setGeneratingHands(false)
+        return
       }
 
-      setHands(generatedHands)
-      setGeneratingHands(false)
-    }, 0)
+      let mulligans = 0
+      let hand: CardEntry[] = []
+      let prizes: CardEntry[] = []
+      let shuffled: CardEntry[] = []
+      let valid = false
+
+      while (!valid && mulligans < 500) {
+        shuffled = [...pool]
+        for (let j = shuffled.length - 1; j > 0; j--) {
+          const k = Math.floor(Math.random() * (j + 1));
+          [shuffled[j], shuffled[k]] = [shuffled[k], shuffled[j]]
+        }
+
+        hand = shuffled.slice(0, 7)
+        prizes = shuffled.slice(7, 13)
+
+        if (hand.some(c => isBasicPokemon(c))) {
+          valid = true
+        } else {
+          mulligans++
+        }
+      }
+
+      generatedHands.push({ hand, prizes, nextCard: shuffled[13], mulligans })
+      handIndex++
+      setTimeout(generateNextHand, 0)
+    }
+
+    generateNextHand()
   }, [deck, entries, basicOverrides])
 
   // Generate initial hands once overrides are ready
@@ -237,28 +246,55 @@ export default function PracticeHandsPage() {
               })}
             </div>
 
-            <div className={styles.prizeSection}>
-              <div className={styles.prizeLabel}>Prize Cards</div>
-              <div className={styles.cardRow}>
-                {h.prizes.map((card, cardIdx) => {
-                  const key = imageKey(card)
-                  const img = imageMap.get(key)
-                  return (
-                    <div key={cardIdx} className={`${styles.cardThumbnail} ${styles.prizeCard}`}>
-                      {img ? (
-                        <img src={cardImageUrl(img, 'low')} alt={card.name} title={card.name} />
-                      ) : (
-                        <div className={styles.cardPlaceholder}>
-                          <div className={styles.placeholderText}>
-                            {card.name}
-                            <br />
-                            <small>{card.setCode}</small>
+            <div className={styles.bottomSection}>
+              <div className={styles.prizeSection}>
+                <div className={styles.prizeLabel}>Prize Cards</div>
+                <div className={styles.cardRow}>
+                  {h.prizes.map((card, cardIdx) => {
+                    const key = imageKey(card)
+                    const img = imageMap.get(key)
+                    return (
+                      <div key={cardIdx} className={`${styles.cardThumbnail} ${styles.prizeCard}`}>
+                        {img ? (
+                          <img src={cardImageUrl(img, 'low')} alt={card.name} title={card.name} />
+                        ) : (
+                          <div className={styles.cardPlaceholder}>
+                            <div className={styles.placeholderText}>
+                              {card.name}
+                              <br />
+                              <small>{card.setCode}</small>
+                            </div>
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className={styles.nextCardSection}>
+                <div className={styles.nextCardLabel}>Next Card</div>
+                <div className={styles.nextCardDisplay}>
+                  {(() => {
+                    const key = imageKey(h.nextCard)
+                    const img = imageMap.get(key)
+                    return (
+                      <>
+                        {img ? (
+                          <img src={cardImageUrl(img, 'low')} alt={h.nextCard.name} title={h.nextCard.name} />
+                        ) : (
+                          <div className={styles.cardPlaceholder}>
+                            <div className={styles.placeholderText}>
+                              {h.nextCard.name}
+                              <br />
+                              <small>{h.nextCard.setCode}</small>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )
+                  })()}
+                </div>
               </div>
             </div>
           </div>
