@@ -18,9 +18,9 @@ export interface Hand {
 // Unknown/empty stage is treated as potentially basic (graceful degradation).
 const EVOLVED_STAGES = new Set(['Stage1', 'Stage2', 'MEGA', 'BREAK'])
 
-function loadSessionJSON<T>(key: string): T | null {
+function loadStoredJSON<T>(key: string): T | null {
   try {
-    const raw = sessionStorage.getItem(key)
+    const raw = localStorage.getItem(key)
     return raw ? JSON.parse(raw) : null
   } catch {
     return null
@@ -35,15 +35,15 @@ export default function PracticeHandsPage() {
   const handsKey = `practice-hands-${id}`
   const overridesKey = `practice-overrides-${id}`
 
-  const [hands, setHands] = useState<Hand[]>(() => loadSessionJSON<Hand[]>(handsKey) ?? [])
+  const [hands, setHands] = useState<Hand[]>(() => loadStoredJSON<Hand[]>(handsKey) ?? [])
   const [generatingHands, setGeneratingHands] = useState(false)
   const [stageMap, setStageMap] = useState<Record<string, string>>({})
   const [basicOverrides, setBasicOverrides] = useState<Set<string>>(() => {
-    const saved = loadSessionJSON<string[]>(overridesKey)
+    const saved = loadStoredJSON<string[]>(overridesKey)
     return saved ? new Set(saved) : new Set()
   })
   const [overridesInitialized, setOverridesInitialized] = useState(false)
-  const hadSavedOverrides = useRef(sessionStorage.getItem(overridesKey) !== null)
+  const hadSavedOverrides = useRef(localStorage.getItem(overridesKey) !== null)
 
   const entries = deck?.entries ?? []
   const [imageMap] = useCardImages(entries)
@@ -91,7 +91,7 @@ export default function PracticeHandsPage() {
             .map(e => imageKey(e))
         )
         setBasicOverrides(initialBasics)
-        sessionStorage.setItem(overridesKey, JSON.stringify([...initialBasics]))
+        localStorage.setItem(overridesKey, JSON.stringify([...initialBasics]))
       }
       setOverridesInitialized(true)
     }
@@ -104,7 +104,7 @@ export default function PracticeHandsPage() {
       const next = new Set(prev)
       if (next.has(cardId)) next.delete(cardId)
       else next.add(cardId)
-      sessionStorage.setItem(overridesKey, JSON.stringify([...next]))
+      localStorage.setItem(overridesKey, JSON.stringify([...next]))
       return next
     })
   }, [overridesKey])
@@ -125,7 +125,7 @@ export default function PracticeHandsPage() {
     const generateNextHand = () => {
       if (handIndex >= 10) {
         setHands(generatedHands)
-        sessionStorage.setItem(handsKey, JSON.stringify(generatedHands))
+        localStorage.setItem(handsKey, JSON.stringify(generatedHands))
         setGeneratingHands(false)
         return
       }
