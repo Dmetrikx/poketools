@@ -1,0 +1,31 @@
+# fly.toml — change "poketools" to your actual app name after running `fly launch`
+app = "poketools"
+primary_region = "lax"   # change to your nearest region: https://fly.io/docs/reference/regions/
+
+[build]
+
+[env]
+  PORT = "8080"
+  DATABASE_PATH = "/data/poketools.db"
+  ENV = "production"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type = "connections"
+    hard_limit = 25
+    soft_limit = 20
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"
+
+[[mounts]]
+  source = "poketools_data"
+  destination = "/data"
+  initial_size = "1gb"
