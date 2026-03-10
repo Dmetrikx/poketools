@@ -427,7 +427,7 @@ export default function HandDetailPage() {
           )}
         </div>
         <div className={styles.headerActions}>
-          <span className={styles.deckCount}>{remainingDeck.length} cards remaining</span>
+          <span className={styles.deckCount}>{remainingDeck.length} in deck</span>
           <button className={styles.reshuffleBtn} onClick={handleReshuffle} title="Shuffle all non-boarded, non-discarded cards back into the deck">Reshuffle</button>
           <button className={styles.shuffleBottomBtn} onClick={handleShuffleToBottom} title="Shuffle hand and drawn/thinned cards to the bottom of the deck">Shuffle to Bottom</button>
           <button className={styles.drawHandBtn} onClick={() => handleDrawToHand(6)} disabled={remainingDeck.length === 0} title="Draw 6 cards to hand">Draw 6</button>
@@ -437,46 +437,7 @@ export default function HandDetailPage() {
         </div>
       </div>
 
-      {/* Board & Discard */}
-      <div className={styles.boardDiscardRow}>
-        <div className={styles.boardZone}>
-          <div className={`${styles.zoneLabel} ${styles.zoneLabelBoard}`}>Board ({boardCount})</div>
-          <div className={styles.boardLayout}>
-            <div className={styles.activeArea}>
-              {renderSlot(boardActive, 'active', 'Active', { zone: 'active' }, styles.activeSlot)}
-            </div>
-            <div className={styles.benchArea}>
-              {boardBench.map((slot, i) => renderSlot(
-                slot,
-                `bench-${i}` as Destination,
-                'Bench',
-                { zone: 'bench', slotIndex: i },
-                styles.benchSlot,
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div
-          className={`${styles.zonePanel} ${styles.zonePanelDiscard}${dragOverZone === 'discard' ? ` ${styles.dropActive}` : ''}`}
-          {...dropHandlers('discard')}
-        >
-          <div className={`${styles.zoneLabel} ${styles.zoneLabelDiscard}`}>Discard ({discardCards.length})</div>
-          {discardCards.length === 0 ? (
-            <p className={styles.zoneEmpty}>{dragOverZone === 'discard' ? 'Drop here' : 'Drag cards here'}</p>
-          ) : (
-            <div className={styles.zoneCards}>
-              {discardCards.map((card, i) => (
-                <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'discard', index: i } }}>
-                  <div className={styles.zoneCard}>{renderCard(card)}</div>
-                </DragCard>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Deal strip: hand, prizes, next card */}
+      {/* Row 1: Hand + Prizes + Next */}
       <div className={styles.dealStrip}>
         <div className={styles.stripGroup}>
           <div className={styles.stripLabel}>Hand</div>
@@ -513,47 +474,80 @@ export default function HandDetailPage() {
         </div>
       </div>
 
-      {/* Draw + Thin columns */}
-      <div className={styles.mainLayout}>
-        <div className={styles.leftColumn}>
-          <div className={styles.actionPanel}>
-            <div className={styles.actionHeader}>
-              <span className={styles.sectionLabel}>
-                Drawn ({drawnCards.length}){thinnedCards.length > 0 ? ` / Thinned (${thinnedCards.length})` : ''}
-              </span>
-              <button className={styles.drawBtn} onClick={handleDraw} disabled={remainingDeck.length === 0}>Draw</button>
-            </div>
-            <div className={styles.cardRow}>
-              {drawnCards.map((card, i) => (
-                <DragCard key={`drawn-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'drawn', index: i } }}>
-                  <div className={`${styles.cardThumbnail} ${styles.drawnCardEntry}`}>{renderCard(card)}</div>
-                </DragCard>
-              ))}
-              {thinnedCards.map((card, i) => (
-                <DragCard key={`thinned-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'thinned', index: i } }}>
-                  <div className={`${styles.cardThumbnail} ${styles.thinnedCard}`}>{renderCard(card)}</div>
-                </DragCard>
-              ))}
-              {drawnCards.length === 0 && thinnedCards.length === 0 && (
-                <p className={styles.emptyHint}>Click "Draw" to pull from the top of the deck</p>
-              )}
-            </div>
+      {/* Row 2: Discard (full width) */}
+      <div
+        className={`${styles.discardRow}${dragOverZone === 'discard' ? ` ${styles.discardRowActive}` : ''}`}
+        {...dropHandlers('discard')}
+      >
+        <div className={`${styles.zoneLabel} ${styles.zoneLabelDiscard}`}>Discard ({discardCards.length})</div>
+        {discardCards.length === 0 ? (
+          <p className={styles.zoneEmpty}>{dragOverZone === 'discard' ? 'Drop here' : 'Drag cards here'}</p>
+        ) : (
+          <div className={styles.discardScrollRow}>
+            {discardCards.map((card, i) => (
+              <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'discard', index: i } }}>
+                <div className={styles.discardCard}>{renderCard(card)}</div>
+              </DragCard>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Row 3: Draw/Thinned (left) + Deck horizontal scroll (right) */}
+      <div className={styles.drawDeckRow}>
+        <div className={styles.drawPanel}>
+          <div className={styles.actionHeader}>
+            <span className={styles.sectionLabel}>
+              Drawn ({drawnCards.length}){thinnedCards.length > 0 ? ` / Thinned (${thinnedCards.length})` : ''}
+            </span>
+            <button className={styles.drawBtn} onClick={handleDraw} disabled={remainingDeck.length === 0}>Draw</button>
+          </div>
+          <div className={styles.drawnScrollRow}>
+            {drawnCards.map((card, i) => (
+              <DragCard key={`drawn-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'drawn', index: i } }}>
+                <div className={`${styles.drawnCard} ${styles.drawnCardEntry}`}>{renderCard(card)}</div>
+              </DragCard>
+            ))}
+            {thinnedCards.map((card, i) => (
+              <DragCard key={`thinned-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'thinned', index: i } }}>
+                <div className={`${styles.drawnCard} ${styles.thinnedCard}`}>{renderCard(card)}</div>
+              </DragCard>
+            ))}
+            {drawnCards.length === 0 && thinnedCards.length === 0 && (
+              <p className={styles.emptyHint}>Click Draw to pull from deck</p>
+            )}
           </div>
         </div>
+        <div className={styles.deckPanel}>
+          <div className={styles.actionHeader}>
+            <span className={styles.sectionLabel}>Deck ({remainingDeck.length})</span>
+            <span className={styles.deckHint}>click to thin</span>
+          </div>
+          <div className={styles.deckScrollRow}>
+            {sortedWithOriginalIndex.map(({ card, originalIndex }) => (
+              <div key={originalIndex} className={styles.deckCard} onClick={() => handleThin(originalIndex)} title={`Thin ${card.name}`}>
+                {renderCard(card)}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
-        <div className={styles.rightColumn}>
-          <div className={styles.actionPanel}>
-            <div className={styles.actionHeader}>
-              <span className={styles.sectionLabel}>Remaining Deck ({remainingDeck.length})</span>
-            </div>
-            <p className={styles.emptyHint}>Click a card to thin it (deck reshuffles after)</p>
-            <div className={styles.thinGrid}>
-              {sortedWithOriginalIndex.map(({ card, originalIndex }) => (
-                <div key={originalIndex} className={styles.thinCard} onClick={() => handleThin(originalIndex)} title={`Thin ${card.name}`}>
-                  {renderCard(card)}
-                </div>
-              ))}
-            </div>
+      {/* Row 4: Board */}
+      <div className={styles.boardDiscardRow}>
+        <div className={`${styles.zoneLabel} ${styles.zoneLabelBoard}`}>Board ({boardCount})</div>
+        <div className={styles.boardLayout}>
+          <div className={styles.activeArea}>
+            {renderSlot(boardActive, 'active', 'Active', { zone: 'active' }, styles.activeSlot)}
+          </div>
+          <div className={styles.benchArea}>
+            {boardBench.map((slot, i) => renderSlot(
+              slot,
+              `bench-${i}` as Destination,
+              'Bench',
+              { zone: 'bench', slotIndex: i },
+              styles.benchSlot,
+            ))}
           </div>
         </div>
       </div>
