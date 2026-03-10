@@ -232,57 +232,35 @@
   display: block;
 }
 
-/* ── Hover card wrapper & action overlay ────────────── */
+/* ── Draggable card wrapper ──────────────────────────── */
 
-.hoverCardWrapper {
+.draggableCard {
   position: relative;
   display: inline-flex;
   flex-shrink: 0;
-}
-
-.cardActions {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  background: rgba(0, 0, 0, 0.7);
+  cursor: grab;
   border-radius: 4px;
-  z-index: 10;
 }
 
-.boardBtn,
-.discardBtn {
-  padding: 3px 0;
-  border: none;
-  border-radius: 3px;
-  font-size: 0.6rem;
-  font-weight: 700;
-  cursor: pointer;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  width: 78%;
-  transition: filter 0.1s;
+.draggableCard:active {
+  cursor: grabbing;
 }
 
-.boardBtn {
-  background: rgba(34, 197, 94, 0.9);
-  color: white;
+/* ── Drop zone active state ──────────────────────────── */
+
+.dropActive {
+  border-width: 2px;
+  border-style: dashed !important;
 }
 
-.boardBtn:hover {
-  filter: brightness(1.15);
+.zonePanelBoard.dropActive {
+  border-color: rgba(34, 197, 94, 0.8) !important;
+  background: rgba(34, 197, 94, 0.12) !important;
 }
 
-.discardBtn {
-  background: rgba(239, 68, 68, 0.9);
-  color: white;
-}
-
-.discardBtn:hover {
-  filter: brightness(1.15);
+.zonePanelDiscard.dropActive {
+  border-color: rgba(239, 68, 68, 0.8) !important;
+  background: rgba(239, 68, 68, 0.12) !important;
 }
 
 /* ── Deal strip (hand + prizes + next) ──────────────── */

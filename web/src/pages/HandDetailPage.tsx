@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useCardImages, imageKey, cardImageUrl } from '@/hooks/useCardImages'
 import type { CardEntry } from '@/types/deck'
@@ -33,39 +33,29 @@ type GameState = {
   discardCards: CardEntry[]
 }
 
-function HoverCard({
-  onBoard,
-  onDiscard,
+type DragSource =
+  | { zone: 'hand'; index: number }
+  | { zone: 'drawn'; index: number }
+  | { zone: 'thinned'; index: number }
+  | { zone: 'next' }
+
+function DragCard({
+  onDragStart,
   children,
 }: {
-  onBoard: () => void
-  onDiscard: () => void
+  onDragStart: () => void
   children: React.ReactNode
 }) {
-  const [hovered, setHovered] = useState(false)
   return (
     <div
-      className={styles.hoverCardWrapper}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      className={styles.draggableCard}
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.effectAllowed = 'move'
+        onDragStart()
+      }}
     >
       {children}
-      {hovered && (
-        <div className={styles.cardActions}>
-          <button
-            className={styles.boardBtn}
-            onClick={(e) => { e.stopPropagation(); onBoard() }}
-          >
-            Board
-          </button>
-          <button
-            className={styles.discardBtn}
-            onClick={(e) => { e.stopPropagation(); onDiscard() }}
-          >
-            Discard
-          </button>
-        </div>
-      )}
     </div>
   )
 }
@@ -90,6 +80,9 @@ export default function HandDetailPage() {
   }))
 
   const [imageMap] = useCardImages(state?.entries ?? [])
+
+  const dragSourceRef = useRef<DragSource | null>(null)
+  const [dragOverZone, setDragOverZone] = useState<Destination | null>(null)
 
   const apply = useCallback((updater: (prev: GameState) => GameState) => {
     setStates(prev => ({
@@ -238,6 +231,17 @@ export default function HandDetailPage() {
     })
   }, [apply])
 
+  const handleDrop = useCallback((dest: Destination) => {
+    setDragOverZone(null)
+    const src = dragSourceRef.current
+    if (!src) return
+    dragSourceRef.current = null
+    if (src.zone === 'hand') moveHandCard(src.index, dest)
+    else if (src.zone === 'drawn') moveDrawnCard(src.index, dest)
+    else if (src.zone === 'thinned') moveThinnedCard(src.index, dest)
+    else if (src.zone === 'next') moveNextCard(dest)
+  }, [moveHandCard, moveDrawnCard, moveThinnedCard, moveNextCard])
+
   if (!state) {
     return (
       <div className={styles.page}>
@@ -338,12 +342,18 @@ export default function HandDetailPage() {
 
       {/* Board & Discard zones */}
       <div className={styles.boardDiscardRow}>
-        <div className={`${styles.zonePanel} ${styles.zonePanelBoard}`}>
+        <div
+          className={`${styles.zonePanel} ${styles.zonePanelBoard}${dragOverZone === 'board' ? ` ${styles.dropActive}` : ''}`}
+          onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move' }}
+          onDragEnter={(e) => { e.preventDefault(); setDragOverZone('board') }}
+          onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragOverZone(null) }}
+          onDrop={(e) => { e.preventDefault(); handleDrop('board') }}
+        >
           <div className={`${styles.zoneLabel} ${styles.zoneLabelBoard}`}>
             Board ({boardCards.length})
           </div>
           {boardCards.length === 0 ? (
-            <p className={styles.zoneEmpty}>No cards on board yet</p>
+            <p className={styles.zoneEmpty}>{dragOverZone === 'board' ? 'Drop here' : 'Drag cards here'}</p>
           ) : (
             <div className={styles.zoneCards}>
               {boardCards.map((card, i) => (
@@ -353,12 +363,18 @@ export default function HandDetailPage() {
           )}
         </div>
 
-        <div className={`${styles.zonePanel} ${styles.zonePanelDiscard}`}>
+        <div
+          className={`${styles.zonePanel} ${styles.zonePanelDiscard}${dragOverZone === 'discard' ? ` ${styles.dropActive}` : ''}`}
+          onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move' }}
+          onDragEnter={(e) => { e.preventDefault(); setDragOverZone('discard') }}
+          onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragOverZone(null) }}
+          onDrop={(e) => { e.preventDefault(); handleDrop('discard') }}
+        >
           <div className={`${styles.zoneLabel} ${styles.zoneLabelDiscard}`}>
             Discard ({discardCards.length})
           </div>
           {discardCards.length === 0 ? (
-            <p className={styles.zoneEmpty}>No cards discarded yet</p>
+            <p className={styles.zoneEmpty}>{dragOverZone === 'discard' ? 'Drop here' : 'Drag cards here'}</p>
           ) : (
             <div className={styles.zoneCards}>
               {discardCards.map((card, i) => (
@@ -375,13 +391,12 @@ export default function HandDetailPage() {
           <div className={styles.stripLabel}>Hand</div>
           <div className={styles.stripCards}>
             {handCards.map((card, i) => (
-              <HoverCard
+              <DragCard
                 key={i}
-                onBoard={() => moveHandCard(i, 'board')}
-                onDiscard={() => moveHandCard(i, 'discard')}
+                onDragStart={() => { dragSourceRef.current = { zone: 'hand', index: i } }}
               >
                 <div className={styles.stripCard}>{renderCard(card)}</div>
-              </HoverCard>
+              </DragCard>
             ))}
             {handCards.length === 0 && (
               <span className={styles.zoneEmpty}>Empty</span>
@@ -402,12 +417,9 @@ export default function HandDetailPage() {
           <div className={styles.stripLabel}>Next</div>
           <div className={styles.stripCards}>
             {nextCard ? (
-              <HoverCard
-                onBoard={() => moveNextCard('board')}
-                onDiscard={() => moveNextCard('discard')}
-              >
+              <DragCard onDragStart={() => { dragSourceRef.current = { zone: 'next' } }}>
                 <div className={styles.stripCard}>{renderCard(nextCard)}</div>
-              </HoverCard>
+              </DragCard>
             ) : (
               <span className={styles.zoneEmpty}>—</span>
             )}
@@ -431,13 +443,12 @@ export default function HandDetailPage() {
             </div>
             <div className={styles.cardRow}>
               {drawnCards.map((card, i) => (
-                <HoverCard
+                <DragCard
                   key={i}
-                  onBoard={() => moveDrawnCard(i, 'board')}
-                  onDiscard={() => moveDrawnCard(i, 'discard')}
+                  onDragStart={() => { dragSourceRef.current = { zone: 'drawn', index: i } }}
                 >
                   <div className={`${styles.cardThumbnail} ${styles.drawnCardEntry}`}>{renderCard(card)}</div>
-                </HoverCard>
+                </DragCard>
               ))}
               {drawnCards.length === 0 && (
                 <p className={styles.emptyHint}>Click "Draw" to pull from the top of the deck</p>
@@ -450,13 +461,12 @@ export default function HandDetailPage() {
               <div className={styles.sectionLabel}>Thinned Cards ({thinnedCards.length})</div>
               <div className={styles.cardRow}>
                 {thinnedCards.map((card, i) => (
-                  <HoverCard
+                  <DragCard
                     key={i}
-                    onBoard={() => moveThinnedCard(i, 'board')}
-                    onDiscard={() => moveThinnedCard(i, 'discard')}
+                    onDragStart={() => { dragSourceRef.current = { zone: 'thinned', index: i } }}
                   >
                     <div className={`${styles.cardThumbnail} ${styles.thinnedCard}`}>{renderCard(card)}</div>
-                  </HoverCard>
+                  </DragCard>
                 ))}
               </div>
             </div>
