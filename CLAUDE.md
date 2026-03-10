@@ -150,8 +150,9 @@ web/
 
 **Tables**:
 - `decks(id, name, format, created_at, updated_at)` — deck metadata
-- `deck_entries(id, deck_id, card_id, name, set_code, number, count, section, position)` — individual cards
+- `deck_entries(id, deck_id, card_id, name, set_code, number, count, section, position, image_url)` — individual cards
   - `section` is constrained to `pokemon | trainer | energy`
+  - `image_url` stores per-entry custom art selection (default `''`)
 
 **Modifying Queries**:
 1. Edit SQL in `internal/repository/sqlite/queries/` (`.sql` files)
@@ -172,6 +173,7 @@ All routes are under `/api`:
 **Deck Entries**
 - `POST /decks/:id/entries` — add card
 - `PUT /decks/:id/entries/:eid` — update count/imageUrl
+- `PUT /decks/:id/entries/:eid/art` — update entry's custom art image URL
 - `DELETE /decks/:id/entries/:eid` — remove card
 
 **Import/Export**
@@ -289,6 +291,10 @@ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 ```
 
 **IDE Setup**: The `.idea/` directory is gitignored. IntelliJ projects rebuild on open.
+
+## Utility Scripts
+
+- `scripts/clear_tables.sh` — clears deck and deck_entries tables from SQLite database. Usage: `./scripts/clear_tables.sh [DATABASE_PATH]`
 
 ## Related Documentation
 

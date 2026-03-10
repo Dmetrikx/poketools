@@ -689,6 +689,180 @@
   border-color: var(--color-danger) !important;
 }
 
+/* ── Opponent button ────────────────────────────────── */
+
+.opponentBtn {
+  padding: 5px 12px;
+  border: 1px solid rgba(251, 146, 60, 0.45);
+  border-radius: var(--radius);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: rgba(251, 146, 60, 0.08);
+  color: #fdba74;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.opponentBtn:hover:not(:disabled) {
+  background: rgba(251, 146, 60, 0.18);
+  border-color: rgba(251, 146, 60, 0.75);
+  color: #fed7aa;
+}
+
+.opponentBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Player tabs ────────────────────────────────────── */
+
+.tabBar {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 2px;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.tabBtn {
+  padding: 4px 14px;
+  border: none;
+  border-radius: calc(var(--radius) - 2px);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: var(--color-text-muted);
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+.tabBtn:hover {
+  color: var(--color-text);
+}
+
+.tabBtnActive {
+  background: var(--color-primary);
+  color: white;
+}
+
+.tabBtnActive:hover {
+  background: var(--color-primary-hover);
+  color: white;
+}
+
+/* ── Deck picker modal ──────────────────────────────── */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(2px);
+}
+
+.modalBox {
+  background: var(--color-bg, #0f0f12);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  width: 380px;
+  max-height: 520px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.modalTitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.modalCloseBtn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.15s ease;
+}
+
+.modalCloseBtn:hover {
+  color: var(--color-text);
+}
+
+.modalLoading {
+  padding: 24px 18px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+.deckPickerList {
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.deckPickerItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: all 0.12s ease;
+  gap: 12px;
+}
+
+.deckPickerItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--color-border);
+}
+
+.deckPickerName {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text);
+  flex: 1;
+  text-align: left;
+}
+
+.deckPickerFormat {
+  font-size: 0.68rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
 /* ── Error state ────────────────────────────────────── */
 
 .error {

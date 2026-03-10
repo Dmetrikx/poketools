@@ -1,6 +1,7 @@
 package server
 
 import (
+	"io/fs"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -8,6 +9,7 @@ import (
 	"github.com/go-chi/cors"
 
 	"github.com/dariomendez/poketools/internal/api"
+	webstatic "github.com/dariomendez/poketools/web"
 )
 
 // NewRouter builds and returns the application chi router.
@@ -57,6 +59,20 @@ func NewRouter(deckHandler *api.DeckHandler, cardHandler *api.CardHandler) http.
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("ok")) //nolint:errcheck
+	})
+
+	// Serve embedded frontend (SPA fallback: unknown paths → index.html)
+	dist, _ := fs.Sub(webstatic.Static, "dist")
+	fileServer := http.FileServer(http.FS(dist))
+	r.Get("/*", func(w http.ResponseWriter, r *http.Request) {
+		path := r.URL.Path[1:] // strip leading "/"
+		if path == "" {
+			path = "index.html"
+		}
+		if _, err := dist.Open(path); err != nil {
+			r.URL.Path = "/index.html"
+		}
+		fileServer.ServeHTTP(w, r)
 	})
 
 	return r

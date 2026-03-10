@@ -46,6 +46,7 @@ export default function DeckEditorPage() {
         count: 1,
         section,
         position: entries.length,
+        imageUrl: '',
       })
     }
   }
