@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useCardImages, imageKey, cardImageUrl } from '@/hooks/useCardImages'
 import type { CardEntry } from '@/types/deck'
@@ -21,7 +21,11 @@ function shuffle<T>(arr: T[]): T[] {
   return a
 }
 
-type Destination = 'board' | 'discard'
+/* ── Board types ─────────────────────────────────────── */
+
+type BoardSlot = { cards: CardEntry[] }
+
+type Destination = 'active' | 'bench-0' | 'bench-1' | 'bench-2' | 'bench-3' | 'bench-4' | 'discard'
 
 type GameState = {
   handCards: CardEntry[]
@@ -29,46 +33,66 @@ type GameState = {
   remainingDeck: CardEntry[]
   drawnCards: CardEntry[]
   thinnedCards: CardEntry[]
-  boardCards: CardEntry[]
+  boardActive: BoardSlot | null
+  boardBench: (BoardSlot | null)[]
   discardCards: CardEntry[]
 }
 
-function HoverCard({
-  onBoard,
-  onDiscard,
-  children,
-}: {
-  onBoard: () => void
-  onDiscard: () => void
-  children: React.ReactNode
-}) {
-  const [hovered, setHovered] = useState(false)
+type DragSource =
+  | { zone: 'hand'; index: number }
+  | { zone: 'drawn'; index: number }
+  | { zone: 'thinned'; index: number }
+  | { zone: 'next' }
+  | { zone: 'active' }
+  | { zone: 'bench'; slotIndex: number }
+  | { zone: 'discard'; index: number }
+  | { zone: 'active-energy'; energyIndex: number }
+  | { zone: 'bench-energy'; slotIndex: number; energyIndex: number }
+
+/* ── Helpers ─────────────────────────────────────────── */
+
+function addToSlot(slot: BoardSlot | null, card: CardEntry): BoardSlot {
+  if (!slot) return { cards: [card] }
+  return { cards: [...slot.cards, card] }
+}
+
+function placeCard(state: GameState, card: CardEntry, dest: Destination): GameState {
+  if (dest === 'discard') {
+    return { ...state, discardCards: [...state.discardCards, card] }
+  }
+  if (dest === 'active') {
+    return { ...state, boardActive: addToSlot(state.boardActive, card) }
+  }
+  const idx = parseInt(dest.split('-')[1])
+  const bench = [...state.boardBench]
+  bench[idx] = addToSlot(bench[idx], card)
+  return { ...state, boardBench: bench }
+}
+
+function removeAt<T>(arr: T[], i: number): T[] {
+  return [...arr.slice(0, i), ...arr.slice(i + 1)]
+}
+
+function totalBoardCards(g: GameState): number {
+  return (g.boardActive?.cards.length ?? 0) +
+    g.boardBench.reduce((n, s) => n + (s?.cards.length ?? 0), 0)
+}
+
+/* ── DragCard wrapper ────────────────────────────────── */
+
+function DragCard({ onDragStart, children }: { onDragStart: () => void; children: React.ReactNode }) {
   return (
     <div
-      className={styles.hoverCardWrapper}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      className={styles.draggableCard}
+      draggable
+      onDragStart={(e) => { e.dataTransfer.effectAllowed = 'move'; onDragStart() }}
     >
       {children}
-      {hovered && (
-        <div className={styles.cardActions}>
-          <button
-            className={styles.boardBtn}
-            onClick={(e) => { e.stopPropagation(); onBoard() }}
-          >
-            Board
-          </button>
-          <button
-            className={styles.discardBtn}
-            onClick={(e) => { e.stopPropagation(); onDiscard() }}
-          >
-            Discard
-          </button>
-        </div>
-      )}
     </div>
   )
 }
+
+/* ── Main component ──────────────────────────────────── */
 
 export default function HandDetailPage() {
   const { id, handIndex } = useParams<{ id: string; handIndex: string }>()
@@ -83,13 +107,16 @@ export default function HandDetailPage() {
       remainingDeck: state?.hand.remainingDeck ?? [],
       drawnCards: [],
       thinnedCards: [],
-      boardCards: [],
+      boardActive: null,
+      boardBench: [null, null, null, null, null],
       discardCards: [],
     },
     history: [],
   }))
 
   const [imageMap] = useCardImages(state?.entries ?? [])
+  const dragSourceRef = useRef<DragSource | null>(null)
+  const [dragOverZone, setDragOverZone] = useState<Destination | null>(null)
 
   const apply = useCallback((updater: (prev: GameState) => GameState) => {
     setStates(prev => ({
@@ -101,10 +128,7 @@ export default function HandDetailPage() {
   const handleUndo = useCallback(() => {
     setStates(prev => {
       if (prev.history.length === 0) return prev
-      return {
-        history: prev.history.slice(0, -1),
-        current: prev.history[prev.history.length - 1],
-      }
+      return { history: prev.history.slice(0, -1), current: prev.history[prev.history.length - 1] }
     })
   }, [])
 
@@ -119,6 +143,8 @@ export default function HandDetailPage() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [handleUndo])
 
+  /* ── Actions ───────────────────────────────────────── */
+
   const handleDraw = useCallback(() => {
     apply(prev => {
       if (prev.remainingDeck.length === 0) return prev
@@ -130,7 +156,7 @@ export default function HandDetailPage() {
   const handleThin = useCallback((index: number) => {
     apply(prev => {
       const card = prev.remainingDeck[index]
-      const rest = [...prev.remainingDeck.slice(0, index), ...prev.remainingDeck.slice(index + 1)]
+      const rest = removeAt(prev.remainingDeck, index)
       return { ...prev, remainingDeck: shuffle(rest), thinnedCards: [...prev.thinnedCards, card] }
     })
   }, [apply])
@@ -139,12 +165,7 @@ export default function HandDetailPage() {
     apply(prev => {
       const card = prev.handCards[idx]
       if (!card) return prev
-      return {
-        ...prev,
-        handCards: [...prev.handCards.slice(0, idx), ...prev.handCards.slice(idx + 1)],
-        boardCards: dest === 'board' ? [...prev.boardCards, card] : prev.boardCards,
-        discardCards: dest === 'discard' ? [...prev.discardCards, card] : prev.discardCards,
-      }
+      return placeCard({ ...prev, handCards: removeAt(prev.handCards, idx) }, card, dest)
     })
   }, [apply])
 
@@ -152,12 +173,7 @@ export default function HandDetailPage() {
     apply(prev => {
       const card = prev.drawnCards[idx]
       if (!card) return prev
-      return {
-        ...prev,
-        drawnCards: [...prev.drawnCards.slice(0, idx), ...prev.drawnCards.slice(idx + 1)],
-        boardCards: dest === 'board' ? [...prev.boardCards, card] : prev.boardCards,
-        discardCards: dest === 'discard' ? [...prev.discardCards, card] : prev.discardCards,
-      }
+      return placeCard({ ...prev, drawnCards: removeAt(prev.drawnCards, idx) }, card, dest)
     })
   }, [apply])
 
@@ -165,24 +181,94 @@ export default function HandDetailPage() {
     apply(prev => {
       const card = prev.thinnedCards[idx]
       if (!card) return prev
-      return {
-        ...prev,
-        thinnedCards: [...prev.thinnedCards.slice(0, idx), ...prev.thinnedCards.slice(idx + 1)],
-        boardCards: dest === 'board' ? [...prev.boardCards, card] : prev.boardCards,
-        discardCards: dest === 'discard' ? [...prev.discardCards, card] : prev.discardCards,
-      }
+      return placeCard({ ...prev, thinnedCards: removeAt(prev.thinnedCards, idx) }, card, dest)
     })
   }, [apply])
 
   const moveNextCard = useCallback((dest: Destination) => {
     apply(prev => {
       if (!prev.nextCard) return prev
-      return {
-        ...prev,
-        nextCard: null,
-        boardCards: dest === 'board' ? [...prev.boardCards, prev.nextCard] : prev.boardCards,
-        discardCards: dest === 'discard' ? [...prev.discardCards, prev.nextCard] : prev.discardCards,
+      return placeCard({ ...prev, nextCard: null }, prev.nextCard, dest)
+    })
+  }, [apply])
+
+  const moveFromActive = useCallback((dest: Destination) => {
+    apply(prev => {
+      if (!prev.boardActive) return prev
+      if (dest === 'discard') {
+        return { ...prev, boardActive: null, discardCards: [...prev.discardCards, ...prev.boardActive.cards] }
       }
+      if (dest === 'active') return prev
+      // Swap with bench slot
+      const benchIdx = parseInt(dest.split('-')[1])
+      const bench = [...prev.boardBench]
+      const target = bench[benchIdx]
+      bench[benchIdx] = prev.boardActive
+      return { ...prev, boardActive: target, boardBench: bench }
+    })
+  }, [apply])
+
+  const moveFromBench = useCallback((slotIdx: number, dest: Destination) => {
+    apply(prev => {
+      const slot = prev.boardBench[slotIdx]
+      if (!slot) return prev
+      if (dest === 'discard') {
+        const bench = [...prev.boardBench]
+        bench[slotIdx] = null
+        return { ...prev, boardBench: bench, discardCards: [...prev.discardCards, ...slot.cards] }
+      }
+      if (dest === 'active') {
+        const bench = [...prev.boardBench]
+        bench[slotIdx] = prev.boardActive
+        return { ...prev, boardActive: slot, boardBench: bench }
+      }
+      // Bench-to-bench swap
+      const targetIdx = parseInt(dest.split('-')[1])
+      if (targetIdx === slotIdx) return prev
+      const bench = [...prev.boardBench]
+      bench[slotIdx] = bench[targetIdx]
+      bench[targetIdx] = slot
+      return { ...prev, boardBench: bench }
+    })
+  }, [apply])
+
+  const moveDiscardCard = useCallback((idx: number, dest: Destination) => {
+    apply(prev => {
+      const card = prev.discardCards[idx]
+      if (!card) return prev
+      return placeCard({ ...prev, discardCards: removeAt(prev.discardCards, idx) }, card, dest)
+    })
+  }, [apply])
+
+  const moveEnergyFromActive = useCallback((energyIndex: number, dest: Destination) => {
+    apply(prev => {
+      if (!prev.boardActive) return prev
+      const energyIndices = prev.boardActive.cards
+        .map((c, i) => c.section === 'energy' ? i : -1)
+        .filter(i => i !== -1)
+      const actualIndex = energyIndices[energyIndex]
+      if (actualIndex === undefined) return prev
+      const energy = prev.boardActive.cards[actualIndex]
+      const newCards = removeAt(prev.boardActive.cards, actualIndex)
+      const newActive = newCards.length > 0 ? { cards: newCards } : null
+      return placeCard({ ...prev, boardActive: newActive }, energy, dest)
+    })
+  }, [apply])
+
+  const moveEnergyFromBench = useCallback((slotIdx: number, energyIndex: number, dest: Destination) => {
+    apply(prev => {
+      const slot = prev.boardBench[slotIdx]
+      if (!slot) return prev
+      const energyIndices = slot.cards
+        .map((c, i) => c.section === 'energy' ? i : -1)
+        .filter(i => i !== -1)
+      const actualIndex = energyIndices[energyIndex]
+      if (actualIndex === undefined) return prev
+      const energy = slot.cards[actualIndex]
+      const newCards = removeAt(slot.cards, actualIndex)
+      const bench = [...prev.boardBench]
+      bench[slotIdx] = newCards.length > 0 ? { cards: newCards } : null
+      return placeCard({ ...prev, boardBench: bench }, energy, dest)
     })
   }, [apply])
 
@@ -238,6 +324,28 @@ export default function HandDetailPage() {
     })
   }, [apply])
 
+  /* ── Drop handler ──────────────────────────────────── */
+
+  const handleDrop = useCallback((dest: Destination) => {
+    setDragOverZone(null)
+    const src = dragSourceRef.current
+    if (!src) return
+    dragSourceRef.current = null
+    switch (src.zone) {
+      case 'hand': moveHandCard(src.index, dest); break
+      case 'drawn': moveDrawnCard(src.index, dest); break
+      case 'thinned': moveThinnedCard(src.index, dest); break
+      case 'next': moveNextCard(dest); break
+      case 'active': moveFromActive(dest); break
+      case 'bench': moveFromBench(src.slotIndex, dest); break
+      case 'discard': moveDiscardCard(src.index, dest); break
+      case 'active-energy': moveEnergyFromActive(src.energyIndex, dest); break
+      case 'bench-energy': moveEnergyFromBench(src.slotIndex, src.energyIndex, dest); break
+    }
+  }, [moveHandCard, moveDrawnCard, moveThinnedCard, moveNextCard, moveFromActive, moveFromBench, moveDiscardCard, moveEnergyFromActive, moveEnergyFromBench])
+
+  /* ── Guard: no state ───────────────────────────────── */
+
   if (!state) {
     return (
       <div className={styles.page}>
@@ -251,10 +359,8 @@ export default function HandDetailPage() {
 
   const { hand } = state
   const handNum = Number(handIndex) + 1
+  const { handCards, nextCard, remainingDeck, drawnCards, thinnedCards, boardActive, boardBench, discardCards } = game
 
-  const { handCards, nextCard, remainingDeck, drawnCards, thinnedCards, boardCards, discardCards } = game
-
-  // Map sorted indices back to actual remainingDeck indices
   const sortedWithOriginalIndex = [...remainingDeck]
     .map((card, idx) => ({ card, originalIndex: idx }))
     .sort((a, b) => {
@@ -271,16 +377,85 @@ export default function HandDetailPage() {
     ) : (
       <div className={styles.cardPlaceholder}>
         <div className={styles.placeholderText}>
-          {card.name}
-          <br />
-          <small>{card.setCode}</small>
+          {card.name}<br /><small>{card.setCode}</small>
         </div>
       </div>
     )
   }
 
+  /* ── Drop event helpers ────────────────────────────── */
+
+  const dropHandlers = (dest: Destination) => ({
+    onDragOver: (e: React.DragEvent) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move' },
+    onDragEnter: (e: React.DragEvent) => { e.preventDefault(); setDragOverZone(dest) },
+    onDragLeave: (e: React.DragEvent) => {
+      if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragOverZone(null)
+    },
+    onDrop: (e: React.DragEvent) => { e.preventDefault(); handleDrop(dest) },
+  })
+
+  /* ── Board slot renderer ───────────────────────────── */
+
+  const renderSlot = (
+    slot: BoardSlot | null,
+    dest: Destination,
+    label: string,
+    dragStart: DragSource,
+    energyDragStart: (energyIndex: number) => DragSource,
+    slotClass: string,
+  ) => {
+    const isOver = dragOverZone === dest
+    const pokemon = slot?.cards.filter(c => c.section !== 'energy') ?? []
+    const energy = slot?.cards.filter(c => c.section === 'energy') ?? []
+
+    return (
+      <div
+        className={`${styles.boardSlot} ${slotClass} ${isOver ? styles.boardSlotDropActive : ''} ${slot ? styles.boardSlotOccupied : ''}`}
+        {...dropHandlers(dest)}
+      >
+        {!slot ? (
+          <>
+            <span className={styles.boardSlotLabel}>{label}</span>
+            {isOver && <span className={styles.boardSlotDrop}>Drop</span>}
+          </>
+        ) : (
+          <div className={styles.cardStack}>
+            <DragCard onDragStart={() => { dragSourceRef.current = dragStart }}>
+              <div className={styles.pokemonStack}>
+                {pokemon.map((card, i) => (
+                  <div
+                    key={i}
+                    className={styles.stackedPokemon}
+                    style={{ zIndex: i }}
+                    title={card.name}
+                  >
+                    {renderCard(card)}
+                  </div>
+                ))}
+              </div>
+            </DragCard>
+            {energy.length > 0 && (
+              <div className={styles.energyRow}>
+                {energy.map((card, i) => (
+                  <DragCard key={i} onDragStart={() => { dragSourceRef.current = energyDragStart(i) }}>
+                    <div className={styles.energyCard} title={card.name}>
+                      {renderCard(card)}
+                    </div>
+                  </DragCard>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  const boardCount = totalBoardCards(game)
+
   return (
     <div className={styles.page}>
+      {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <h1 className={styles.title}>Hand {handNum}</h1>
@@ -291,101 +466,27 @@ export default function HandDetailPage() {
           )}
         </div>
         <div className={styles.headerActions}>
-          <span className={styles.deckCount}>{remainingDeck.length} cards remaining</span>
-          <button
-            className={styles.reshuffleBtn}
-            onClick={handleReshuffle}
-            title="Shuffle all non-boarded, non-discarded cards back into the deck"
-          >
-            Reshuffle
-          </button>
-          <button
-            className={styles.shuffleBottomBtn}
-            onClick={handleShuffleToBottom}
-            title="Shuffle hand and drawn/thinned cards to the bottom of the deck"
-          >
-            Shuffle to Bottom
-          </button>
-          <button
-            className={styles.drawHandBtn}
-            onClick={() => handleDrawToHand(6)}
-            disabled={remainingDeck.length === 0}
-            title="Draw 6 cards to hand"
-          >
-            Draw 6
-          </button>
-          <button
-            className={styles.drawHandBtn}
-            onClick={() => handleDrawToHand(8)}
-            disabled={remainingDeck.length === 0}
-            title="Draw 8 cards to hand"
-          >
-            Draw 8
-          </button>
-          <button
-            className={styles.undoBtn}
-            onClick={handleUndo}
-            disabled={history.length === 0}
-            title="Undo last action (⌘Z)"
-          >
-            Undo
-          </button>
-          <button className={styles.backBtn} onClick={() => navigate(`/decks/${id}/practice`)}>
-            Back
-          </button>
+          <span className={styles.deckCount}>{remainingDeck.length} in deck</span>
+          <button className={styles.reshuffleBtn} onClick={handleReshuffle} title="Shuffle all non-boarded, non-discarded cards back into the deck">Reshuffle</button>
+          <button className={styles.shuffleBottomBtn} onClick={handleShuffleToBottom} title="Shuffle hand and drawn/thinned cards to the bottom of the deck">Shuffle to Bottom</button>
+          <button className={styles.drawHandBtn} onClick={() => handleDrawToHand(6)} disabled={remainingDeck.length === 0} title="Draw 6 cards to hand">Draw 6</button>
+          <button className={styles.drawHandBtn} onClick={() => handleDrawToHand(8)} disabled={remainingDeck.length === 0} title="Draw 8 cards to hand">Draw 8</button>
+          <button className={styles.undoBtn} onClick={handleUndo} disabled={history.length === 0} title="Undo last action">Undo</button>
+          <button className={styles.backBtn} onClick={() => navigate(`/decks/${id}/practice`)}>Back</button>
         </div>
       </div>
 
-      {/* Board & Discard zones */}
-      <div className={styles.boardDiscardRow}>
-        <div className={`${styles.zonePanel} ${styles.zonePanelBoard}`}>
-          <div className={`${styles.zoneLabel} ${styles.zoneLabelBoard}`}>
-            Board ({boardCards.length})
-          </div>
-          {boardCards.length === 0 ? (
-            <p className={styles.zoneEmpty}>No cards on board yet</p>
-          ) : (
-            <div className={styles.zoneCards}>
-              {boardCards.map((card, i) => (
-                <div key={i} className={styles.zoneCard}>{renderCard(card)}</div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className={`${styles.zonePanel} ${styles.zonePanelDiscard}`}>
-          <div className={`${styles.zoneLabel} ${styles.zoneLabelDiscard}`}>
-            Discard ({discardCards.length})
-          </div>
-          {discardCards.length === 0 ? (
-            <p className={styles.zoneEmpty}>No cards discarded yet</p>
-          ) : (
-            <div className={styles.zoneCards}>
-              {discardCards.map((card, i) => (
-                <div key={i} className={styles.zoneCard}>{renderCard(card)}</div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Compact top strip: opening hand, prizes, next card */}
+      {/* Row 1: Hand + Prizes + Next */}
       <div className={styles.dealStrip}>
         <div className={styles.stripGroup}>
           <div className={styles.stripLabel}>Hand</div>
           <div className={styles.stripCards}>
             {handCards.map((card, i) => (
-              <HoverCard
-                key={i}
-                onBoard={() => moveHandCard(i, 'board')}
-                onDiscard={() => moveHandCard(i, 'discard')}
-              >
+              <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'hand', index: i } }}>
                 <div className={styles.stripCard}>{renderCard(card)}</div>
-              </HoverCard>
+              </DragCard>
             ))}
-            {handCards.length === 0 && (
-              <span className={styles.zoneEmpty}>Empty</span>
-            )}
+            {handCards.length === 0 && <span className={styles.zoneEmpty}>Empty</span>}
           </div>
         </div>
         <div className={styles.stripDivider} />
@@ -402,12 +503,9 @@ export default function HandDetailPage() {
           <div className={styles.stripLabel}>Next</div>
           <div className={styles.stripCards}>
             {nextCard ? (
-              <HoverCard
-                onBoard={() => moveNextCard('board')}
-                onDiscard={() => moveNextCard('discard')}
-              >
+              <DragCard onDragStart={() => { dragSourceRef.current = { zone: 'next' } }}>
                 <div className={styles.stripCard}>{renderCard(nextCard)}</div>
-              </HoverCard>
+              </DragCard>
             ) : (
               <span className={styles.zoneEmpty}>—</span>
             )}
@@ -415,74 +513,81 @@ export default function HandDetailPage() {
         </div>
       </div>
 
-      {/* Two-column layout: draw + thin */}
-      <div className={styles.mainLayout}>
-        <div className={styles.leftColumn}>
-          <div className={styles.actionPanel}>
-            <div className={styles.actionHeader}>
-              <span className={styles.sectionLabel}>Drawn Cards ({drawnCards.length})</span>
-              <button
-                className={styles.drawBtn}
-                onClick={handleDraw}
-                disabled={remainingDeck.length === 0}
-              >
-                Draw
-              </button>
-            </div>
-            <div className={styles.cardRow}>
-              {drawnCards.map((card, i) => (
-                <HoverCard
-                  key={i}
-                  onBoard={() => moveDrawnCard(i, 'board')}
-                  onDiscard={() => moveDrawnCard(i, 'discard')}
-                >
-                  <div className={`${styles.cardThumbnail} ${styles.drawnCardEntry}`}>{renderCard(card)}</div>
-                </HoverCard>
-              ))}
-              {drawnCards.length === 0 && (
-                <p className={styles.emptyHint}>Click "Draw" to pull from the top of the deck</p>
-              )}
-            </div>
+      {/* Row 2: Discard (full width) */}
+      <div
+        className={`${styles.discardRow}${dragOverZone === 'discard' ? ` ${styles.discardRowActive}` : ''}`}
+        {...dropHandlers('discard')}
+      >
+        <div className={`${styles.zoneLabel} ${styles.zoneLabelDiscard}`}>Discard ({discardCards.length})</div>
+        {discardCards.length === 0 ? (
+          <p className={styles.zoneEmpty}>{dragOverZone === 'discard' ? 'Drop here' : 'Drag cards here'}</p>
+        ) : (
+          <div className={styles.discardScrollRow}>
+            {discardCards.map((card, i) => (
+              <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'discard', index: i } }}>
+                <div className={styles.discardCard}>{renderCard(card)}</div>
+              </DragCard>
+            ))}
           </div>
+        )}
+      </div>
 
-          {thinnedCards.length > 0 && (
-            <div className={styles.actionPanel}>
-              <div className={styles.sectionLabel}>Thinned Cards ({thinnedCards.length})</div>
-              <div className={styles.cardRow}>
-                {thinnedCards.map((card, i) => (
-                  <HoverCard
-                    key={i}
-                    onBoard={() => moveThinnedCard(i, 'board')}
-                    onDiscard={() => moveThinnedCard(i, 'discard')}
-                  >
-                    <div className={`${styles.cardThumbnail} ${styles.thinnedCard}`}>{renderCard(card)}</div>
-                  </HoverCard>
-                ))}
-              </div>
-            </div>
-          )}
+      {/* Row 3: Draw/Thinned (left) + Deck horizontal scroll (right) */}
+      <div className={styles.drawDeckRow}>
+        <div className={styles.drawPanel}>
+          <div className={styles.actionHeader}>
+            <span className={styles.sectionLabel}>
+              Drawn ({drawnCards.length}){thinnedCards.length > 0 ? ` / Thinned (${thinnedCards.length})` : ''}
+            </span>
+            <button className={styles.drawBtn} onClick={handleDraw} disabled={remainingDeck.length === 0}>Draw</button>
+          </div>
+          <div className={styles.drawnScrollRow}>
+            {drawnCards.map((card, i) => (
+              <DragCard key={`drawn-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'drawn', index: i } }}>
+                <div className={`${styles.drawnCard} ${styles.drawnCardEntry}`}>{renderCard(card)}</div>
+              </DragCard>
+            ))}
+            {thinnedCards.map((card, i) => (
+              <DragCard key={`thinned-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'thinned', index: i } }}>
+                <div className={`${styles.drawnCard} ${styles.thinnedCard}`}>{renderCard(card)}</div>
+              </DragCard>
+            ))}
+            {drawnCards.length === 0 && thinnedCards.length === 0 && (
+              <p className={styles.emptyHint}>Click Draw to pull from deck</p>
+            )}
+          </div>
         </div>
+        <div className={styles.deckPanel}>
+          <div className={styles.actionHeader}>
+            <span className={styles.sectionLabel}>Deck ({remainingDeck.length})</span>
+            <span className={styles.deckHint}>click to thin</span>
+          </div>
+          <div className={styles.deckScrollRow}>
+            {sortedWithOriginalIndex.map(({ card, originalIndex }) => (
+              <div key={originalIndex} className={styles.deckCard} onClick={() => handleThin(originalIndex)} title={`Thin ${card.name}`}>
+                {renderCard(card)}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
-        <div className={styles.rightColumn}>
-          <div className={styles.actionPanel}>
-            <div className={styles.actionHeader}>
-              <span className={styles.sectionLabel}>
-                Remaining Deck ({remainingDeck.length})
-              </span>
-            </div>
-            <p className={styles.emptyHint}>Click a card to thin it (deck reshuffles after)</p>
-            <div className={styles.thinGrid}>
-              {sortedWithOriginalIndex.map(({ card, originalIndex }) => (
-                <div
-                  key={originalIndex}
-                  className={styles.thinCard}
-                  onClick={() => handleThin(originalIndex)}
-                  title={`Thin ${card.name}`}
-                >
-                  {renderCard(card)}
-                </div>
-              ))}
-            </div>
+      {/* Row 4: Board */}
+      <div className={styles.boardDiscardRow}>
+        <div className={`${styles.zoneLabel} ${styles.zoneLabelBoard}`}>Board ({boardCount})</div>
+        <div className={styles.boardLayout}>
+          <div className={styles.activeArea}>
+            {renderSlot(boardActive, 'active', 'Active', { zone: 'active' }, (ei) => ({ zone: 'active-energy', energyIndex: ei }), styles.activeSlot)}
+          </div>
+          <div className={styles.benchArea}>
+            {boardBench.map((slot, i) => renderSlot(
+              slot,
+              `bench-${i}` as Destination,
+              'Bench',
+              { zone: 'bench', slotIndex: i },
+              (ei) => ({ zone: 'bench-energy', slotIndex: i, energyIndex: ei }),
+              styles.benchSlot,
+            ))}
           </div>
         </div>
       </div>

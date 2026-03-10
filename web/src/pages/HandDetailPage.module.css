@@ -1,9 +1,9 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 24px;
-  max-width: 1440px;
+  gap: 10px;
+  padding: 16px 24px;
+  max-width: 1600px;
   margin: 0 auto;
 }
 
@@ -13,18 +13,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .headerLeft {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .title {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
@@ -35,9 +35,9 @@
   gap: 4px;
   background: rgba(239, 68, 68, 0.12);
   color: #f87171;
-  padding: 4px 10px;
+  padding: 3px 8px;
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
@@ -45,30 +45,33 @@
 .headerActions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .deckCount {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--color-text-muted);
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   background: rgba(255, 255, 255, 0.04);
-  padding: 5px 12px;
+  padding: 4px 10px;
   border-radius: 20px;
   border: 1px solid var(--color-border);
+  white-space: nowrap;
 }
 
 .backBtn {
-  padding: 6px 14px;
+  padding: 5px 12px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   background: none;
   color: var(--color-text-muted);
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .backBtn:hover {
@@ -78,15 +81,16 @@
 }
 
 .undoBtn {
-  padding: 6px 14px;
+  padding: 5px 12px;
   border: 1px solid rgba(99, 102, 241, 0.4);
   border-radius: var(--radius);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   background: rgba(99, 102, 241, 0.08);
   color: #a5b4fc;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .undoBtn:hover:not(:disabled) {
@@ -101,15 +105,16 @@
 }
 
 .reshuffleBtn {
-  padding: 6px 14px;
+  padding: 5px 12px;
   border: 1px solid rgba(245, 158, 11, 0.4);
   border-radius: var(--radius);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   background: rgba(245, 158, 11, 0.08);
   color: #fcd34d;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .reshuffleBtn:hover {
@@ -119,15 +124,16 @@
 }
 
 .drawHandBtn {
-  padding: 6px 14px;
+  padding: 5px 12px;
   border: 1px solid rgba(52, 211, 153, 0.4);
   border-radius: var(--radius);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   background: rgba(52, 211, 153, 0.08);
   color: #6ee7b7;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .drawHandBtn:hover:not(:disabled) {
@@ -142,15 +148,16 @@
 }
 
 .shuffleBottomBtn {
-  padding: 6px 14px;
+  padding: 5px 12px;
   border: 1px solid rgba(168, 85, 247, 0.4);
   border-radius: var(--radius);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   background: rgba(168, 85, 247, 0.08);
   color: #c4b5fd;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .shuffleBottomBtn:hover {
@@ -159,154 +166,29 @@
   color: #ddd6fe;
 }
 
-/* ── Board & Discard zones ──────────────────────────── */
-
-.boardDiscardRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.zonePanel {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 12px 16px;
-  background: var(--color-surface);
-  min-height: 80px;
-}
-
-.zonePanelBoard {
-  border-color: rgba(34, 197, 94, 0.3);
-  background: rgba(34, 197, 94, 0.04);
-}
-
-.zonePanelDiscard {
-  border-color: rgba(239, 68, 68, 0.3);
-  background: rgba(239, 68, 68, 0.04);
-}
-
-.zoneLabel {
-  font-size: 0.65rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 8px;
-}
-
-.zoneLabelBoard {
-  color: #86efac;
-}
-
-.zoneLabelDiscard {
-  color: #fca5a5;
-}
-
-.zoneEmpty {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-  font-style: italic;
-  margin: 0;
-}
-
-.zoneCards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.zoneCard {
-  width: 72px;
-  height: 100px;
-  border-radius: 4px;
-  overflow: hidden;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  flex-shrink: 0;
-}
-
-.zoneCard img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* ── Hover card wrapper & action overlay ────────────── */
-
-.hoverCardWrapper {
-  position: relative;
-  display: inline-flex;
-  flex-shrink: 0;
-}
-
-.cardActions {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 4px;
-  z-index: 10;
-}
-
-.boardBtn,
-.discardBtn {
-  padding: 3px 0;
-  border: none;
-  border-radius: 3px;
-  font-size: 0.6rem;
-  font-weight: 700;
-  cursor: pointer;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  width: 78%;
-  transition: filter 0.1s;
-}
-
-.boardBtn {
-  background: rgba(34, 197, 94, 0.9);
-  color: white;
-}
-
-.boardBtn:hover {
-  filter: brightness(1.15);
-}
-
-.discardBtn {
-  background: rgba(239, 68, 68, 0.9);
-  color: white;
-}
-
-.discardBtn:hover {
-  filter: brightness(1.15);
-}
-
-/* ── Deal strip (hand + prizes + next) ──────────────── */
+/* ── Row 1: Deal strip (hand + prizes + next) ────────── */
 
 .dealStrip {
   display: flex;
   align-items: flex-end;
-  gap: 16px;
-  padding: 12px 16px;
+  gap: 12px;
+  padding: 10px 14px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   overflow-x: auto;
+  flex-shrink: 0;
 }
 
 .stripGroup {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   flex-shrink: 0;
 }
 
 .stripLabel {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 600;
   color: var(--color-text-muted);
   text-transform: uppercase;
@@ -319,8 +201,8 @@
 }
 
 .stripCard {
-  width: 72px;
-  height: 100px;
+  width: 64px;
+  height: 90px;
   border-radius: 4px;
   overflow: hidden;
   background: var(--color-surface);
@@ -342,118 +224,402 @@
   flex-shrink: 0;
 }
 
-/* Prize cards (used in strip) */
 .prizeCard {
-  opacity: 0.5;
+  opacity: 0.45;
   border-style: dashed;
-  filter: saturate(0.6);
+  filter: saturate(0.5);
 }
 
-/* ── Main layout (draw + thin) ──────────────────────── */
+/* ── Row 2: Discard (full width) ─────────────────────── */
 
-.mainLayout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  align-items: start;
-}
-
-.leftColumn,
-.rightColumn {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-@media (max-width: 1000px) {
-  .mainLayout {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ── Sections & Panels ──────────────────────────────── */
-
-.sectionLabel {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.actionPanel {
-  border: 1px solid var(--color-border);
+.discardRow {
+  border: 1px solid rgba(239, 68, 68, 0.3);
   border-radius: var(--radius);
-  padding: 16px;
-  background: var(--color-surface);
+  padding: 8px 14px;
+  background: rgba(239, 68, 68, 0.04);
+  min-height: 52px;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.actionHeader {
+.discardRowActive {
+  border-color: rgba(239, 68, 68, 0.8) !important;
+  border-width: 2px;
+  border-style: dashed !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+
+.discardScrollRow {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
+  flex-wrap: nowrap;
+  gap: 5px;
+  overflow-x: auto;
+  padding-bottom: 2px;
 }
 
-/* ── Card rendering ─────────────────────────────────── */
-
-.cardRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: flex-start;
-}
-
-.cardThumbnail {
-  width: 100px;
-  height: 140px;
-  border-radius: 6px;
+.discardCard {
+  width: 56px;
+  height: 78px;
+  border-radius: 4px;
   overflow: hidden;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   flex-shrink: 0;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.cardThumbnail img {
+.discardCard img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-/* Placeholder for cards without images */
-.cardPlaceholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.03);
-  padding: 6px;
+/* ── Row 3: Draw/Thinned + Deck ──────────────────────── */
+
+.drawDeckRow {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 12px;
+  align-items: start;
 }
 
-.placeholderText {
-  font-size: 0.6rem;
-  text-align: center;
+.drawPanel {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  background: var(--color-surface);
+}
+
+.deckPanel {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  background: var(--color-surface);
+  min-width: 0;
+}
+
+.drawnScrollRow {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  min-height: 100px;
+  align-items: flex-start;
+}
+
+.drawnCard {
+  width: 72px;
+  height: 100px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.drawnCard img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.deckScrollRow {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.deckCard {
+  width: 54px;
+  height: 76px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+  position: relative;
+}
+
+.deckCard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  border-radius: 3px;
+  transition: background 0.15s ease;
+  pointer-events: none;
+}
+
+.deckCard:hover {
+  border-color: var(--color-danger);
+  transform: scale(1.12);
+  z-index: 1;
+}
+
+.deckCard:hover::after {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.deckCard img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.deckHint {
+  font-size: 0.62rem;
   color: var(--color-text-muted);
-  line-height: 1.3;
-  word-break: break-word;
+  font-style: italic;
+}
+
+/* ── Row 4: Board ────────────────────────────────────── */
+
+.boardDiscardRow {
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  background: rgba(34, 197, 94, 0.04);
+}
+
+.boardZone {
+  display: contents;
+}
+
+.boardLayout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.activeArea {
+  display: flex;
+  justify-content: center;
+}
+
+.benchArea {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ── Board slots ─────────────────────────────────────── */
+
+.boardSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 5px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.activeSlot {
+  width: 116px;
+  min-height: 172px;
+  border-color: rgba(255, 215, 0, 0.25);
+  background: rgba(255, 215, 0, 0.03);
+}
+
+.benchSlot {
+  width: 94px;
+  min-height: 140px;
+  border-color: rgba(34, 197, 94, 0.2);
+  background: rgba(34, 197, 94, 0.02);
+}
+
+.boardSlotOccupied {
+  border-color: transparent;
+  background: transparent;
+  padding: 3px;
+}
+
+.boardSlotDropActive {
+  border-color: rgba(34, 197, 94, 0.7) !important;
+  background: rgba(34, 197, 94, 0.1) !important;
+  border-style: dashed !important;
+}
+
+.activeSlot.boardSlotDropActive {
+  border-color: rgba(255, 215, 0, 0.7) !important;
+  background: rgba(255, 215, 0, 0.08) !important;
+}
+
+.boardSlotLabel {
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.boardSlotDrop {
+  font-size: 0.62rem;
+  color: #86efac;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* ── Card stacking ───────────────────────────────────── */
+
+.cardStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pokemonStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stackedPokemon {
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Active slot cards */
+.activeSlot .stackedPokemon {
+  width: 100px;
+  height: 140px;
+}
+
+.activeSlot .stackedPokemon + .stackedPokemon {
+  margin-top: -118px;
+}
+
+/* Bench slot cards */
+.benchSlot .stackedPokemon {
+  width: 80px;
+  height: 112px;
+}
+
+.benchSlot .stackedPokemon + .stackedPokemon {
+  margin-top: -94px;
+}
+
+.stackedPokemon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Energy cards below the pokemon stack */
+.energyRow {
+  display: flex;
+  gap: 3px;
+  margin-top: 4px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.energyCard {
+  width: 26px;
+  height: 36px;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+  transition: transform 0.1s ease;
+}
+
+.energyCard:hover {
+  transform: scale(1.15);
+  z-index: 1;
+}
+
+.energyCard img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Zone labels ─────────────────────────────────────── */
+
+.zoneLabel {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.zoneLabelBoard {
+  color: #86efac;
+}
+
+.zoneLabelDiscard {
+  color: #fca5a5;
+}
+
+.zoneEmpty {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ── Draggable card wrapper ──────────────────────────── */
+
+.draggableCard {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  cursor: grab;
+  border-radius: 4px;
+}
+
+.draggableCard:active {
+  cursor: grabbing;
+}
+
+/* ── Common action header ────────────────────────────── */
+
+.sectionLabel {
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.actionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
 /* ── Draw button ────────────────────────────────────── */
 
 .drawBtn {
-  padding: 7px 24px;
+  padding: 5px 18px;
   border: none;
   border-radius: var(--radius);
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
   background: var(--color-primary);
   color: white;
   transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
   letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
 .drawBtn:hover:not(:disabled) {
@@ -473,7 +639,27 @@
   cursor: not-allowed;
 }
 
-/* ── Drawn cards area ───────────────────────────────── */
+/* ── Card placeholder ────────────────────────────────── */
+
+.cardPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 4px;
+}
+
+.placeholderText {
+  font-size: 0.56rem;
+  text-align: center;
+  color: var(--color-text-muted);
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+/* ── Drawn cards animation ───────────────────────────── */
 
 .drawnCardEntry {
   animation: slideIn 0.2s ease-out;
@@ -482,7 +668,7 @@
 @keyframes slideIn {
   from {
     opacity: 0;
-    transform: translateY(-8px) scale(0.95);
+    transform: translateY(-6px) scale(0.95);
   }
   to {
     opacity: 1;
@@ -491,70 +677,16 @@
 }
 
 .emptyHint {
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   color: var(--color-text-muted);
-  margin: 0 0 8px 0;
+  margin: 0;
   font-style: italic;
-}
-
-/* ── Thin grid ──────────────────────────────────────── */
-
-.thinGrid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  max-height: 400px;
-  overflow-y: auto;
-  align-content: flex-start;
-  padding-right: 4px;
-}
-
-.thinCard {
-  width: 80px;
-  height: 112px;
-  border-radius: 5px;
-  overflow: hidden;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  cursor: pointer;
-  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
-  flex-shrink: 0;
-  position: relative;
-}
-
-.thinCard::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: transparent;
-  border-radius: 4px;
-  transition: background 0.15s ease;
-  pointer-events: none;
-}
-
-.thinCard:hover {
-  border-color: var(--color-danger);
-  transform: scale(1.08);
-  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.2);
-  z-index: 1;
-}
-
-.thinCard:hover::after {
-  background: rgba(239, 68, 68, 0.08);
-}
-
-.thinCard img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  white-space: nowrap;
 }
 
 /* Thinned cards */
 .thinnedCard {
-  opacity: 1.0;
-  border-color: var(--color-danger);
-  /*filter: saturate(0.4) brightness(0.8);*/
+  border-color: var(--color-danger) !important;
 }
 
 /* ── Error state ────────────────────────────────────── */
@@ -568,15 +700,38 @@
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
-/* ── Responsive: deal strip wrapping ────────────────── */
+/* ── Responsive ─────────────────────────────────────── */
+
+@media (max-width: 1000px) {
+  .drawDeckRow {
+    grid-template-columns: 1fr;
+  }
+}
 
 @media (max-width: 700px) {
   .dealStrip {
-    flex-wrap: wrap;
-    gap: 12px;
+    gap: 8px;
   }
 
   .stripDivider {
     display: none;
+  }
+
+  .benchArea {
+    gap: 5px;
+  }
+
+  .benchSlot {
+    width: 76px;
+    min-height: 116px;
+  }
+
+  .benchSlot .stackedPokemon {
+    width: 68px;
+    height: 95px;
+  }
+
+  .benchSlot .stackedPokemon + .stackedPokemon {
+    margin-top: -79px;
   }
 }

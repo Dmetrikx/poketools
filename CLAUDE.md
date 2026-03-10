@@ -122,19 +122,25 @@ web/
       deck.ts                        # TypeScript Deck interface
       card.ts                        # TypeScript Card interface
     pages/
-      HomePage.tsx                   # Deck list + create
-      DeckEditorPage.tsx             # Edit entries + import/export
+      HomePage.tsx                   # Deck list + create (gallery thumbnails)
+      DeckEditorPage.tsx             # Edit entries + import/export (default: gallery view)
       ImportPage.tsx                 # Paste decklist + select format
       PracticeHandsPage.tsx          # Generate 10 opening hands
+      HandDetailPage.tsx             # Hand simulation (draw, thin, board, discard, undo)
     components/
       layout/                        # Nav, layout wrapper
-      deck/                          # Deck editor components
+      deck/
+        DeckGalleryView.tsx          # Gallery view for deck editor (cards as images)
+        DeckThumbnail.tsx            # Deck card thumbnail for home page
+        CardRow.tsx                  # List-view row for a card entry
+        SectionGroup.tsx             # Groups entries by section
+        CardImageModal.tsx           # Art picker modal
       card/                          # Card search + selection
     hooks/
       useDecks.ts                    # Fetch + manage deck list
       useDeck.ts                     # Fetch single deck
       useCardSearch.ts               # Search cards with debounce
-      useCardImages.ts               # Resolve card images (energy special handling)
+      useCardImages.ts               # Resolve card images; returns [imageMap, overrideImage]
       useDebounce.ts                 # Debounce hook
 ```
 
@@ -165,7 +171,7 @@ All routes are under `/api`:
 
 **Deck Entries**
 - `POST /decks/:id/entries` — add card
-- `PUT /decks/:id/entries/:eid` — update count
+- `PUT /decks/:id/entries/:eid` — update count/imageUrl
 - `DELETE /decks/:id/entries/:eid` — remove card
 
 **Import/Export**
@@ -216,7 +222,10 @@ go test -run TestImport ./internal/format/ptcglive  # Single test
 **Hooks**:
 - Data fetching: `useDecks`, `useDeck`, `useCardSearch`
 - Side effects: `useDebounce` for search input
-- Image resolution: `useCardImages` (handles energy card swsh-set fallback)
+- Image resolution: `useCardImages` — returns `[imageMap, overrideImage]`
+  - Module-level cache (`imageCache`) persists across unmount/remount and page navigation
+  - `overrideImage(key, url)` lets callers manually set an image (art picker)
+  - Supports `imageUrl` field on entries for persisted/saved art selections
 
 **Component Organization**:
 - Page components in `src/pages/` correspond to route paths
@@ -227,6 +236,37 @@ go test -run TestImport ./internal/format/ptcglive  # Single test
 - Frontend detects energy cards by `section === 'energy'`
 - Tries swsh set first, falls back to original setCode
 - Backend complements this: `CardService.Get()` detects basic energy, forces swsh lookup
+
+**Deck Editor View Modes**:
+- Default view is gallery (`DeckGalleryView`) — cards displayed as images grouped by section
+- Gallery supports increment/decrement, remove, and art picker (select/save art per entry)
+- Art selections saved to the entry's `imageUrl` field and persisted to the DB
+
+## Hand Detail Page (Game Simulation)
+
+Route: `/decks/:id/practice/:handIndex` — navigated to from `PracticeHandsPage` by clicking a hand panel.
+
+State is passed via React Router `location.state` (type `{ hand: Hand, entries: CardEntry[] }`). No backend calls are made on this page.
+
+**Game State** (`GameState` type):
+- `handCards` — cards in hand (from opening deal)
+- `nextCard` — top card after hand (burn card)
+- `remainingDeck` — draw pile
+- `drawnCards` — cards drawn one at a time via "Draw" button
+- `thinnedCards` — cards removed from deck via thin action (deck reshuffles after)
+- `boardCards` — cards moved to the board zone
+- `discardCards` — cards moved to the discard zone
+
+**Actions**:
+- **Draw** — pull top card of remaining deck into drawn pile
+- **Thin** — remove a card from remaining deck (sorted view), deck reshuffles
+- **Board / Discard** — hover any hand/drawn/thinned/next card to reveal buttons that move it to the board or discard zone
+- **Reshuffle** — shuffle all non-boarded, non-discarded cards back into the deck
+- **Shuffle to Bottom** — send hand + drawn + thinned cards to bottom of deck
+- **Draw 6 / Draw 8** — draw N cards from remaining deck directly into hand
+- **Undo** — revert to previous game state (full history stack); also triggered by Cmd/Ctrl+Z
+
+**HoverCard component**: wraps any card image and shows "Board" / "Discard" action buttons on mouse enter.
 
 ## Configuration
 

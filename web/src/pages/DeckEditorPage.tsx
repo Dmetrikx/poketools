@@ -19,7 +19,7 @@ export default function DeckEditorPage() {
 
   const [exportText, setExportText] = useState('')
   const [exporting, setExporting] = useState(false)
-  const [viewMode, setViewMode] = useState<ViewMode>('list')
+  const [viewMode, setViewMode] = useState<ViewMode>('gallery')
 
   // Always call hooks before early returns
   const entries = deck?.entries ?? []
