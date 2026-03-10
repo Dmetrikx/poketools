@@ -38,6 +38,8 @@ type DragSource =
   | { zone: 'drawn'; index: number }
   | { zone: 'thinned'; index: number }
   | { zone: 'next' }
+  | { zone: 'board'; index: number }
+  | { zone: 'discard'; index: number }
 
 function DragCard({
   onDragStart,
@@ -179,6 +181,32 @@ export default function HandDetailPage() {
     })
   }, [apply])
 
+  const moveBoardCard = useCallback((idx: number, dest: Destination) => {
+    apply(prev => {
+      const card = prev.boardCards[idx]
+      if (!card) return prev
+      const newBoardCards = prev.boardCards.slice(0, idx).concat(prev.boardCards.slice(idx + 1))
+      return {
+        ...prev,
+        boardCards: dest === 'board' ? [...newBoardCards, card] : newBoardCards,
+        discardCards: dest === 'discard' ? [...prev.discardCards, card] : prev.discardCards,
+      }
+    })
+  }, [apply])
+
+  const moveDiscardCard = useCallback((idx: number, dest: Destination) => {
+    apply(prev => {
+      const card = prev.discardCards[idx]
+      if (!card) return prev
+      const newDiscardCards = prev.discardCards.slice(0, idx).concat(prev.discardCards.slice(idx + 1))
+      return {
+        ...prev,
+        discardCards: dest === 'discard' ? [...newDiscardCards, card] : newDiscardCards,
+        boardCards: dest === 'board' ? [...prev.boardCards, card] : prev.boardCards,
+      }
+    })
+  }, [apply])
+
   const handleReshuffle = useCallback(() => {
     apply(prev => {
       const toReshuffle = [
@@ -240,7 +268,9 @@ export default function HandDetailPage() {
     else if (src.zone === 'drawn') moveDrawnCard(src.index, dest)
     else if (src.zone === 'thinned') moveThinnedCard(src.index, dest)
     else if (src.zone === 'next') moveNextCard(dest)
-  }, [moveHandCard, moveDrawnCard, moveThinnedCard, moveNextCard])
+    else if (src.zone === 'board') moveBoardCard(src.index, dest)
+    else if (src.zone === 'discard') moveDiscardCard(src.index, dest)
+  }, [moveHandCard, moveDrawnCard, moveThinnedCard, moveNextCard, moveBoardCard, moveDiscardCard])
 
   if (!state) {
     return (
@@ -357,7 +387,12 @@ export default function HandDetailPage() {
           ) : (
             <div className={styles.zoneCards}>
               {boardCards.map((card, i) => (
-                <div key={i} className={styles.zoneCard}>{renderCard(card)}</div>
+                <DragCard
+                  key={i}
+                  onDragStart={() => { dragSourceRef.current = { zone: 'board', index: i } }}
+                >
+                  <div className={styles.zoneCard}>{renderCard(card)}</div>
+                </DragCard>
               ))}
             </div>
           )}
@@ -378,7 +413,12 @@ export default function HandDetailPage() {
           ) : (
             <div className={styles.zoneCards}>
               {discardCards.map((card, i) => (
-                <div key={i} className={styles.zoneCard}>{renderCard(card)}</div>
+                <DragCard
+                  key={i}
+                  onDragStart={() => { dragSourceRef.current = { zone: 'discard', index: i } }}
+                >
+                  <div className={styles.zoneCard}>{renderCard(card)}</div>
+                </DragCard>
               ))}
             </div>
           )}
