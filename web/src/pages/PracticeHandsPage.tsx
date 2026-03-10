@@ -73,8 +73,22 @@ export default function PracticeHandsPage() {
         unique.map(async entry => {
           const k = imageKey(entry)
           try {
-            const card = await cardsApi.get(entry.cardId || k)
-            stages[k] = card.stage ?? ''
+            // PTCG Live set codes don't match TCGdex IDs, so resolve via
+            // name search when cardId isn't stored.
+            let tcgdexId = entry.cardId
+            if (!tcgdexId) {
+              let results = await cardsApi.search(entry.name, entry.setCode).catch(() => [])
+              if (!results.length) {
+                results = await cardsApi.search(entry.name).catch(() => [])
+              }
+              const nameLower = entry.name.toLowerCase()
+              const match = results.find(r => r.name.toLowerCase() === nameLower) ?? results[0]
+              tcgdexId = match?.id
+            }
+            if (tcgdexId) {
+              const card = await cardsApi.get(tcgdexId)
+              stages[k] = card.stage ?? ''
+            }
           } catch {
             // Silently skip — unknown stage → treated as basic
           }
