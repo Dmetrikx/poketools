@@ -46,6 +46,8 @@ type DragSource =
   | { zone: 'active' }
   | { zone: 'bench'; slotIndex: number }
   | { zone: 'discard'; index: number }
+  | { zone: 'active-energy'; energyIndex: number }
+  | { zone: 'bench-energy'; slotIndex: number; energyIndex: number }
 
 /* ── Helpers ─────────────────────────────────────────── */
 
@@ -238,6 +240,38 @@ export default function HandDetailPage() {
     })
   }, [apply])
 
+  const moveEnergyFromActive = useCallback((energyIndex: number, dest: Destination) => {
+    apply(prev => {
+      if (!prev.boardActive) return prev
+      const energyIndices = prev.boardActive.cards
+        .map((c, i) => c.section === 'energy' ? i : -1)
+        .filter(i => i !== -1)
+      const actualIndex = energyIndices[energyIndex]
+      if (actualIndex === undefined) return prev
+      const energy = prev.boardActive.cards[actualIndex]
+      const newCards = removeAt(prev.boardActive.cards, actualIndex)
+      const newActive = newCards.length > 0 ? { cards: newCards } : null
+      return placeCard({ ...prev, boardActive: newActive }, energy, dest)
+    })
+  }, [apply])
+
+  const moveEnergyFromBench = useCallback((slotIdx: number, energyIndex: number, dest: Destination) => {
+    apply(prev => {
+      const slot = prev.boardBench[slotIdx]
+      if (!slot) return prev
+      const energyIndices = slot.cards
+        .map((c, i) => c.section === 'energy' ? i : -1)
+        .filter(i => i !== -1)
+      const actualIndex = energyIndices[energyIndex]
+      if (actualIndex === undefined) return prev
+      const energy = slot.cards[actualIndex]
+      const newCards = removeAt(slot.cards, actualIndex)
+      const bench = [...prev.boardBench]
+      bench[slotIdx] = newCards.length > 0 ? { cards: newCards } : null
+      return placeCard({ ...prev, boardBench: bench }, energy, dest)
+    })
+  }, [apply])
+
   const handleReshuffle = useCallback(() => {
     apply(prev => {
       const toReshuffle = [
@@ -305,8 +339,10 @@ export default function HandDetailPage() {
       case 'active': moveFromActive(dest); break
       case 'bench': moveFromBench(src.slotIndex, dest); break
       case 'discard': moveDiscardCard(src.index, dest); break
+      case 'active-energy': moveEnergyFromActive(src.energyIndex, dest); break
+      case 'bench-energy': moveEnergyFromBench(src.slotIndex, src.energyIndex, dest); break
     }
-  }, [moveHandCard, moveDrawnCard, moveThinnedCard, moveNextCard, moveFromActive, moveFromBench, moveDiscardCard])
+  }, [moveHandCard, moveDrawnCard, moveThinnedCard, moveNextCard, moveFromActive, moveFromBench, moveDiscardCard, moveEnergyFromActive, moveEnergyFromBench])
 
   /* ── Guard: no state ───────────────────────────────── */
 
@@ -365,6 +401,7 @@ export default function HandDetailPage() {
     dest: Destination,
     label: string,
     dragStart: DragSource,
+    energyDragStart: (energyIndex: number) => DragSource,
     slotClass: string,
   ) => {
     const isOver = dragOverZone === dest
@@ -382,8 +419,8 @@ export default function HandDetailPage() {
             {isOver && <span className={styles.boardSlotDrop}>Drop</span>}
           </>
         ) : (
-          <DragCard onDragStart={() => { dragSourceRef.current = dragStart }}>
-            <div className={styles.cardStack}>
+          <div className={styles.cardStack}>
+            <DragCard onDragStart={() => { dragSourceRef.current = dragStart }}>
               <div className={styles.pokemonStack}>
                 {pokemon.map((card, i) => (
                   <div
@@ -396,17 +433,19 @@ export default function HandDetailPage() {
                   </div>
                 ))}
               </div>
-              {energy.length > 0 && (
-                <div className={styles.energyRow}>
-                  {energy.map((card, i) => (
-                    <div key={i} className={styles.energyCard} title={card.name}>
+            </DragCard>
+            {energy.length > 0 && (
+              <div className={styles.energyRow}>
+                {energy.map((card, i) => (
+                  <DragCard key={i} onDragStart={() => { dragSourceRef.current = energyDragStart(i) }}>
+                    <div className={styles.energyCard} title={card.name}>
                       {renderCard(card)}
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </DragCard>
+                  </DragCard>
+                ))}
+              </div>
+            )}
+          </div>
         )}
       </div>
     )
@@ -538,7 +577,7 @@ export default function HandDetailPage() {
         <div className={`${styles.zoneLabel} ${styles.zoneLabelBoard}`}>Board ({boardCount})</div>
         <div className={styles.boardLayout}>
           <div className={styles.activeArea}>
-            {renderSlot(boardActive, 'active', 'Active', { zone: 'active' }, styles.activeSlot)}
+            {renderSlot(boardActive, 'active', 'Active', { zone: 'active' }, (ei) => ({ zone: 'active-energy', energyIndex: ei }), styles.activeSlot)}
           </div>
           <div className={styles.benchArea}>
             {boardBench.map((slot, i) => renderSlot(
@@ -546,6 +585,7 @@ export default function HandDetailPage() {
               `bench-${i}` as Destination,
               'Bench',
               { zone: 'bench', slotIndex: i },
+              (ei) => ({ zone: 'bench-energy', slotIndex: i, energyIndex: ei }),
               styles.benchSlot,
             ))}
           </div>
