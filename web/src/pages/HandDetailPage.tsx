@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useCardImages, imageKey, cardImageUrl } from '@/hooks/useCardImages'
-import type { CardEntry } from '@/types/deck'
+import { decksApi } from '@/api/decks'
+import type { CardEntry, DeckSummary } from '@/types/deck'
 import type { Hand } from './PracticeHandsPage'
 import styles from './HandDetailPage.module.css'
 
@@ -78,45 +79,71 @@ function totalBoardCards(g: GameState): number {
     g.boardBench.reduce((n, s) => n + (s?.cards.length ?? 0), 0)
 }
 
-/* ── DragCard wrapper ────────────────────────────────── */
-
-function DragCard({ onDragStart, children }: { onDragStart: () => void; children: React.ReactNode }) {
-  return (
-    <div
-      className={styles.draggableCard}
-      draggable
-      onDragStart={(e) => { e.dataTransfer.effectAllowed = 'move'; onDragStart() }}
-    >
-      {children}
-    </div>
-  )
+const EMPTY_GAME: GameState = {
+  handCards: [],
+  nextCard: null,
+  remainingDeck: [],
+  drawnCards: [],
+  thinnedCards: [],
+  boardActive: null,
+  boardBench: [null, null, null, null, null],
+  discardCards: [],
 }
 
-/* ── Main component ──────────────────────────────────── */
+/* ── Hand generation ─────────────────────────────────── */
 
-export default function HandDetailPage() {
-  const { id, handIndex } = useParams<{ id: string; handIndex: string }>()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const state = location.state as LocationState | null
+function generateValidHand(entries: CardEntry[]): Hand {
+  if (entries.length < 14) {
+    // Not enough cards — return whatever we have
+    const pool = entries.flatMap(e => Array(e.count).fill(e))
+    const s = shuffle(pool)
+    return {
+      hand: s.slice(0, Math.min(7, s.length)),
+      prizes: s.slice(7, Math.min(13, s.length)),
+      nextCard: s[13] ?? s[0] ?? entries[0],
+      remainingDeck: s.slice(14),
+      mulligans: 0,
+    }
+  }
 
+  const pool: CardEntry[] = entries.flatMap(e => Array(e.count).fill(e))
+  let shuffled: CardEntry[] = []
+  let hand: CardEntry[] = []
+  let prizes: CardEntry[] = []
+  let mulligans = 0
+  let valid = false
+
+  while (!valid && mulligans < 500) {
+    shuffled = shuffle([...pool])
+    hand = shuffled.slice(0, 7)
+    prizes = shuffled.slice(7, 13)
+    if (hand.some(c => c.section === 'pokemon')) {
+      valid = true
+    } else {
+      mulligans++
+    }
+  }
+
+  return {
+    hand,
+    prizes,
+    nextCard: shuffled[13],
+    remainingDeck: shuffled.slice(14),
+    mulligans,
+  }
+}
+
+/* ── useGameState hook ───────────────────────────────── */
+
+function useGameState(initial: GameState) {
   const [{ current: game, history }, setStates] = useState<{ current: GameState; history: GameState[] }>(() => ({
-    current: {
-      handCards: state?.hand.hand ?? [],
-      nextCard: state?.hand.nextCard ?? null,
-      remainingDeck: state?.hand.remainingDeck ?? [],
-      drawnCards: [],
-      thinnedCards: [],
-      boardActive: null,
-      boardBench: [null, null, null, null, null],
-      discardCards: [],
-    },
+    current: initial,
     history: [],
   }))
 
-  const [imageMap] = useCardImages(state?.entries ?? [])
-  const dragSourceRef = useRef<DragSource | null>(null)
-  const [dragOverZone, setDragOverZone] = useState<Destination | null>(null)
+  const reset = useCallback((newState: GameState) => {
+    setStates({ current: newState, history: [] })
+  }, [])
 
   const apply = useCallback((updater: (prev: GameState) => GameState) => {
     setStates(prev => ({
@@ -131,19 +158,6 @@ export default function HandDetailPage() {
       return { history: prev.history.slice(0, -1), current: prev.history[prev.history.length - 1] }
     })
   }, [])
-
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
-        e.preventDefault()
-        handleUndo()
-      }
-    }
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [handleUndo])
-
-  /* ── Actions ───────────────────────────────────────── */
 
   const handleDraw = useCallback(() => {
     apply(prev => {
@@ -199,7 +213,6 @@ export default function HandDetailPage() {
         return { ...prev, boardActive: null, discardCards: [...prev.discardCards, ...prev.boardActive.cards] }
       }
       if (dest === 'active') return prev
-      // Swap with bench slot
       const benchIdx = parseInt(dest.split('-')[1])
       const bench = [...prev.boardBench]
       const target = bench[benchIdx]
@@ -222,7 +235,6 @@ export default function HandDetailPage() {
         bench[slotIdx] = prev.boardActive
         return { ...prev, boardActive: slot, boardBench: bench }
       }
-      // Bench-to-bench swap
       const targetIdx = parseInt(dest.split('-')[1])
       if (targetIdx === slotIdx) return prev
       const bench = [...prev.boardBench]
@@ -324,25 +336,186 @@ export default function HandDetailPage() {
     })
   }, [apply])
 
-  /* ── Drop handler ──────────────────────────────────── */
+  return {
+    game,
+    history,
+    reset,
+    handleUndo,
+    handleDraw,
+    handleThin,
+    moveHandCard,
+    moveDrawnCard,
+    moveThinnedCard,
+    moveNextCard,
+    moveFromActive,
+    moveFromBench,
+    moveDiscardCard,
+    moveEnergyFromActive,
+    moveEnergyFromBench,
+    handleReshuffle,
+    handleShuffleToBottom,
+    handleDrawToHand,
+  }
+}
+
+/* ── DragCard wrapper ────────────────────────────────── */
+
+function DragCard({ onDragStart, children }: { onDragStart: () => void; children: React.ReactNode }) {
+  return (
+    <div
+      className={styles.draggableCard}
+      draggable
+      onDragStart={(e) => { e.dataTransfer.effectAllowed = 'move'; onDragStart() }}
+    >
+      {children}
+    </div>
+  )
+}
+
+/* ── DeckPickerModal ─────────────────────────────────── */
+
+function DeckPickerModal({ onSelect, onClose }: { onSelect: (id: string) => void; onClose: () => void }) {
+  const [decks, setDecks] = useState<DeckSummary[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    decksApi.list()
+      .then(setDecks)
+      .catch(() => setDecks([]))
+      .finally(() => setLoading(false))
+  }, [])
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalBox} onClick={e => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
+          <span className={styles.modalTitle}>Select Opponent Deck</span>
+          <button className={styles.modalCloseBtn} onClick={onClose}>✕</button>
+        </div>
+        {loading ? (
+          <p className={styles.modalLoading}>Loading decks…</p>
+        ) : decks.length === 0 ? (
+          <p className={styles.modalLoading}>No decks found.</p>
+        ) : (
+          <div className={styles.deckPickerList}>
+            {decks.map(deck => (
+              <button
+                key={deck.id}
+                className={styles.deckPickerItem}
+                onClick={() => onSelect(deck.id)}
+              >
+                <span className={styles.deckPickerName}>{deck.name}</span>
+                <span className={styles.deckPickerFormat}>{deck.format}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/* ── Main component ──────────────────────────────────── */
+
+export default function HandDetailPage() {
+  const { id, handIndex } = useParams<{ id: string; handIndex: string }>()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const state = location.state as LocationState | null
+
+  // Two independent game states
+  const playerGs = useGameState({
+    handCards: state?.hand.hand ?? [],
+    nextCard: state?.hand.nextCard ?? null,
+    remainingDeck: state?.hand.remainingDeck ?? [],
+    drawnCards: [],
+    thinnedCards: [],
+    boardActive: null,
+    boardBench: [null, null, null, null, null],
+    discardCards: [],
+  })
+  const opponentGs = useGameState(EMPTY_GAME)
+
+  const [activePlayer, setActivePlayer] = useState<'player' | 'opponent'>('player')
+  const [opponentEntries, setOpponentEntries] = useState<CardEntry[]>([])
+  const [opponentInfo, setOpponentInfo] = useState<{ deckName: string; mulligans: number; prizes: CardEntry[] } | null>(null)
+  const [showDeckPicker, setShowDeckPicker] = useState(false)
+  const [loadingOpponent, setLoadingOpponent] = useState(false)
+
+  const [playerImageMap] = useCardImages(state?.entries ?? [])
+  const [opponentImageMap] = useCardImages(opponentEntries)
+
+  // Stable refs so keyboard/drop handlers don't go stale
+  const activePlayerRef = useRef(activePlayer)
+  activePlayerRef.current = activePlayer
+  const playerGsRef = useRef(playerGs)
+  playerGsRef.current = playerGs
+  const opponentGsRef = useRef(opponentGs)
+  opponentGsRef.current = opponentGs
+
+  const dragSourceRef = useRef<DragSource | null>(null)
+  const [dragOverZone, setDragOverZone] = useState<Destination | null>(null)
+
+  // Keyboard undo — always targets active player's board
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault()
+        const gs = activePlayerRef.current === 'player' ? playerGsRef.current : opponentGsRef.current
+        gs.handleUndo()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
+
+  const { reset: resetOpponent } = opponentGs
+
+  const handleSelectOpponent = useCallback(async (deckId: string) => {
+    setShowDeckPicker(false)
+    setLoadingOpponent(true)
+    try {
+      const deck = await decksApi.get(deckId)
+      const entries = deck.entries
+      setOpponentEntries(entries)
+      const hand = generateValidHand(entries)
+      resetOpponent({
+        handCards: hand.hand,
+        nextCard: hand.nextCard,
+        remainingDeck: hand.remainingDeck,
+        drawnCards: [],
+        thinnedCards: [],
+        boardActive: null,
+        boardBench: [null, null, null, null, null],
+        discardCards: [],
+      })
+      setOpponentInfo({ deckName: deck.name, mulligans: hand.mulligans, prizes: hand.prizes })
+      setActivePlayer('opponent')
+    } catch (err) {
+      console.error('Failed to load opponent deck', err)
+    } finally {
+      setLoadingOpponent(false)
+    }
+  }, [resetOpponent])
 
   const handleDrop = useCallback((dest: Destination) => {
     setDragOverZone(null)
     const src = dragSourceRef.current
     if (!src) return
     dragSourceRef.current = null
+    const gs = activePlayerRef.current === 'player' ? playerGsRef.current : opponentGsRef.current
     switch (src.zone) {
-      case 'hand': moveHandCard(src.index, dest); break
-      case 'drawn': moveDrawnCard(src.index, dest); break
-      case 'thinned': moveThinnedCard(src.index, dest); break
-      case 'next': moveNextCard(dest); break
-      case 'active': moveFromActive(dest); break
-      case 'bench': moveFromBench(src.slotIndex, dest); break
-      case 'discard': moveDiscardCard(src.index, dest); break
-      case 'active-energy': moveEnergyFromActive(src.energyIndex, dest); break
-      case 'bench-energy': moveEnergyFromBench(src.slotIndex, src.energyIndex, dest); break
+      case 'hand': gs.moveHandCard(src.index, dest); break
+      case 'drawn': gs.moveDrawnCard(src.index, dest); break
+      case 'thinned': gs.moveThinnedCard(src.index, dest); break
+      case 'next': gs.moveNextCard(dest); break
+      case 'active': gs.moveFromActive(dest); break
+      case 'bench': gs.moveFromBench(src.slotIndex, dest); break
+      case 'discard': gs.moveDiscardCard(src.index, dest); break
+      case 'active-energy': gs.moveEnergyFromActive(src.energyIndex, dest); break
+      case 'bench-energy': gs.moveEnergyFromBench(src.slotIndex, src.energyIndex, dest); break
     }
-  }, [moveHandCard, moveDrawnCard, moveThinnedCard, moveNextCard, moveFromActive, moveFromBench, moveDiscardCard, moveEnergyFromActive, moveEnergyFromBench])
+  }, [])
 
   /* ── Guard: no state ───────────────────────────────── */
 
@@ -357,9 +530,12 @@ export default function HandDetailPage() {
     )
   }
 
+  // Active player's data
+  const activeGs = activePlayer === 'player' ? playerGs : opponentGs
+  const activeImageMap = activePlayer === 'player' ? playerImageMap : opponentImageMap
   const { hand } = state
   const handNum = Number(handIndex) + 1
-  const { handCards, nextCard, remainingDeck, drawnCards, thinnedCards, boardActive, boardBench, discardCards } = game
+  const { handCards, nextCard, remainingDeck, drawnCards, thinnedCards, boardActive, boardBench, discardCards } = activeGs.game
 
   const sortedWithOriginalIndex = [...remainingDeck]
     .map((card, idx) => ({ card, originalIndex: idx }))
@@ -371,7 +547,7 @@ export default function HandDetailPage() {
 
   const renderCard = (card: CardEntry, className?: string) => {
     const key = imageKey(card)
-    const img = imageMap.get(key)
+    const img = activeImageMap.get(key)
     return img ? (
       <img className={className} src={cardImageUrl(img, 'low')} alt={card.name} title={card.name} />
     ) : (
@@ -451,27 +627,58 @@ export default function HandDetailPage() {
     )
   }
 
-  const boardCount = totalBoardCards(game)
+  const boardCount = totalBoardCards(activeGs.game)
+  const activeHistory = activeGs.history
+  const activeMulligans = activePlayer === 'player' ? hand.mulligans : (opponentInfo?.mulligans ?? 0)
 
   return (
     <div className={styles.page}>
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
-          <h1 className={styles.title}>Hand {handNum}</h1>
-          {hand.mulligans > 0 && (
+          {opponentInfo && (
+            <div className={styles.tabBar}>
+              <button
+                className={`${styles.tabBtn} ${activePlayer === 'player' ? styles.tabBtnActive : ''}`}
+                onClick={() => setActivePlayer('player')}
+              >
+                You
+              </button>
+              <button
+                className={`${styles.tabBtn} ${activePlayer === 'opponent' ? styles.tabBtnActive : ''}`}
+                onClick={() => setActivePlayer('opponent')}
+              >
+                Opponent
+              </button>
+            </div>
+          )}
+          <h1 className={styles.title}>
+            {activePlayer === 'player'
+              ? `Hand ${handNum}`
+              : opponentInfo?.deckName ?? 'Opponent'
+            }
+          </h1>
+          {activeMulligans > 0 && (
             <span className={styles.mulliganBadge}>
-              {hand.mulligans} {hand.mulligans === 1 ? 'mulligan' : 'mulligans'}
+              {activeMulligans} {activeMulligans === 1 ? 'mulligan' : 'mulligans'}
             </span>
           )}
         </div>
         <div className={styles.headerActions}>
           <span className={styles.deckCount}>{remainingDeck.length} in deck</span>
-          <button className={styles.reshuffleBtn} onClick={handleReshuffle} title="Shuffle all non-boarded, non-discarded cards back into the deck">Reshuffle</button>
-          <button className={styles.shuffleBottomBtn} onClick={handleShuffleToBottom} title="Shuffle hand and drawn/thinned cards to the bottom of the deck">Shuffle to Bottom</button>
-          <button className={styles.drawHandBtn} onClick={() => handleDrawToHand(6)} disabled={remainingDeck.length === 0} title="Draw 6 cards to hand">Draw 6</button>
-          <button className={styles.drawHandBtn} onClick={() => handleDrawToHand(8)} disabled={remainingDeck.length === 0} title="Draw 8 cards to hand">Draw 8</button>
-          <button className={styles.undoBtn} onClick={handleUndo} disabled={history.length === 0} title="Undo last action">Undo</button>
+          <button className={styles.reshuffleBtn} onClick={activeGs.handleReshuffle} title="Shuffle all non-boarded, non-discarded cards back into the deck">Reshuffle</button>
+          <button className={styles.shuffleBottomBtn} onClick={activeGs.handleShuffleToBottom} title="Shuffle hand and drawn/thinned cards to the bottom of the deck">Shuffle to Bottom</button>
+          <button className={styles.drawHandBtn} onClick={() => activeGs.handleDrawToHand(6)} disabled={remainingDeck.length === 0} title="Draw 6 cards to hand">Draw 6</button>
+          <button className={styles.drawHandBtn} onClick={() => activeGs.handleDrawToHand(8)} disabled={remainingDeck.length === 0} title="Draw 8 cards to hand">Draw 8</button>
+          <button className={styles.undoBtn} onClick={activeGs.handleUndo} disabled={activeHistory.length === 0} title="Undo last action">Undo</button>
+          <button
+            className={styles.opponentBtn}
+            onClick={() => setShowDeckPicker(true)}
+            disabled={loadingOpponent}
+            title={opponentInfo ? `Currently: ${opponentInfo.deckName}. Click to switch.` : 'Add an opponent deck to practice the matchup'}
+          >
+            {loadingOpponent ? 'Loading…' : opponentInfo ? 'Switch Deck' : 'Add Opponent'}
+          </button>
           <button className={styles.backBtn} onClick={() => navigate(`/decks/${id}/practice`)}>Back</button>
         </div>
       </div>
@@ -493,9 +700,14 @@ export default function HandDetailPage() {
         <div className={styles.stripGroup}>
           <div className={styles.stripLabel}>Prizes</div>
           <div className={styles.stripCards}>
-            {hand.prizes.map((card, i) => (
-              <div key={i} className={`${styles.stripCard} ${styles.prizeCard}`}>{renderCard(card)}</div>
-            ))}
+            {activePlayer === 'player'
+              ? hand.prizes.map((card, i) => (
+                  <div key={i} className={`${styles.stripCard} ${styles.prizeCard}`}>{renderCard(card)}</div>
+                ))
+              : opponentInfo?.prizes.map((card, i) => (
+                  <div key={i} className={`${styles.stripCard} ${styles.prizeCard}`}>{renderCard(card)}</div>
+                )) ?? <span className={styles.zoneEmpty}>—</span>
+            }
           </div>
         </div>
         <div className={styles.stripDivider} />
@@ -539,7 +751,7 @@ export default function HandDetailPage() {
             <span className={styles.sectionLabel}>
               Drawn ({drawnCards.length}){thinnedCards.length > 0 ? ` / Thinned (${thinnedCards.length})` : ''}
             </span>
-            <button className={styles.drawBtn} onClick={handleDraw} disabled={remainingDeck.length === 0}>Draw</button>
+            <button className={styles.drawBtn} onClick={activeGs.handleDraw} disabled={remainingDeck.length === 0}>Draw</button>
           </div>
           <div className={styles.drawnScrollRow}>
             {drawnCards.map((card, i) => (
@@ -564,7 +776,7 @@ export default function HandDetailPage() {
           </div>
           <div className={styles.deckScrollRow}>
             {sortedWithOriginalIndex.map(({ card, originalIndex }) => (
-              <div key={originalIndex} className={styles.deckCard} onClick={() => handleThin(originalIndex)} title={`Thin ${card.name}`}>
+              <div key={originalIndex} className={styles.deckCard} onClick={() => activeGs.handleThin(originalIndex)} title={`Thin ${card.name}`}>
                 {renderCard(card)}
               </div>
             ))}
@@ -591,6 +803,14 @@ export default function HandDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Deck picker modal */}
+      {showDeckPicker && (
+        <DeckPickerModal
+          onSelect={handleSelectOpponent}
+          onClose={() => setShowDeckPicker(false)}
+        />
+      )}
     </div>
   )
 }
