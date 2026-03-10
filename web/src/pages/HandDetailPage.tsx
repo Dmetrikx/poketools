@@ -518,31 +518,27 @@ export default function HandDetailPage() {
         <div className={styles.leftColumn}>
           <div className={styles.actionPanel}>
             <div className={styles.actionHeader}>
-              <span className={styles.sectionLabel}>Drawn Cards ({drawnCards.length})</span>
+              <span className={styles.sectionLabel}>
+                Drawn ({drawnCards.length}){thinnedCards.length > 0 ? ` / Thinned (${thinnedCards.length})` : ''}
+              </span>
               <button className={styles.drawBtn} onClick={handleDraw} disabled={remainingDeck.length === 0}>Draw</button>
             </div>
             <div className={styles.cardRow}>
               {drawnCards.map((card, i) => (
-                <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'drawn', index: i } }}>
+                <DragCard key={`drawn-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'drawn', index: i } }}>
                   <div className={`${styles.cardThumbnail} ${styles.drawnCardEntry}`}>{renderCard(card)}</div>
                 </DragCard>
               ))}
-              {drawnCards.length === 0 && <p className={styles.emptyHint}>Click "Draw" to pull from the top of the deck</p>}
+              {thinnedCards.map((card, i) => (
+                <DragCard key={`thinned-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'thinned', index: i } }}>
+                  <div className={`${styles.cardThumbnail} ${styles.thinnedCard}`}>{renderCard(card)}</div>
+                </DragCard>
+              ))}
+              {drawnCards.length === 0 && thinnedCards.length === 0 && (
+                <p className={styles.emptyHint}>Click "Draw" to pull from the top of the deck</p>
+              )}
             </div>
           </div>
-
-          {thinnedCards.length > 0 && (
-            <div className={styles.actionPanel}>
-              <div className={styles.sectionLabel}>Thinned Cards ({thinnedCards.length})</div>
-              <div className={styles.cardRow}>
-                {thinnedCards.map((card, i) => (
-                  <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'thinned', index: i } }}>
-                    <div className={`${styles.cardThumbnail} ${styles.thinnedCard}`}>{renderCard(card)}</div>
-                  </DragCard>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
         <div className={styles.rightColumn}>
