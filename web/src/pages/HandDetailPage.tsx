@@ -24,7 +24,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 /* ── Board types ─────────────────────────────────────── */
 
-type BoardSlot = { cards: CardEntry[] }
+type BoardSlot = { cards: CardEntry[]; damage: number }
 
 type Destination = 'active' | 'bench-0' | 'bench-1' | 'bench-2' | 'bench-3' | 'bench-4' | 'bench-5' | 'bench-6' | 'bench-7' | 'stadium' | 'discard'
 
@@ -56,8 +56,8 @@ type DragSource =
 /* ── Helpers ─────────────────────────────────────────── */
 
 function addToSlot(slot: BoardSlot | null, card: CardEntry): BoardSlot {
-  if (!slot) return { cards: [card] }
-  return { cards: [...slot.cards, card] }
+  if (!slot) return { cards: [card], damage: 0 }
+  return { ...slot, cards: [...slot.cards, card] }
 }
 
 function placeCard(state: GameState, card: CardEntry, dest: Destination): GameState {
@@ -271,7 +271,7 @@ function useGameState(initial: GameState) {
       if (actualIndex === undefined) return prev
       const energy = prev.boardActive.cards[actualIndex]
       const newCards = removeAt(prev.boardActive.cards, actualIndex)
-      const newActive = newCards.length > 0 ? { cards: newCards } : null
+      const newActive = newCards.length > 0 ? { ...prev.boardActive, cards: newCards } : null
       return placeCard({ ...prev, boardActive: newActive }, energy, dest)
     })
   }, [apply])
@@ -323,8 +323,22 @@ function useGameState(initial: GameState) {
       const energy = slot.cards[actualIndex]
       const newCards = removeAt(slot.cards, actualIndex)
       const bench = [...prev.boardBench]
-      bench[slotIdx] = newCards.length > 0 ? { cards: newCards } : null
+      bench[slotIdx] = newCards.length > 0 ? { ...slot, cards: newCards } : null
       return placeCard({ ...prev, boardBench: bench }, energy, dest)
+    })
+  }, [apply])
+
+  const adjustDamage = useCallback((target: 'active' | number, amount: number) => {
+    apply(prev => {
+      if (target === 'active') {
+        if (!prev.boardActive) return prev
+        return { ...prev, boardActive: { ...prev.boardActive, damage: Math.max(0, prev.boardActive.damage + amount) } }
+      }
+      const slot = prev.boardBench[target]
+      if (!slot) return prev
+      const bench = [...prev.boardBench]
+      bench[target] = { ...slot, damage: Math.max(0, slot.damage + amount) }
+      return { ...prev, boardBench: bench }
     })
   }, [apply])
 
@@ -397,6 +411,7 @@ function useGameState(initial: GameState) {
     moveDiscardCard,
     moveEnergyFromActive,
     moveEnergyFromBench,
+    adjustDamage,
     handleReshuffle,
     handleShuffleToBottom,
     handleDrawToHand,
@@ -631,10 +646,12 @@ export default function HandDetailPage() {
     dragStart: DragSource,
     energyDragStart: (energyIndex: number) => DragSource,
     slotClass: string,
+    damageTarget?: 'active' | number,
   ) => {
     const isOver = dragOverZone === dest
     const pokemon = slot?.cards.filter(c => c.section !== 'energy') ?? []
     const energy = slot?.cards.filter(c => c.section === 'energy') ?? []
+    const hasPokemon = pokemon.length > 0
 
     return (
       <div
@@ -671,6 +688,19 @@ export default function HandDetailPage() {
                     </div>
                   </DragCard>
                 ))}
+              </div>
+            )}
+            {hasPokemon && damageTarget !== undefined && (
+              <div className={styles.damageCounter}>
+                <div className={styles.damageButtons}>
+                  <button className={styles.damageBtn} onClick={(e) => { e.stopPropagation(); activeGs.adjustDamage(damageTarget, -100) }} title="-100">--</button>
+                  <button className={styles.damageBtn} onClick={(e) => { e.stopPropagation(); activeGs.adjustDamage(damageTarget, -10) }} title="-10">-</button>
+                </div>
+                <span className={`${styles.damageValue} ${slot.damage > 0 ? styles.damageValueActive : ''}`}>{slot.damage}</span>
+                <div className={styles.damageButtons}>
+                  <button className={`${styles.damageBtn} ${styles.damageBtnAdd}`} onClick={(e) => { e.stopPropagation(); activeGs.adjustDamage(damageTarget, 10) }} title="+10">+</button>
+                  <button className={`${styles.damageBtn} ${styles.damageBtnAdd}`} onClick={(e) => { e.stopPropagation(); activeGs.adjustDamage(damageTarget, 100) }} title="+100">++</button>
+                </div>
               </div>
             )}
           </div>
@@ -861,7 +891,7 @@ export default function HandDetailPage() {
         </div>
         <div className={styles.boardLayout}>
           <div className={styles.activeArea}>
-            {renderSlot(boardActive, 'active', 'Active', { zone: 'active' }, (ei) => ({ zone: 'active-energy', energyIndex: ei }), styles.activeSlot)}
+            {renderSlot(boardActive, 'active', 'Active', { zone: 'active' }, (ei) => ({ zone: 'active-energy', energyIndex: ei }), styles.activeSlot, 'active')}
             {renderSlot(boardStadium, 'stadium', 'Stadium', { zone: 'stadium' }, (_ei) => ({ zone: 'stadium' }), styles.stadiumSlot)}
           </div>
           <div className={styles.benchArea}>
@@ -872,6 +902,7 @@ export default function HandDetailPage() {
               { zone: 'bench', slotIndex: i },
               (ei) => ({ zone: 'bench-energy', slotIndex: i, energyIndex: ei }),
               styles.benchSlot,
+              i,
             ))}
           </div>
         </div>
