@@ -224,41 +224,55 @@
   flex-shrink: 0;
 }
 
+.nextGroup {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 .prizeCard {
   opacity: 0.45;
   border-style: dashed;
   filter: saturate(0.5);
 }
 
-/* ── Row 2: Discard (full width) ─────────────────────── */
+/* ── Discard panel (in 3-column row) ─────────────────── */
 
-.discardRow {
+.discardPanel {
+  width: 300px;
+  min-width: 300px;
+  flex-shrink: 0;
   border: 1px solid rgba(239, 68, 68, 0.3);
   border-radius: var(--radius);
-  padding: 8px 14px;
+  padding: 10px 14px;
   background: rgba(239, 68, 68, 0.04);
   min-height: 52px;
   transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.discardRowActive {
+.discardPanelActive {
   border-color: rgba(239, 68, 68, 0.8) !important;
   border-width: 2px;
   border-style: dashed !important;
   background: rgba(239, 68, 68, 0.1) !important;
 }
 
+.sectionLabelDiscard {
+  color: #fca5a5;
+}
+
 .discardScrollRow {
   display: flex;
   flex-wrap: nowrap;
-  gap: 5px;
+  gap: 6px;
   overflow-x: auto;
-  padding-bottom: 2px;
+  padding-bottom: 4px;
+  min-height: 100px;
+  align-items: flex-start;
 }
 
 .discardCard {
-  width: 56px;
-  height: 78px;
+  width: 72px;
+  height: 100px;
   border-radius: 4px;
   overflow: hidden;
   background: var(--color-surface);
@@ -273,16 +287,19 @@
   display: block;
 }
 
-/* ── Row 3: Draw/Thinned + Deck ──────────────────────── */
+/* ── Row 2: Drawn/Thinned + Deck + Discard ───────────── */
 
 .drawDeckRow {
-  display: grid;
-  grid-template-columns: 360px 1fr;
+  display: flex;
   gap: 12px;
   align-items: start;
+  overflow-x: auto;
 }
 
 .drawPanel {
+  width: 300px;
+  min-width: 300px;
+  flex-shrink: 0;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   padding: 10px 14px;
@@ -290,11 +307,13 @@
 }
 
 .deckPanel {
+  width: 500px;
+  min-width: 500px;
+  flex-shrink: 0;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   padding: 10px 14px;
   background: var(--color-surface);
-  min-width: 0;
 }
 
 .drawnScrollRow {
@@ -327,14 +346,16 @@
 .deckScrollRow {
   display: flex;
   flex-wrap: nowrap;
-  gap: 4px;
+  gap: 6px;
   overflow-x: auto;
-  padding-bottom: 6px;
+  padding-bottom: 4px;
+  min-height: 100px;
+  align-items: flex-start;
 }
 
 .deckCard {
-  width: 54px;
-  height: 76px;
+  width: 72px;
+  height: 100px;
   border-radius: 4px;
   overflow: hidden;
   background: var(--color-surface);
@@ -721,6 +742,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+  min-height: 30px;
 }
 
 /* ── Draw button ────────────────────────────────────── */
@@ -993,11 +1015,6 @@
 
 /* ── Responsive ─────────────────────────────────────── */
 
-@media (max-width: 1000px) {
-  .drawDeckRow {
-    grid-template-columns: 1fr;
-  }
-}
 
 @media (max-width: 700px) {
   .dealStrip {

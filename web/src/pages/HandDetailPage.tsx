@@ -34,6 +34,7 @@ type GameState = {
   remainingDeck: CardEntry[]
   drawnCards: CardEntry[]
   thinnedCards: CardEntry[]
+  prizeCards: CardEntry[]
   boardActive: BoardSlot | null
   boardBench: (BoardSlot | null)[]
   boardStadium: BoardSlot | null
@@ -46,6 +47,7 @@ type DragSource =
   | { zone: 'drawn'; index: number }
   | { zone: 'thinned'; index: number }
   | { zone: 'next' }
+  | { zone: 'prize'; index: number }
   | { zone: 'active' }
   | { zone: 'bench'; slotIndex: number }
   | { zone: 'discard'; index: number }
@@ -92,6 +94,7 @@ const EMPTY_GAME: GameState = {
   remainingDeck: [],
   drawnCards: [],
   thinnedCards: [],
+  prizeCards: [],
   boardActive: null,
   boardBench: [null, null, null, null, null],
   boardStadium: null,
@@ -205,6 +208,14 @@ function useGameState(initial: GameState) {
       const card = prev.thinnedCards[idx]
       if (!card) return prev
       return placeCard({ ...prev, thinnedCards: removeAt(prev.thinnedCards, idx) }, card, dest)
+    })
+  }, [apply])
+
+  const moveFromPrize = useCallback((idx: number, dest: Destination) => {
+    apply(prev => {
+      const card = prev.prizeCards[idx]
+      if (!card) return prev
+      return placeCard({ ...prev, prizeCards: removeAt(prev.prizeCards, idx) }, card, dest)
     })
   }, [apply])
 
@@ -404,6 +415,7 @@ function useGameState(initial: GameState) {
     moveHandCard,
     moveDrawnCard,
     moveThinnedCard,
+    moveFromPrize,
     moveNextCard,
     moveFromActive,
     moveFromBench,
@@ -492,6 +504,7 @@ export default function HandDetailPage() {
     remainingDeck: state?.hand.remainingDeck ?? [],
     drawnCards: [],
     thinnedCards: [],
+    prizeCards: state?.hand.prizes ?? [],
     boardActive: null,
     boardBench: [null, null, null, null, null],
     boardStadium: null,
@@ -549,6 +562,7 @@ export default function HandDetailPage() {
         remainingDeck: hand.remainingDeck,
         drawnCards: [],
         thinnedCards: [],
+        prizeCards: hand.prizes,
         boardActive: null,
         boardBench: [null, null, null, null, null],
         boardStadium: null,
@@ -575,6 +589,7 @@ export default function HandDetailPage() {
       case 'drawn': gs.moveDrawnCard(src.index, dest); break
       case 'thinned': gs.moveThinnedCard(src.index, dest); break
       case 'next': gs.moveNextCard(dest); break
+      case 'prize': gs.moveFromPrize(src.index, dest); break
       case 'active': gs.moveFromActive(dest); break
       case 'bench': gs.moveFromBench(src.slotIndex, dest); break
       case 'discard': gs.moveDiscardCard(src.index, dest); break
@@ -602,7 +617,7 @@ export default function HandDetailPage() {
   const activeImageMap = activePlayer === 'player' ? playerImageMap : opponentImageMap
   const { hand } = state
   const handNum = Number(handIndex) + 1
-  const { handCards, nextCard, remainingDeck, drawnCards, thinnedCards, boardActive, boardBench, boardStadium, benchSize, discardCards } = activeGs.game
+  const { handCards, nextCard, remainingDeck, drawnCards, thinnedCards, prizeCards, boardActive, boardBench, boardStadium, benchSize, discardCards } = activeGs.game
 
   const sortedWithOriginalIndex = [...remainingDeck]
     .map((card, idx) => ({ card, originalIndex: idx }))
@@ -765,7 +780,7 @@ export default function HandDetailPage() {
         </div>
       </div>
 
-      {/* Row 1: Hand + Prizes + Next */}
+      {/* Row 1: Hand + Next + Prizes */}
       <div className={styles.dealStrip}>
         <div className={styles.stripGroup}>
           <div className={styles.stripLabel}>Hand</div>
@@ -779,21 +794,7 @@ export default function HandDetailPage() {
           </div>
         </div>
         <div className={styles.stripDivider} />
-        <div className={styles.stripGroup}>
-          <div className={styles.stripLabel}>Prizes</div>
-          <div className={styles.stripCards}>
-            {activePlayer === 'player'
-              ? hand.prizes.map((card, i) => (
-                  <div key={i} className={`${styles.stripCard} ${styles.prizeCard}`}>{renderCard(card)}</div>
-                ))
-              : opponentInfo?.prizes.map((card, i) => (
-                  <div key={i} className={`${styles.stripCard} ${styles.prizeCard}`}>{renderCard(card)}</div>
-                )) ?? <span className={styles.zoneEmpty}>—</span>
-            }
-          </div>
-        </div>
-        <div className={styles.stripDivider} />
-        <div className={styles.stripGroup}>
+        <div className={`${styles.stripGroup} ${styles.nextGroup}`}>
           <div className={styles.stripLabel}>Next</div>
           <div className={styles.stripCards}>
             {nextCard ? (
@@ -805,28 +806,23 @@ export default function HandDetailPage() {
             )}
           </div>
         </div>
-      </div>
-
-      {/* Row 2: Discard (full width) */}
-      <div
-        className={`${styles.discardRow}${dragOverZone === 'discard' ? ` ${styles.discardRowActive}` : ''}`}
-        {...dropHandlers('discard')}
-      >
-        <div className={`${styles.zoneLabel} ${styles.zoneLabelDiscard}`}>Discard ({discardCards.length})</div>
-        {discardCards.length === 0 ? (
-          <p className={styles.zoneEmpty}>{dragOverZone === 'discard' ? 'Drop here' : 'Drag cards here'}</p>
-        ) : (
-          <div className={styles.discardScrollRow}>
-            {discardCards.map((card, i) => (
-              <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'discard', index: i } }}>
-                <div className={styles.discardCard}>{renderCard(card)}</div>
-              </DragCard>
-            ))}
+        <div className={styles.stripDivider} />
+        <div className={styles.stripGroup}>
+          <div className={styles.stripLabel}>Prizes</div>
+          <div className={styles.stripCards}>
+            {prizeCards.length > 0
+              ? prizeCards.map((card, i) => (
+                  <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'prize', index: i } }}>
+                    <div className={`${styles.stripCard} ${styles.prizeCard}`}>{renderCard(card)}</div>
+                  </DragCard>
+                ))
+              : <span className={styles.zoneEmpty}>—</span>
+            }
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Row 3: Draw/Thinned (left) + Deck horizontal scroll (right) */}
+      {/* Row 2: Drawn/Thinned + Deck + Discard */}
       <div className={styles.drawDeckRow}>
         <div className={styles.drawPanel}>
           <div className={styles.actionHeader}>
@@ -863,6 +859,25 @@ export default function HandDetailPage() {
               </div>
             ))}
           </div>
+        </div>
+        <div
+          className={`${styles.discardPanel}${dragOverZone === 'discard' ? ` ${styles.discardPanelActive}` : ''}`}
+          {...dropHandlers('discard')}
+        >
+          <div className={styles.actionHeader}>
+            <span className={`${styles.sectionLabel} ${styles.sectionLabelDiscard}`}>Discard ({discardCards.length})</span>
+          </div>
+          {discardCards.length === 0 ? (
+            <p className={styles.emptyHint}>{dragOverZone === 'discard' ? 'Drop here' : 'Drag cards here'}</p>
+          ) : (
+            <div className={styles.discardScrollRow}>
+              {discardCards.map((card, i) => (
+                <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'discard', index: i } }}>
+                  <div className={styles.discardCard}>{renderCard(card)}</div>
+                </DragCard>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
