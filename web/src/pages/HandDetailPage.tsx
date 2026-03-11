@@ -26,7 +26,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 type BoardSlot = { cards: CardEntry[] }
 
-type Destination = 'active' | 'bench-0' | 'bench-1' | 'bench-2' | 'bench-3' | 'bench-4' | 'discard'
+type Destination = 'active' | 'bench-0' | 'bench-1' | 'bench-2' | 'bench-3' | 'bench-4' | 'bench-5' | 'bench-6' | 'bench-7' | 'stadium' | 'discard'
 
 type GameState = {
   handCards: CardEntry[]
@@ -36,6 +36,8 @@ type GameState = {
   thinnedCards: CardEntry[]
   boardActive: BoardSlot | null
   boardBench: (BoardSlot | null)[]
+  boardStadium: BoardSlot | null
+  benchSize: 5 | 8
   discardCards: CardEntry[]
 }
 
@@ -49,6 +51,7 @@ type DragSource =
   | { zone: 'discard'; index: number }
   | { zone: 'active-energy'; energyIndex: number }
   | { zone: 'bench-energy'; slotIndex: number; energyIndex: number }
+  | { zone: 'stadium' }
 
 /* ── Helpers ─────────────────────────────────────────── */
 
@@ -64,6 +67,9 @@ function placeCard(state: GameState, card: CardEntry, dest: Destination): GameSt
   if (dest === 'active') {
     return { ...state, boardActive: addToSlot(state.boardActive, card) }
   }
+  if (dest === 'stadium') {
+    return { ...state, boardStadium: addToSlot(state.boardStadium, card) }
+  }
   const idx = parseInt(dest.split('-')[1])
   const bench = [...state.boardBench]
   bench[idx] = addToSlot(bench[idx], card)
@@ -76,7 +82,8 @@ function removeAt<T>(arr: T[], i: number): T[] {
 
 function totalBoardCards(g: GameState): number {
   return (g.boardActive?.cards.length ?? 0) +
-    g.boardBench.reduce((n, s) => n + (s?.cards.length ?? 0), 0)
+    g.boardBench.reduce((n, s) => n + (s?.cards.length ?? 0), 0) +
+    (g.boardStadium?.cards.length ?? 0)
 }
 
 const EMPTY_GAME: GameState = {
@@ -87,6 +94,8 @@ const EMPTY_GAME: GameState = {
   thinnedCards: [],
   boardActive: null,
   boardBench: [null, null, null, null, null],
+  boardStadium: null,
+  benchSize: 5,
   discardCards: [],
 }
 
@@ -267,6 +276,41 @@ function useGameState(initial: GameState) {
     })
   }, [apply])
 
+  const moveFromStadium = useCallback((dest: Destination) => {
+    apply(prev => {
+      if (!prev.boardStadium) return prev
+      if (dest === 'discard') {
+        return { ...prev, boardStadium: null, discardCards: [...prev.discardCards, ...prev.boardStadium.cards] }
+      }
+      if (dest === 'stadium') return prev
+      // Move entire stadium slot (all cards) to destination; treat each card individually
+      const cards = prev.boardStadium.cards
+      let next: GameState = { ...prev, boardStadium: null }
+      for (const card of cards) next = placeCard(next, card, dest)
+      return next
+    })
+  }, [apply])
+
+  const expandBench = useCallback(() => {
+    apply(prev => {
+      if (prev.benchSize === 8) return prev
+      return { ...prev, benchSize: 8, boardBench: [...prev.boardBench, null, null, null] }
+    })
+  }, [apply])
+
+  const shrinkBench = useCallback(() => {
+    apply(prev => {
+      if (prev.benchSize === 5) return prev
+      const overflowCards = prev.boardBench.slice(5).flatMap(slot => slot?.cards ?? [])
+      return {
+        ...prev,
+        benchSize: 5,
+        boardBench: prev.boardBench.slice(0, 5),
+        discardCards: [...prev.discardCards, ...overflowCards],
+      }
+    })
+  }, [apply])
+
   const moveEnergyFromBench = useCallback((slotIdx: number, energyIndex: number, dest: Destination) => {
     apply(prev => {
       const slot = prev.boardBench[slotIdx]
@@ -349,12 +393,15 @@ function useGameState(initial: GameState) {
     moveNextCard,
     moveFromActive,
     moveFromBench,
+    moveFromStadium,
     moveDiscardCard,
     moveEnergyFromActive,
     moveEnergyFromBench,
     handleReshuffle,
     handleShuffleToBottom,
     handleDrawToHand,
+    expandBench,
+    shrinkBench,
   }
 }
 
@@ -432,6 +479,8 @@ export default function HandDetailPage() {
     thinnedCards: [],
     boardActive: null,
     boardBench: [null, null, null, null, null],
+    boardStadium: null,
+    benchSize: 5,
     discardCards: [],
   })
   const opponentGs = useGameState(EMPTY_GAME)
@@ -487,6 +536,8 @@ export default function HandDetailPage() {
         thinnedCards: [],
         boardActive: null,
         boardBench: [null, null, null, null, null],
+        boardStadium: null,
+        benchSize: 5,
         discardCards: [],
       })
       setOpponentInfo({ deckName: deck.name, mulligans: hand.mulligans, prizes: hand.prizes })
@@ -514,6 +565,7 @@ export default function HandDetailPage() {
       case 'discard': gs.moveDiscardCard(src.index, dest); break
       case 'active-energy': gs.moveEnergyFromActive(src.energyIndex, dest); break
       case 'bench-energy': gs.moveEnergyFromBench(src.slotIndex, src.energyIndex, dest); break
+      case 'stadium': gs.moveFromStadium(dest); break
     }
   }, [])
 
@@ -535,7 +587,7 @@ export default function HandDetailPage() {
   const activeImageMap = activePlayer === 'player' ? playerImageMap : opponentImageMap
   const { hand } = state
   const handNum = Number(handIndex) + 1
-  const { handCards, nextCard, remainingDeck, drawnCards, thinnedCards, boardActive, boardBench, discardCards } = activeGs.game
+  const { handCards, nextCard, remainingDeck, drawnCards, thinnedCards, boardActive, boardBench, boardStadium, benchSize, discardCards } = activeGs.game
 
   const sortedWithOriginalIndex = [...remainingDeck]
     .map((card, idx) => ({ card, originalIndex: idx }))
@@ -786,10 +838,31 @@ export default function HandDetailPage() {
 
       {/* Row 4: Board */}
       <div className={styles.boardDiscardRow}>
-        <div className={`${styles.zoneLabel} ${styles.zoneLabelBoard}`}>Board ({boardCount})</div>
+        <div className={styles.boardHeader}>
+          <div className={`${styles.zoneLabel} ${styles.zoneLabelBoard}`}>Board ({boardCount})</div>
+          <div className={styles.benchSizeControls}>
+            <button
+              className={styles.benchSizeBtn}
+              onClick={activeGs.expandBench}
+              disabled={benchSize === 8}
+              title="Expand bench to 8 slots"
+            >
+              Bench 8
+            </button>
+            <button
+              className={styles.benchSizeBtn}
+              onClick={activeGs.shrinkBench}
+              disabled={benchSize === 5}
+              title="Shrink bench to 5 slots (overflow discarded)"
+            >
+              Bench 5
+            </button>
+          </div>
+        </div>
         <div className={styles.boardLayout}>
           <div className={styles.activeArea}>
             {renderSlot(boardActive, 'active', 'Active', { zone: 'active' }, (ei) => ({ zone: 'active-energy', energyIndex: ei }), styles.activeSlot)}
+            {renderSlot(boardStadium, 'stadium', 'Stadium', { zone: 'stadium' }, (_ei) => ({ zone: 'stadium' }), styles.stadiumSlot)}
           </div>
           <div className={styles.benchArea}>
             {boardBench.map((slot, i) => renderSlot(
