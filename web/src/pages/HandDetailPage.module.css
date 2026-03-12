@@ -1,10 +1,12 @@
+/* ── Page shell ──────────────────────────────────────── */
+
 .page {
   display: flex;
   flex-direction: column;
+  /* 56px nav + 48px main padding (24px top + 24px bottom) */
+  height: calc(100vh - 104px);
+  overflow: hidden;
   gap: 10px;
-  padding: 16px 24px;
-  max-width: 1600px;
-  margin: 0 auto;
 }
 
 /* ── Header ─────────────────────────────────────────── */
@@ -14,6 +16,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .headerLeft {
@@ -166,241 +169,290 @@
   color: #ddd6fe;
 }
 
-/* ── Row 1: Deal strip (hand + prizes + next) ────────── */
+/* ── Main horizontal row ─────────────────────────────── */
 
-.dealStrip {
+.mainRow {
   display: flex;
-  align-items: flex-end;
-  gap: 12px;
-  padding: 10px 14px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  overflow-x: auto;
-  flex-shrink: 0;
+  flex-direction: row;
+  flex: 1;
+  gap: 10px;
+  min-height: 0;
+  overflow: hidden;
 }
 
-.stripGroup {
+/* ── Shared column styles ────────────────────────────── */
+
+.colActionHeader {
   display: flex;
-  flex-direction: column;
-  gap: 5px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--color-border);
   flex-shrink: 0;
+  min-height: 34px;
 }
 
-.stripLabel {
-  font-size: 0.6rem;
+.colLabel {
+  font-size: 0.62rem;
   font-weight: 600;
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
-.stripCards {
-  display: flex;
-  gap: 4px;
+.colLabelDiscard {
+  color: #fca5a5;
 }
 
-.stripCard {
-  width: 64px;
-  height: 90px;
+.colLabelBoard {
+  color: #86efac;
+}
+
+.colSubLabel {
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 8px 0 3px;
+  opacity: 0.7;
+}
+
+.colScrollArea {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 6px;
+  min-height: 0;
+}
+
+.colDropActive {
+  outline: 2px dashed rgba(99, 102, 241, 0.55);
+  outline-offset: -2px;
   border-radius: 4px;
+}
+
+/* ── Column card grid ────────────────────────────────── */
+
+.columnCardGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  align-content: start;
+}
+
+/* 3-column compact grid for the remaining deck */
+.deckCardGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  align-content: start;
+}
+
+.columnCardItem {
+  aspect-ratio: 2.5 / 3.5;
+  border-radius: 5px;
   overflow: hidden;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  flex-shrink: 0;
+  position: relative;
 }
 
-.stripCard img {
+.columnCardItem img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.stripDivider {
-  width: 1px;
-  align-self: stretch;
-  background: var(--color-border);
-  flex-shrink: 0;
+.columnCardItem .cardPlaceholder {
+  width: 100%;
+  height: 100%;
 }
 
-.prizeCard {
+.deckCardItem {
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.12s ease;
+}
+
+.deckCardItem:hover {
+  border-color: var(--color-danger);
+  transform: scale(1.12);
+  z-index: 1;
+}
+
+.thinnedCardItem {
+  border-color: var(--color-danger) !important;
+}
+
+.prizeCardItem {
   opacity: 0.45;
   border-style: dashed;
   filter: saturate(0.5);
 }
 
-/* ── Row 2: Discard (full width) ─────────────────────── */
+/* ── Column 1: Hand / Drawing / Thinning ────────────── */
 
-.discardRow {
+.handColumn {
+  width: 172px;
+  min-width: 172px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.handColumnScroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 6px;
+  min-height: 0;
+}
+
+/* Deck section within column 1 — separate drop target */
+.deckSection {
+  margin-top: 4px;
+  border-radius: 4px;
+  padding: 0 0 4px;
+}
+
+.deckSectionDropActive {
+  outline: 2px dashed rgba(59, 130, 246, 0.6);
+  outline-offset: 2px;
+  background: rgba(59, 130, 246, 0.04);
+  border-radius: 4px;
+}
+
+/* Column 1b: Next card slot — docked to bottom */
+.nextSlotDocked {
+  flex-shrink: 0;
+  border-top: 1px solid var(--color-border);
+  padding: 6px 8px 8px;
+  background: rgba(255, 255, 255, 0.015);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.nextSlotDropActive {
+  border-top-color: rgba(99, 102, 241, 0.6) !important;
+  background: rgba(99, 102, 241, 0.06) !important;
+  outline: 2px dashed rgba(99, 102, 241, 0.5);
+  outline-offset: -2px;
+}
+
+.nextCardItem {
+  aspect-ratio: 2.5 / 3.5;
+  width: 68px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.nextCardItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Column 2: Discard ───────────────────────────────── */
+
+.discardColumn {
+  width: 172px;
+  min-width: 172px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   border: 1px solid rgba(239, 68, 68, 0.3);
   border-radius: var(--radius);
-  padding: 8px 14px;
   background: rgba(239, 68, 68, 0.04);
-  min-height: 52px;
+  overflow: hidden;
   transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.discardRowActive {
+.discardColumnActive {
   border-color: rgba(239, 68, 68, 0.8) !important;
   border-width: 2px;
   border-style: dashed !important;
   background: rgba(239, 68, 68, 0.1) !important;
 }
 
-.discardScrollRow {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 5px;
-  overflow-x: auto;
-  padding-bottom: 2px;
-}
+/* ── Column 3: Board ─────────────────────────────────── */
 
-.discardCard {
-  width: 56px;
-  height: 78px;
-  border-radius: 4px;
-  overflow: hidden;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  flex-shrink: 0;
-}
-
-.discardCard img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* ── Row 3: Draw/Thinned + Deck ──────────────────────── */
-
-.drawDeckRow {
-  display: grid;
-  grid-template-columns: 360px 1fr;
-  gap: 12px;
-  align-items: start;
-}
-
-.drawPanel {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 10px 14px;
-  background: var(--color-surface);
-}
-
-.deckPanel {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 10px 14px;
-  background: var(--color-surface);
+.boardColumn {
+  flex: 1;
   min-width: 0;
-}
-
-.drawnScrollRow {
   display: flex;
-  flex-wrap: nowrap;
-  gap: 6px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-  min-height: 100px;
-  align-items: flex-start;
-}
-
-.drawnCard {
-  width: 72px;
-  height: 100px;
-  border-radius: 5px;
-  overflow: hidden;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  flex-shrink: 0;
-}
-
-.drawnCard img {
-  width: 100%;
+  flex-direction: column;
   height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.deckScrollRow {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 4px;
-  overflow-x: auto;
-  padding-bottom: 6px;
-}
-
-.deckCard {
-  width: 54px;
-  height: 76px;
-  border-radius: 4px;
-  overflow: hidden;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: border-color 0.15s ease, transform 0.15s ease;
-  position: relative;
-}
-
-.deckCard::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: transparent;
-  border-radius: 3px;
-  transition: background 0.15s ease;
-  pointer-events: none;
-}
-
-.deckCard:hover {
-  border-color: var(--color-danger);
-  transform: scale(1.12);
-  z-index: 1;
-}
-
-.deckCard:hover::after {
-  background: rgba(239, 68, 68, 0.1);
-}
-
-.deckCard img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.deckHint {
-  font-size: 0.62rem;
-  color: var(--color-text-muted);
-  font-style: italic;
-}
-
-/* ── Row 4: Board ────────────────────────────────────── */
-
-.boardDiscardRow {
   border: 1px solid rgba(34, 197, 94, 0.3);
   border-radius: var(--radius);
-  padding: 10px 16px;
   background: rgba(34, 197, 94, 0.04);
+  overflow: hidden;
 }
 
-.boardZone {
-  display: contents;
+.boardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  border-bottom: 1px solid rgba(34, 197, 94, 0.2);
+  flex-shrink: 0;
+  min-height: 34px;
+}
+
+.benchSizeControls {
+  display: flex;
+  gap: 6px;
+}
+
+.benchSizeBtn {
+  padding: 3px 10px;
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  border-radius: var(--radius);
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: rgba(34, 197, 94, 0.07);
+  color: #86efac;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+.benchSizeBtn:hover:not(:disabled) {
+  background: rgba(34, 197, 94, 0.18);
+  border-color: rgba(34, 197, 94, 0.7);
+  color: #bbf7d0;
+}
+
+.benchSizeBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .boardLayout {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 10px;
+  overflow: hidden;
+  padding: 12px 8px;
 }
 
 .activeArea {
   display: flex;
+  align-items: flex-start;
   justify-content: center;
+  gap: 0;
 }
 
 .benchArea {
@@ -408,6 +460,28 @@
   gap: 8px;
   justify-content: center;
   flex-wrap: wrap;
+}
+
+/* ── Column 4: Prizes ────────────────────────────────── */
+
+.prizesColumn {
+  width: 172px;
+  min-width: 172px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  overflow: hidden;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.prizesColumnActive {
+  border-color: rgba(99, 102, 241, 0.7) !important;
+  border-style: dashed !important;
+  background: rgba(99, 102, 241, 0.06) !important;
 }
 
 /* ── Board slots ─────────────────────────────────────── */
@@ -435,6 +509,19 @@
   min-height: 140px;
   border-color: rgba(34, 197, 94, 0.2);
   background: rgba(34, 197, 94, 0.02);
+}
+
+.stadiumSlot {
+  width: 94px;
+  min-height: 140px;
+  border-color: rgba(59, 130, 246, 0.3);
+  background: rgba(59, 130, 246, 0.03);
+  margin-left: 12px;
+}
+
+.stadiumSlot.boardSlotDropActive {
+  border-color: rgba(59, 130, 246, 0.75) !important;
+  background: rgba(59, 130, 246, 0.1) !important;
 }
 
 .boardSlotOccupied {
@@ -502,12 +589,14 @@
 }
 
 /* Bench slot cards */
-.benchSlot .stackedPokemon {
+.benchSlot .stackedPokemon,
+.stadiumSlot .stackedPokemon {
   width: 80px;
   height: 112px;
 }
 
-.benchSlot .stackedPokemon + .stackedPokemon {
+.benchSlot .stackedPokemon + .stackedPokemon,
+.stadiumSlot .stackedPokemon + .stackedPokemon {
   margin-top: -94px;
 }
 
@@ -549,7 +638,66 @@
   display: block;
 }
 
-/* ── Zone labels ─────────────────────────────────────── */
+/* ── Damage counter ──────────────────────────────────── */
+
+.damageCounter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 4px;
+  user-select: none;
+}
+
+.damageButtons {
+  display: flex;
+  gap: 1px;
+}
+
+.damageBtn {
+  padding: 1px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  font-size: 0.52rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.35);
+  transition: all 0.12s ease;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.damageBtn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+.damageBtnAdd:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+}
+
+.damageValue {
+  min-width: 28px;
+  text-align: center;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.25);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  padding: 0 2px;
+  transition: color 0.15s ease;
+}
+
+.damageValueActive {
+  color: #f87171;
+}
+
+/* ── Misc labels and states ──────────────────────────── */
 
 .zoneLabel {
   font-size: 0.62rem;
@@ -564,15 +712,20 @@
   color: #86efac;
 }
 
-.zoneLabelDiscard {
-  color: #fca5a5;
-}
-
 .zoneEmpty {
   font-size: 0.72rem;
   color: var(--color-text-muted);
   font-style: italic;
   margin: 0;
+}
+
+.emptyHint {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  margin: 0;
+  font-style: italic;
+  white-space: nowrap;
+  padding: 6px 0;
 }
 
 /* ── Draggable card wrapper ──────────────────────────── */
@@ -589,30 +742,13 @@
   cursor: grabbing;
 }
 
-/* ── Common action header ────────────────────────────── */
-
-.sectionLabel {
-  font-size: 0.66rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.actionHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-/* ── Draw button ────────────────────────────────────── */
+/* ── Draw button ─────────────────────────────────────── */
 
 .drawBtn {
-  padding: 5px 18px;
+  padding: 4px 12px;
   border: none;
   border-radius: var(--radius);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
   background: var(--color-primary);
@@ -620,6 +756,7 @@
   transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
   letter-spacing: 0.02em;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .drawBtn:hover:not(:disabled) {
@@ -637,6 +774,17 @@
   background: var(--color-border);
   color: var(--color-text-muted);
   cursor: not-allowed;
+}
+
+/* ── Deck hint ───────────────────────────────────────── */
+
+.deckHint {
+  font-size: 0.58rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 /* ── Card placeholder ────────────────────────────────── */
@@ -659,7 +807,7 @@
   word-break: break-word;
 }
 
-/* ── Drawn cards animation ───────────────────────────── */
+/* ── Drawn card animation ────────────────────────────── */
 
 .drawnCardEntry {
   animation: slideIn 0.2s ease-out;
@@ -676,20 +824,7 @@
   }
 }
 
-.emptyHint {
-  font-size: 0.72rem;
-  color: var(--color-text-muted);
-  margin: 0;
-  font-style: italic;
-  white-space: nowrap;
-}
-
-/* Thinned cards */
-.thinnedCard {
-  border-color: var(--color-danger) !important;
-}
-
-/* ── Opponent button ────────────────────────────────── */
+/* ── Opponent button ─────────────────────────────────── */
 
 .opponentBtn {
   padding: 5px 12px;
@@ -715,7 +850,7 @@
   cursor: not-allowed;
 }
 
-/* ── Player tabs ────────────────────────────────────── */
+/* ── Player tabs ─────────────────────────────────────── */
 
 .tabBar {
   display: flex;
@@ -756,7 +891,7 @@
   color: white;
 }
 
-/* ── Deck picker modal ──────────────────────────────── */
+/* ── Deck picker modal ───────────────────────────────── */
 
 .modalOverlay {
   position: fixed;
@@ -863,7 +998,7 @@
   flex-shrink: 0;
 }
 
-/* ── Error state ────────────────────────────────────── */
+/* ── Error state ─────────────────────────────────────── */
 
 .error {
   padding: 20px;
@@ -874,25 +1009,14 @@
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
-/* ── Responsive ─────────────────────────────────────── */
+/* ── Responsive ──────────────────────────────────────── */
 
-@media (max-width: 1000px) {
-  .drawDeckRow {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 700px) {
-  .dealStrip {
-    gap: 8px;
-  }
-
-  .stripDivider {
-    display: none;
-  }
-
-  .benchArea {
-    gap: 5px;
+@media (max-width: 900px) {
+  .handColumn,
+  .discardColumn,
+  .prizesColumn {
+    width: 140px;
+    min-width: 140px;
   }
 
   .benchSlot {

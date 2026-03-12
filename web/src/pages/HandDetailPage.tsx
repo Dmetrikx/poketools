@@ -24,9 +24,12 @@ function shuffle<T>(arr: T[]): T[] {
 
 /* ── Board types ─────────────────────────────────────── */
 
-type BoardSlot = { cards: CardEntry[] }
+type BoardSlot = { cards: CardEntry[]; damage: number }
 
-type Destination = 'active' | 'bench-0' | 'bench-1' | 'bench-2' | 'bench-3' | 'bench-4' | 'discard'
+type Destination =
+  | 'hand' | 'drawn' | 'thinned' | 'deck' | 'next' | 'prize'
+  | 'active' | 'bench-0' | 'bench-1' | 'bench-2' | 'bench-3' | 'bench-4'
+  | 'bench-5' | 'bench-6' | 'bench-7' | 'stadium' | 'discard'
 
 type GameState = {
   handCards: CardEntry[]
@@ -34,8 +37,11 @@ type GameState = {
   remainingDeck: CardEntry[]
   drawnCards: CardEntry[]
   thinnedCards: CardEntry[]
+  prizeCards: CardEntry[]
   boardActive: BoardSlot | null
   boardBench: (BoardSlot | null)[]
+  boardStadium: BoardSlot | null
+  benchSize: 5 | 8
   discardCards: CardEntry[]
 }
 
@@ -44,30 +50,19 @@ type DragSource =
   | { zone: 'drawn'; index: number }
   | { zone: 'thinned'; index: number }
   | { zone: 'next' }
+  | { zone: 'prize'; index: number }
   | { zone: 'active' }
   | { zone: 'bench'; slotIndex: number }
   | { zone: 'discard'; index: number }
   | { zone: 'active-energy'; energyIndex: number }
   | { zone: 'bench-energy'; slotIndex: number; energyIndex: number }
+  | { zone: 'stadium' }
 
 /* ── Helpers ─────────────────────────────────────────── */
 
 function addToSlot(slot: BoardSlot | null, card: CardEntry): BoardSlot {
-  if (!slot) return { cards: [card] }
-  return { cards: [...slot.cards, card] }
-}
-
-function placeCard(state: GameState, card: CardEntry, dest: Destination): GameState {
-  if (dest === 'discard') {
-    return { ...state, discardCards: [...state.discardCards, card] }
-  }
-  if (dest === 'active') {
-    return { ...state, boardActive: addToSlot(state.boardActive, card) }
-  }
-  const idx = parseInt(dest.split('-')[1])
-  const bench = [...state.boardBench]
-  bench[idx] = addToSlot(bench[idx], card)
-  return { ...state, boardBench: bench }
+  if (!slot) return { cards: [card], damage: 0 }
+  return { ...slot, cards: [...slot.cards, card] }
 }
 
 function removeAt<T>(arr: T[], i: number): T[] {
@@ -76,7 +71,84 @@ function removeAt<T>(arr: T[], i: number): T[] {
 
 function totalBoardCards(g: GameState): number {
   return (g.boardActive?.cards.length ?? 0) +
-    g.boardBench.reduce((n, s) => n + (s?.cards.length ?? 0), 0)
+    g.boardBench.reduce((n, s) => n + (s?.cards.length ?? 0), 0) +
+    (g.boardStadium?.cards.length ?? 0)
+}
+
+/** Place card(s) into any destination zone. */
+function placeCards(state: GameState, cards: CardEntry[], dest: Destination): GameState {
+  switch (dest) {
+    case 'hand':
+      return { ...state, handCards: [...state.handCards, ...cards] }
+    case 'drawn':
+      return { ...state, drawnCards: [...state.drawnCards, ...cards] }
+    case 'thinned':
+      return { ...state, thinnedCards: [...state.thinnedCards, ...cards] }
+    case 'deck':
+      return { ...state, remainingDeck: shuffle([...state.remainingDeck, ...cards]) }
+    case 'next': {
+      const extras = state.nextCard ? [state.nextCard, ...cards.slice(1)] : cards.slice(1)
+      return {
+        ...state,
+        nextCard: cards[0],
+        remainingDeck: extras.length > 0 ? shuffle([...state.remainingDeck, ...extras]) : state.remainingDeck,
+      }
+    }
+    case 'prize':
+      return { ...state, prizeCards: [...state.prizeCards, ...cards] }
+    case 'discard':
+      return { ...state, discardCards: [...state.discardCards, ...cards] }
+    case 'active': {
+      let s = state
+      for (const card of cards) s = { ...s, boardActive: addToSlot(s.boardActive, card) }
+      return s
+    }
+    case 'stadium': {
+      let s = state
+      for (const card of cards) s = { ...s, boardStadium: addToSlot(s.boardStadium, card) }
+      return s
+    }
+    default: {
+      const idx = parseInt(dest.split('-')[1])
+      let s = state
+      for (const card of cards) {
+        const bench = [...s.boardBench]
+        bench[idx] = addToSlot(bench[idx], card)
+        s = { ...s, boardBench: bench }
+      }
+      return s
+    }
+  }
+}
+
+function boardKeyOf(source: DragSource): string | null {
+  if (source.zone === 'active') return 'active'
+  if (source.zone === 'bench') return `bench-${source.slotIndex}`
+  if (source.zone === 'stadium') return 'stadium'
+  return null
+}
+
+function isBoardDest(dest: Destination): boolean {
+  return dest === 'active' || dest.startsWith('bench-') || dest === 'stadium'
+}
+
+function getBoardSlot(state: GameState, key: string): BoardSlot | null {
+  if (key === 'active') return state.boardActive
+  if (key === 'stadium') return state.boardStadium
+  if (key.startsWith('bench-')) return state.boardBench[parseInt(key.split('-')[1])]
+  return null
+}
+
+function setBoardSlot(state: GameState, key: string, slot: BoardSlot | null): GameState {
+  if (key === 'active') return { ...state, boardActive: slot }
+  if (key === 'stadium') return { ...state, boardStadium: slot }
+  if (key.startsWith('bench-')) {
+    const idx = parseInt(key.split('-')[1])
+    const bench = [...state.boardBench]
+    bench[idx] = slot
+    return { ...state, boardBench: bench }
+  }
+  return state
 }
 
 const EMPTY_GAME: GameState = {
@@ -85,8 +157,11 @@ const EMPTY_GAME: GameState = {
   remainingDeck: [],
   drawnCards: [],
   thinnedCards: [],
+  prizeCards: [],
   boardActive: null,
   boardBench: [null, null, null, null, null],
+  boardStadium: null,
+  benchSize: 5,
   discardCards: [],
 }
 
@@ -94,7 +169,6 @@ const EMPTY_GAME: GameState = {
 
 function generateValidHand(entries: CardEntry[]): Hand {
   if (entries.length < 14) {
-    // Not enough cards — return whatever we have
     const pool = entries.flatMap(e => Array(e.count).fill(e))
     const s = shuffle(pool)
     return {
@@ -175,112 +249,136 @@ function useGameState(initial: GameState) {
     })
   }, [apply])
 
-  const moveHandCard = useCallback((idx: number, dest: Destination) => {
+  /** Unified card movement: any zone to any zone. */
+  const moveCard = useCallback((source: DragSource, dest: Destination) => {
     apply(prev => {
-      const card = prev.handCards[idx]
-      if (!card) return prev
-      return placeCard({ ...prev, handCards: removeAt(prev.handCards, idx) }, card, dest)
-    })
-  }, [apply])
+      const srcBoardKey = boardKeyOf(source)
+      const isEnergySrc = source.zone === 'active-energy' || source.zone === 'bench-energy'
 
-  const moveDrawnCard = useCallback((idx: number, dest: Destination) => {
-    apply(prev => {
-      const card = prev.drawnCards[idx]
-      if (!card) return prev
-      return placeCard({ ...prev, drawnCards: removeAt(prev.drawnCards, idx) }, card, dest)
-    })
-  }, [apply])
-
-  const moveThinnedCard = useCallback((idx: number, dest: Destination) => {
-    apply(prev => {
-      const card = prev.thinnedCards[idx]
-      if (!card) return prev
-      return placeCard({ ...prev, thinnedCards: removeAt(prev.thinnedCards, idx) }, card, dest)
-    })
-  }, [apply])
-
-  const moveNextCard = useCallback((dest: Destination) => {
-    apply(prev => {
-      if (!prev.nextCard) return prev
-      return placeCard({ ...prev, nextCard: null }, prev.nextCard, dest)
-    })
-  }, [apply])
-
-  const moveFromActive = useCallback((dest: Destination) => {
-    apply(prev => {
-      if (!prev.boardActive) return prev
-      if (dest === 'discard') {
-        return { ...prev, boardActive: null, discardCards: [...prev.discardCards, ...prev.boardActive.cards] }
+      // Board-to-board (non-energy): swap entire slots
+      if (srcBoardKey && isBoardDest(dest) && !isEnergySrc) {
+        if (srcBoardKey === dest) return prev
+        const srcSlot = getBoardSlot(prev, srcBoardKey)
+        const destSlot = getBoardSlot(prev, dest)
+        let next = setBoardSlot(prev, srcBoardKey, destSlot)
+        next = setBoardSlot(next, dest, srcSlot)
+        return next
       }
-      if (dest === 'active') return prev
-      const benchIdx = parseInt(dest.split('-')[1])
-      const bench = [...prev.boardBench]
-      const target = bench[benchIdx]
-      bench[benchIdx] = prev.boardActive
-      return { ...prev, boardActive: target, boardBench: bench }
+
+      // Extract card(s) from source
+      let cards: CardEntry[]
+      let updated: GameState
+
+      switch (source.zone) {
+        case 'hand': {
+          const card = prev.handCards[source.index]
+          if (!card) return prev
+          cards = [card]
+          updated = { ...prev, handCards: removeAt(prev.handCards, source.index) }
+          break
+        }
+        case 'drawn': {
+          const card = prev.drawnCards[source.index]
+          if (!card) return prev
+          cards = [card]
+          updated = { ...prev, drawnCards: removeAt(prev.drawnCards, source.index) }
+          break
+        }
+        case 'thinned': {
+          const card = prev.thinnedCards[source.index]
+          if (!card) return prev
+          cards = [card]
+          updated = { ...prev, thinnedCards: removeAt(prev.thinnedCards, source.index) }
+          break
+        }
+        case 'next': {
+          if (!prev.nextCard) return prev
+          cards = [prev.nextCard]
+          updated = { ...prev, nextCard: null }
+          break
+        }
+        case 'prize': {
+          const card = prev.prizeCards[source.index]
+          if (!card) return prev
+          cards = [card]
+          updated = { ...prev, prizeCards: removeAt(prev.prizeCards, source.index) }
+          break
+        }
+        case 'discard': {
+          const card = prev.discardCards[source.index]
+          if (!card) return prev
+          cards = [card]
+          updated = { ...prev, discardCards: removeAt(prev.discardCards, source.index) }
+          break
+        }
+        case 'active': {
+          if (!prev.boardActive) return prev
+          cards = prev.boardActive.cards
+          updated = { ...prev, boardActive: null }
+          break
+        }
+        case 'bench': {
+          const slot = prev.boardBench[source.slotIndex]
+          if (!slot) return prev
+          cards = slot.cards
+          const bench = [...prev.boardBench]
+          bench[source.slotIndex] = null
+          updated = { ...prev, boardBench: bench }
+          break
+        }
+        case 'stadium': {
+          if (!prev.boardStadium) return prev
+          cards = prev.boardStadium.cards
+          updated = { ...prev, boardStadium: null }
+          break
+        }
+        case 'active-energy': {
+          if (!prev.boardActive) return prev
+          const energyIndices = prev.boardActive.cards
+            .map((c, i) => c.section === 'energy' ? i : -1)
+            .filter(i => i !== -1)
+          const actualIndex = energyIndices[source.energyIndex]
+          if (actualIndex === undefined) return prev
+          cards = [prev.boardActive.cards[actualIndex]]
+          const newCards = removeAt(prev.boardActive.cards, actualIndex)
+          updated = { ...prev, boardActive: newCards.length > 0 ? { ...prev.boardActive, cards: newCards } : null }
+          break
+        }
+        case 'bench-energy': {
+          const bSlot = prev.boardBench[source.slotIndex]
+          if (!bSlot) return prev
+          const energyIndices = bSlot.cards
+            .map((c, i) => c.section === 'energy' ? i : -1)
+            .filter(i => i !== -1)
+          const actualIndex = energyIndices[source.energyIndex]
+          if (actualIndex === undefined) return prev
+          cards = [bSlot.cards[actualIndex]]
+          const newCards = removeAt(bSlot.cards, actualIndex)
+          const bench = [...prev.boardBench]
+          bench[source.slotIndex] = newCards.length > 0 ? { ...bSlot, cards: newCards } : null
+          updated = { ...prev, boardBench: bench }
+          break
+        }
+        default:
+          return prev
+      }
+
+      if (!cards.length) return prev
+      return placeCards(updated, cards, dest)
     })
   }, [apply])
 
-  const moveFromBench = useCallback((slotIdx: number, dest: Destination) => {
+  const adjustDamage = useCallback((target: 'active' | number, amount: number) => {
     apply(prev => {
-      const slot = prev.boardBench[slotIdx]
+      if (target === 'active') {
+        if (!prev.boardActive) return prev
+        return { ...prev, boardActive: { ...prev.boardActive, damage: Math.max(0, prev.boardActive.damage + amount) } }
+      }
+      const slot = prev.boardBench[target]
       if (!slot) return prev
-      if (dest === 'discard') {
-        const bench = [...prev.boardBench]
-        bench[slotIdx] = null
-        return { ...prev, boardBench: bench, discardCards: [...prev.discardCards, ...slot.cards] }
-      }
-      if (dest === 'active') {
-        const bench = [...prev.boardBench]
-        bench[slotIdx] = prev.boardActive
-        return { ...prev, boardActive: slot, boardBench: bench }
-      }
-      const targetIdx = parseInt(dest.split('-')[1])
-      if (targetIdx === slotIdx) return prev
       const bench = [...prev.boardBench]
-      bench[slotIdx] = bench[targetIdx]
-      bench[targetIdx] = slot
+      bench[target] = { ...slot, damage: Math.max(0, slot.damage + amount) }
       return { ...prev, boardBench: bench }
-    })
-  }, [apply])
-
-  const moveDiscardCard = useCallback((idx: number, dest: Destination) => {
-    apply(prev => {
-      const card = prev.discardCards[idx]
-      if (!card) return prev
-      return placeCard({ ...prev, discardCards: removeAt(prev.discardCards, idx) }, card, dest)
-    })
-  }, [apply])
-
-  const moveEnergyFromActive = useCallback((energyIndex: number, dest: Destination) => {
-    apply(prev => {
-      if (!prev.boardActive) return prev
-      const energyIndices = prev.boardActive.cards
-        .map((c, i) => c.section === 'energy' ? i : -1)
-        .filter(i => i !== -1)
-      const actualIndex = energyIndices[energyIndex]
-      if (actualIndex === undefined) return prev
-      const energy = prev.boardActive.cards[actualIndex]
-      const newCards = removeAt(prev.boardActive.cards, actualIndex)
-      const newActive = newCards.length > 0 ? { cards: newCards } : null
-      return placeCard({ ...prev, boardActive: newActive }, energy, dest)
-    })
-  }, [apply])
-
-  const moveEnergyFromBench = useCallback((slotIdx: number, energyIndex: number, dest: Destination) => {
-    apply(prev => {
-      const slot = prev.boardBench[slotIdx]
-      if (!slot) return prev
-      const energyIndices = slot.cards
-        .map((c, i) => c.section === 'energy' ? i : -1)
-        .filter(i => i !== -1)
-      const actualIndex = energyIndices[energyIndex]
-      if (actualIndex === undefined) return prev
-      const energy = slot.cards[actualIndex]
-      const newCards = removeAt(slot.cards, actualIndex)
-      const bench = [...prev.boardBench]
-      bench[slotIdx] = newCards.length > 0 ? { cards: newCards } : null
-      return placeCard({ ...prev, boardBench: bench }, energy, dest)
     })
   }, [apply])
 
@@ -336,6 +434,26 @@ function useGameState(initial: GameState) {
     })
   }, [apply])
 
+  const expandBench = useCallback(() => {
+    apply(prev => {
+      if (prev.benchSize === 8) return prev
+      return { ...prev, benchSize: 8, boardBench: [...prev.boardBench, null, null, null] }
+    })
+  }, [apply])
+
+  const shrinkBench = useCallback(() => {
+    apply(prev => {
+      if (prev.benchSize === 5) return prev
+      const overflowCards = prev.boardBench.slice(5).flatMap(slot => slot?.cards ?? [])
+      return {
+        ...prev,
+        benchSize: 5,
+        boardBench: prev.boardBench.slice(0, 5),
+        discardCards: [...prev.discardCards, ...overflowCards],
+      }
+    })
+  }, [apply])
+
   return {
     game,
     history,
@@ -343,18 +461,13 @@ function useGameState(initial: GameState) {
     handleUndo,
     handleDraw,
     handleThin,
-    moveHandCard,
-    moveDrawnCard,
-    moveThinnedCard,
-    moveNextCard,
-    moveFromActive,
-    moveFromBench,
-    moveDiscardCard,
-    moveEnergyFromActive,
-    moveEnergyFromBench,
+    moveCard,
+    adjustDamage,
     handleReshuffle,
     handleShuffleToBottom,
     handleDrawToHand,
+    expandBench,
+    shrinkBench,
   }
 }
 
@@ -430,8 +543,11 @@ export default function HandDetailPage() {
     remainingDeck: state?.hand.remainingDeck ?? [],
     drawnCards: [],
     thinnedCards: [],
+    prizeCards: state?.hand.prizes ?? [],
     boardActive: null,
     boardBench: [null, null, null, null, null],
+    boardStadium: null,
+    benchSize: 5,
     discardCards: [],
   })
   const opponentGs = useGameState(EMPTY_GAME)
@@ -485,8 +601,11 @@ export default function HandDetailPage() {
         remainingDeck: hand.remainingDeck,
         drawnCards: [],
         thinnedCards: [],
+        prizeCards: hand.prizes,
         boardActive: null,
         boardBench: [null, null, null, null, null],
+        boardStadium: null,
+        benchSize: 5,
         discardCards: [],
       })
       setOpponentInfo({ deckName: deck.name, mulligans: hand.mulligans, prizes: hand.prizes })
@@ -504,17 +623,7 @@ export default function HandDetailPage() {
     if (!src) return
     dragSourceRef.current = null
     const gs = activePlayerRef.current === 'player' ? playerGsRef.current : opponentGsRef.current
-    switch (src.zone) {
-      case 'hand': gs.moveHandCard(src.index, dest); break
-      case 'drawn': gs.moveDrawnCard(src.index, dest); break
-      case 'thinned': gs.moveThinnedCard(src.index, dest); break
-      case 'next': gs.moveNextCard(dest); break
-      case 'active': gs.moveFromActive(dest); break
-      case 'bench': gs.moveFromBench(src.slotIndex, dest); break
-      case 'discard': gs.moveDiscardCard(src.index, dest); break
-      case 'active-energy': gs.moveEnergyFromActive(src.energyIndex, dest); break
-      case 'bench-energy': gs.moveEnergyFromBench(src.slotIndex, src.energyIndex, dest); break
-    }
+    gs.moveCard(src, dest)
   }, [])
 
   /* ── Guard: no state ───────────────────────────────── */
@@ -535,7 +644,7 @@ export default function HandDetailPage() {
   const activeImageMap = activePlayer === 'player' ? playerImageMap : opponentImageMap
   const { hand } = state
   const handNum = Number(handIndex) + 1
-  const { handCards, nextCard, remainingDeck, drawnCards, thinnedCards, boardActive, boardBench, discardCards } = activeGs.game
+  const { handCards, nextCard, remainingDeck, drawnCards, thinnedCards, prizeCards, boardActive, boardBench, boardStadium, benchSize, discardCards } = activeGs.game
 
   const sortedWithOriginalIndex = [...remainingDeck]
     .map((card, idx) => ({ card, originalIndex: idx }))
@@ -579,10 +688,12 @@ export default function HandDetailPage() {
     dragStart: DragSource,
     energyDragStart: (energyIndex: number) => DragSource,
     slotClass: string,
+    damageTarget?: 'active' | number,
   ) => {
     const isOver = dragOverZone === dest
     const pokemon = slot?.cards.filter(c => c.section !== 'energy') ?? []
     const energy = slot?.cards.filter(c => c.section === 'energy') ?? []
+    const hasPokemon = pokemon.length > 0
 
     return (
       <div
@@ -619,6 +730,19 @@ export default function HandDetailPage() {
                     </div>
                   </DragCard>
                 ))}
+              </div>
+            )}
+            {hasPokemon && damageTarget !== undefined && (
+              <div className={styles.damageCounter}>
+                <div className={styles.damageButtons}>
+                  <button className={styles.damageBtn} onClick={(e) => { e.stopPropagation(); activeGs.adjustDamage(damageTarget, -100) }} title="-100">--</button>
+                  <button className={styles.damageBtn} onClick={(e) => { e.stopPropagation(); activeGs.adjustDamage(damageTarget, -10) }} title="-10">-</button>
+                </div>
+                <span className={`${styles.damageValue} ${slot.damage > 0 ? styles.damageValueActive : ''}`}>{slot.damage}</span>
+                <div className={styles.damageButtons}>
+                  <button className={`${styles.damageBtn} ${styles.damageBtnAdd}`} onClick={(e) => { e.stopPropagation(); activeGs.adjustDamage(damageTarget, 10) }} title="+10">+</button>
+                  <button className={`${styles.damageBtn} ${styles.damageBtnAdd}`} onClick={(e) => { e.stopPropagation(); activeGs.adjustDamage(damageTarget, 100) }} title="+100">++</button>
+                </div>
               </div>
             )}
           </div>
@@ -683,125 +807,193 @@ export default function HandDetailPage() {
         </div>
       </div>
 
-      {/* Row 1: Hand + Prizes + Next */}
-      <div className={styles.dealStrip}>
-        <div className={styles.stripGroup}>
-          <div className={styles.stripLabel}>Hand</div>
-          <div className={styles.stripCards}>
-            {handCards.map((card, i) => (
-              <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'hand', index: i } }}>
-                <div className={styles.stripCard}>{renderCard(card)}</div>
-              </DragCard>
-            ))}
-            {handCards.length === 0 && <span className={styles.zoneEmpty}>Empty</span>}
-          </div>
-        </div>
-        <div className={styles.stripDivider} />
-        <div className={styles.stripGroup}>
-          <div className={styles.stripLabel}>Prizes</div>
-          <div className={styles.stripCards}>
-            {activePlayer === 'player'
-              ? hand.prizes.map((card, i) => (
-                  <div key={i} className={`${styles.stripCard} ${styles.prizeCard}`}>{renderCard(card)}</div>
-                ))
-              : opponentInfo?.prizes.map((card, i) => (
-                  <div key={i} className={`${styles.stripCard} ${styles.prizeCard}`}>{renderCard(card)}</div>
-                )) ?? <span className={styles.zoneEmpty}>—</span>
-            }
-          </div>
-        </div>
-        <div className={styles.stripDivider} />
-        <div className={styles.stripGroup}>
-          <div className={styles.stripLabel}>Next</div>
-          <div className={styles.stripCards}>
-            {nextCard ? (
-              <DragCard onDragStart={() => { dragSourceRef.current = { zone: 'next' } }}>
-                <div className={styles.stripCard}>{renderCard(nextCard)}</div>
-              </DragCard>
-            ) : (
-              <span className={styles.zoneEmpty}>—</span>
-            )}
-          </div>
-        </div>
-      </div>
+      {/* Main horizontal row of columns */}
+      <div className={styles.mainRow}>
 
-      {/* Row 2: Discard (full width) */}
-      <div
-        className={`${styles.discardRow}${dragOverZone === 'discard' ? ` ${styles.discardRowActive}` : ''}`}
-        {...dropHandlers('discard')}
-      >
-        <div className={`${styles.zoneLabel} ${styles.zoneLabelDiscard}`}>Discard ({discardCards.length})</div>
-        {discardCards.length === 0 ? (
-          <p className={styles.zoneEmpty}>{dragOverZone === 'discard' ? 'Drop here' : 'Drag cards here'}</p>
-        ) : (
-          <div className={styles.discardScrollRow}>
-            {discardCards.map((card, i) => (
-              <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'discard', index: i } }}>
-                <div className={styles.discardCard}>{renderCard(card)}</div>
-              </DragCard>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Row 3: Draw/Thinned (left) + Deck horizontal scroll (right) */}
-      <div className={styles.drawDeckRow}>
-        <div className={styles.drawPanel}>
-          <div className={styles.actionHeader}>
-            <span className={styles.sectionLabel}>
-              Drawn ({drawnCards.length}){thinnedCards.length > 0 ? ` / Thinned (${thinnedCards.length})` : ''}
+        {/* Column 1: Unified Hand / Drawing / Thinning */}
+        <div className={styles.handColumn}>
+          <div className={styles.colActionHeader}>
+            <span className={styles.colLabel}>
+              Hand ({handCards.length + drawnCards.length + thinnedCards.length})
             </span>
             <button className={styles.drawBtn} onClick={activeGs.handleDraw} disabled={remainingDeck.length === 0}>Draw</button>
           </div>
-          <div className={styles.drawnScrollRow}>
-            {drawnCards.map((card, i) => (
-              <DragCard key={`drawn-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'drawn', index: i } }}>
-                <div className={`${styles.drawnCard} ${styles.drawnCardEntry}`}>{renderCard(card)}</div>
-              </DragCard>
-            ))}
-            {thinnedCards.map((card, i) => (
-              <DragCard key={`thinned-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'thinned', index: i } }}>
-                <div className={`${styles.drawnCard} ${styles.thinnedCard}`}>{renderCard(card)}</div>
-              </DragCard>
-            ))}
-            {drawnCards.length === 0 && thinnedCards.length === 0 && (
-              <p className={styles.emptyHint}>Click Draw to pull from deck</p>
+          <div
+            className={`${styles.handColumnScroll} ${dragOverZone === 'hand' ? styles.colDropActive : ''}`}
+            {...dropHandlers('hand')}
+          >
+            {/* Hand cards */}
+            {handCards.length > 0 && (
+              <div className={styles.columnCardGrid}>
+                {handCards.map((card, i) => (
+                  <DragCard key={`hand-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'hand', index: i } }}>
+                    <div className={styles.columnCardItem}>{renderCard(card)}</div>
+                  </DragCard>
+                ))}
+              </div>
+            )}
+
+            {/* Drawn cards */}
+            {drawnCards.length > 0 && (
+              <>
+                <div className={styles.colSubLabel}>Drawn ({drawnCards.length})</div>
+                <div className={styles.columnCardGrid}>
+                  {drawnCards.map((card, i) => (
+                    <DragCard key={`drawn-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'drawn', index: i } }}>
+                      <div className={`${styles.columnCardItem} ${styles.drawnCardEntry}`}>{renderCard(card)}</div>
+                    </DragCard>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Thinned cards */}
+            {thinnedCards.length > 0 && (
+              <>
+                <div className={styles.colSubLabel}>Thinned ({thinnedCards.length})</div>
+                <div className={styles.columnCardGrid}>
+                  {thinnedCards.map((card, i) => (
+                    <DragCard key={`thinned-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'thinned', index: i } }}>
+                      <div className={`${styles.columnCardItem} ${styles.thinnedCardItem}`}>{renderCard(card)}</div>
+                    </DragCard>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Remaining deck for thinning */}
+            {remainingDeck.length > 0 && (
+              <div
+                className={`${styles.deckSection} ${dragOverZone === 'deck' ? styles.deckSectionDropActive : ''}`}
+                {...dropHandlers('deck')}
+              >
+                <div className={styles.colSubLabel}>
+                  Deck ({remainingDeck.length}) <span className={styles.deckHint}>· click to thin</span>
+                </div>
+                <div className={styles.deckCardGrid}>
+                  {sortedWithOriginalIndex.map(({ card, originalIndex }) => (
+                    <div
+                      key={originalIndex}
+                      className={`${styles.columnCardItem} ${styles.deckCardItem}`}
+                      onClick={() => activeGs.handleThin(originalIndex)}
+                      title={`Thin ${card.name}`}
+                    >
+                      {renderCard(card)}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {handCards.length === 0 && drawnCards.length === 0 && thinnedCards.length === 0 && remainingDeck.length === 0 && (
+              <p className={styles.emptyHint}>{dragOverZone === 'hand' ? 'Drop here' : 'Empty'}</p>
             )}
           </div>
-        </div>
-        <div className={styles.deckPanel}>
-          <div className={styles.actionHeader}>
-            <span className={styles.sectionLabel}>Deck ({remainingDeck.length})</span>
-            <span className={styles.deckHint}>click to thin</span>
-          </div>
-          <div className={styles.deckScrollRow}>
-            {sortedWithOriginalIndex.map(({ card, originalIndex }) => (
-              <div key={originalIndex} className={styles.deckCard} onClick={() => activeGs.handleThin(originalIndex)} title={`Thin ${card.name}`}>
-                {renderCard(card)}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
 
-      {/* Row 4: Board */}
-      <div className={styles.boardDiscardRow}>
-        <div className={`${styles.zoneLabel} ${styles.zoneLabelBoard}`}>Board ({boardCount})</div>
-        <div className={styles.boardLayout}>
-          <div className={styles.activeArea}>
-            {renderSlot(boardActive, 'active', 'Active', { zone: 'active' }, (ei) => ({ zone: 'active-energy', energyIndex: ei }), styles.activeSlot)}
+          {/* Column 1b: Next card slot — docked to bottom, disappears when empty */}
+          {(nextCard !== null || dragOverZone === 'next') && (
+            <div
+              className={`${styles.nextSlotDocked} ${dragOverZone === 'next' ? styles.nextSlotDropActive : ''}`}
+              {...dropHandlers('next')}
+            >
+              <div className={styles.colSubLabel}>Next</div>
+              {nextCard ? (
+                <DragCard onDragStart={() => { dragSourceRef.current = { zone: 'next' } }}>
+                  <div className={styles.nextCardItem}>{renderCard(nextCard)}</div>
+                </DragCard>
+              ) : (
+                <span className={styles.zoneEmpty}>Drop here</span>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Column 2: Discard */}
+        <div
+          className={`${styles.discardColumn} ${dragOverZone === 'discard' ? styles.discardColumnActive : ''}`}
+          {...dropHandlers('discard')}
+        >
+          <div className={styles.colActionHeader}>
+            <span className={`${styles.colLabel} ${styles.colLabelDiscard}`}>Discard ({discardCards.length})</span>
           </div>
-          <div className={styles.benchArea}>
-            {boardBench.map((slot, i) => renderSlot(
-              slot,
-              `bench-${i}` as Destination,
-              'Bench',
-              { zone: 'bench', slotIndex: i },
-              (ei) => ({ zone: 'bench-energy', slotIndex: i, energyIndex: ei }),
-              styles.benchSlot,
-            ))}
+          <div className={styles.colScrollArea}>
+            <div className={styles.columnCardGrid}>
+              {discardCards.map((card, i) => (
+                <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'discard', index: i } }}>
+                  <div className={styles.columnCardItem}>{renderCard(card)}</div>
+                </DragCard>
+              ))}
+              {discardCards.length === 0 && (
+                <p className={styles.emptyHint}>{dragOverZone === 'discard' ? 'Drop here' : 'Drag cards here'}</p>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Column 3: Board — primary visual focus */}
+        <div className={styles.boardColumn}>
+          <div className={styles.boardHeader}>
+            <div className={`${styles.colLabel} ${styles.colLabelBoard}`}>Board ({boardCount})</div>
+            <div className={styles.benchSizeControls}>
+              <button
+                className={styles.benchSizeBtn}
+                onClick={activeGs.expandBench}
+                disabled={benchSize === 8}
+                title="Expand bench to 8 slots"
+              >
+                Bench 8
+              </button>
+              <button
+                className={styles.benchSizeBtn}
+                onClick={activeGs.shrinkBench}
+                disabled={benchSize === 5}
+                title="Shrink bench to 5 slots (overflow discarded)"
+              >
+                Bench 5
+              </button>
+            </div>
+          </div>
+          <div className={styles.boardLayout}>
+            <div className={styles.activeArea}>
+              {renderSlot(boardActive, 'active', 'Active', { zone: 'active' }, (ei) => ({ zone: 'active-energy', energyIndex: ei }), styles.activeSlot, 'active')}
+              {renderSlot(boardStadium, 'stadium', 'Stadium', { zone: 'stadium' }, (_ei) => ({ zone: 'stadium' }), styles.stadiumSlot)}
+            </div>
+            <div className={styles.benchArea}>
+              {boardBench.map((slot, i) => renderSlot(
+                slot,
+                `bench-${i}` as Destination,
+                'Bench',
+                { zone: 'bench', slotIndex: i },
+                (ei) => ({ zone: 'bench-energy', slotIndex: i, energyIndex: ei }),
+                styles.benchSlot,
+                i,
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Column 4: Prizes */}
+        <div
+          className={`${styles.prizesColumn} ${dragOverZone === 'prize' ? styles.prizesColumnActive : ''}`}
+          {...dropHandlers('prize')}
+        >
+          <div className={styles.colActionHeader}>
+            <span className={styles.colLabel}>Prizes ({prizeCards.length})</span>
+          </div>
+          <div className={styles.colScrollArea}>
+            <div className={styles.columnCardGrid}>
+              {prizeCards.map((card, i) => (
+                <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'prize', index: i } }}>
+                  <div className={`${styles.columnCardItem} ${styles.prizeCardItem}`}>{renderCard(card)}</div>
+                </DragCard>
+              ))}
+              {prizeCards.length === 0 && (
+                <p className={styles.emptyHint}>{dragOverZone === 'prize' ? 'Drop here' : '—'}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
       </div>
 
       {/* Deck picker modal */}
