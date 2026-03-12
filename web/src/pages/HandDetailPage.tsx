@@ -807,162 +807,193 @@ export default function HandDetailPage() {
         </div>
       </div>
 
-      {/* Row 1: Hand + Next + Prizes */}
-      <div className={styles.dealStrip}>
-        <div
-          className={`${styles.stripGroup} ${dragOverZone === 'hand' ? styles.stripGroupDropActive : ''}`}
-          {...dropHandlers('hand')}
-        >
-          <div className={styles.stripLabel}>Hand</div>
-          <div className={styles.stripCards}>
-            {handCards.map((card, i) => (
-              <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'hand', index: i } }}>
-                <div className={styles.stripCard}>{renderCard(card)}</div>
-              </DragCard>
-            ))}
-            {handCards.length === 0 && <span className={styles.zoneEmpty}>{dragOverZone === 'hand' ? 'Drop here' : 'Empty'}</span>}
-          </div>
-        </div>
-        <div className={styles.stripDivider} />
-        <div
-          className={`${styles.stripGroup} ${styles.nextGroup} ${dragOverZone === 'next' ? styles.stripGroupDropActive : ''}`}
-          {...dropHandlers('next')}
-        >
-          <div className={styles.stripLabel}>Next</div>
-          <div className={styles.stripCards}>
-            {nextCard ? (
-              <DragCard onDragStart={() => { dragSourceRef.current = { zone: 'next' } }}>
-                <div className={styles.stripCard}>{renderCard(nextCard)}</div>
-              </DragCard>
-            ) : (
-              <span className={styles.zoneEmpty}>{dragOverZone === 'next' ? 'Drop here' : '—'}</span>
-            )}
-          </div>
-        </div>
-        <div className={styles.stripDivider} />
-        <div
-          className={`${styles.stripGroup} ${dragOverZone === 'prize' ? styles.stripGroupDropActive : ''}`}
-          {...dropHandlers('prize')}
-        >
-          <div className={styles.stripLabel}>Prizes</div>
-          <div className={styles.stripCards}>
-            {prizeCards.length > 0
-              ? prizeCards.map((card, i) => (
-                  <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'prize', index: i } }}>
-                    <div className={`${styles.stripCard} ${styles.prizeCard}`}>{renderCard(card)}</div>
-                  </DragCard>
-                ))
-              : <span className={styles.zoneEmpty}>{dragOverZone === 'prize' ? 'Drop here' : '—'}</span>
-            }
-          </div>
-        </div>
-      </div>
+      {/* Main horizontal row of columns */}
+      <div className={styles.mainRow}>
 
-      {/* Row 2: Drawn/Thinned + Deck + Discard */}
-      <div className={styles.drawDeckRow}>
-        <div
-          className={`${styles.drawPanel} ${dragOverZone === 'drawn' ? styles.drawPanelDropActive : ''}`}
-          {...dropHandlers('drawn')}
-        >
-          <div className={styles.actionHeader}>
-            <span className={styles.sectionLabel}>
-              Drawn ({drawnCards.length}){thinnedCards.length > 0 ? ` / Thinned (${thinnedCards.length})` : ''}
+        {/* Column 1: Unified Hand / Drawing / Thinning */}
+        <div className={styles.handColumn}>
+          <div className={styles.colActionHeader}>
+            <span className={styles.colLabel}>
+              Hand ({handCards.length + drawnCards.length + thinnedCards.length})
             </span>
             <button className={styles.drawBtn} onClick={activeGs.handleDraw} disabled={remainingDeck.length === 0}>Draw</button>
           </div>
-          <div className={styles.drawnScrollRow}>
-            {drawnCards.map((card, i) => (
-              <DragCard key={`drawn-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'drawn', index: i } }}>
-                <div className={`${styles.drawnCard} ${styles.drawnCardEntry}`}>{renderCard(card)}</div>
-              </DragCard>
-            ))}
-            {thinnedCards.map((card, i) => (
-              <DragCard key={`thinned-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'thinned', index: i } }}>
-                <div className={`${styles.drawnCard} ${styles.thinnedCard}`}>{renderCard(card)}</div>
-              </DragCard>
-            ))}
-            {drawnCards.length === 0 && thinnedCards.length === 0 && (
-              <p className={styles.emptyHint}>{dragOverZone === 'drawn' ? 'Drop here' : 'Click Draw to pull from deck'}</p>
+          <div
+            className={`${styles.handColumnScroll} ${dragOverZone === 'hand' ? styles.colDropActive : ''}`}
+            {...dropHandlers('hand')}
+          >
+            {/* Hand cards */}
+            {handCards.length > 0 && (
+              <div className={styles.columnCardGrid}>
+                {handCards.map((card, i) => (
+                  <DragCard key={`hand-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'hand', index: i } }}>
+                    <div className={styles.columnCardItem}>{renderCard(card)}</div>
+                  </DragCard>
+                ))}
+              </div>
+            )}
+
+            {/* Drawn cards */}
+            {drawnCards.length > 0 && (
+              <>
+                <div className={styles.colSubLabel}>Drawn ({drawnCards.length})</div>
+                <div className={styles.columnCardGrid}>
+                  {drawnCards.map((card, i) => (
+                    <DragCard key={`drawn-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'drawn', index: i } }}>
+                      <div className={`${styles.columnCardItem} ${styles.drawnCardEntry}`}>{renderCard(card)}</div>
+                    </DragCard>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Thinned cards */}
+            {thinnedCards.length > 0 && (
+              <>
+                <div className={styles.colSubLabel}>Thinned ({thinnedCards.length})</div>
+                <div className={styles.columnCardGrid}>
+                  {thinnedCards.map((card, i) => (
+                    <DragCard key={`thinned-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'thinned', index: i } }}>
+                      <div className={`${styles.columnCardItem} ${styles.thinnedCardItem}`}>{renderCard(card)}</div>
+                    </DragCard>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Remaining deck for thinning */}
+            {remainingDeck.length > 0 && (
+              <div
+                className={`${styles.deckSection} ${dragOverZone === 'deck' ? styles.deckSectionDropActive : ''}`}
+                {...dropHandlers('deck')}
+              >
+                <div className={styles.colSubLabel}>
+                  Deck ({remainingDeck.length}) <span className={styles.deckHint}>· click to thin</span>
+                </div>
+                <div className={styles.deckCardGrid}>
+                  {sortedWithOriginalIndex.map(({ card, originalIndex }) => (
+                    <div
+                      key={originalIndex}
+                      className={`${styles.columnCardItem} ${styles.deckCardItem}`}
+                      onClick={() => activeGs.handleThin(originalIndex)}
+                      title={`Thin ${card.name}`}
+                    >
+                      {renderCard(card)}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {handCards.length === 0 && drawnCards.length === 0 && thinnedCards.length === 0 && remainingDeck.length === 0 && (
+              <p className={styles.emptyHint}>{dragOverZone === 'hand' ? 'Drop here' : 'Empty'}</p>
             )}
           </div>
-        </div>
-        <div
-          className={`${styles.deckPanel} ${dragOverZone === 'deck' ? styles.deckPanelDropActive : ''}`}
-          {...dropHandlers('deck')}
-        >
-          <div className={styles.actionHeader}>
-            <span className={styles.sectionLabel}>Deck ({remainingDeck.length})</span>
-            <span className={styles.deckHint}>click to thin · drop to shuffle in</span>
-          </div>
-          <div className={styles.deckScrollRow}>
-            {sortedWithOriginalIndex.map(({ card, originalIndex }) => (
-              <div key={originalIndex} className={styles.deckCard} onClick={() => activeGs.handleThin(originalIndex)} title={`Thin ${card.name}`}>
-                {renderCard(card)}
-              </div>
-            ))}
-          </div>
-        </div>
-        <div
-          className={`${styles.discardPanel}${dragOverZone === 'discard' ? ` ${styles.discardPanelActive}` : ''}`}
-          {...dropHandlers('discard')}
-        >
-          <div className={styles.actionHeader}>
-            <span className={`${styles.sectionLabel} ${styles.sectionLabelDiscard}`}>Discard ({discardCards.length})</span>
-          </div>
-          {discardCards.length === 0 ? (
-            <p className={styles.emptyHint}>{dragOverZone === 'discard' ? 'Drop here' : 'Drag cards here'}</p>
-          ) : (
-            <div className={styles.discardScrollRow}>
-              {discardCards.map((card, i) => (
-                <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'discard', index: i } }}>
-                  <div className={styles.discardCard}>{renderCard(card)}</div>
+
+          {/* Column 1b: Next card slot — docked to bottom, disappears when empty */}
+          {(nextCard !== null || dragOverZone === 'next') && (
+            <div
+              className={`${styles.nextSlotDocked} ${dragOverZone === 'next' ? styles.nextSlotDropActive : ''}`}
+              {...dropHandlers('next')}
+            >
+              <div className={styles.colSubLabel}>Next</div>
+              {nextCard ? (
+                <DragCard onDragStart={() => { dragSourceRef.current = { zone: 'next' } }}>
+                  <div className={styles.nextCardItem}>{renderCard(nextCard)}</div>
                 </DragCard>
-              ))}
+              ) : (
+                <span className={styles.zoneEmpty}>Drop here</span>
+              )}
             </div>
           )}
         </div>
-      </div>
 
-      {/* Row 4: Board */}
-      <div className={styles.boardDiscardRow}>
-        <div className={styles.boardHeader}>
-          <div className={`${styles.zoneLabel} ${styles.zoneLabelBoard}`}>Board ({boardCount})</div>
-          <div className={styles.benchSizeControls}>
-            <button
-              className={styles.benchSizeBtn}
-              onClick={activeGs.expandBench}
-              disabled={benchSize === 8}
-              title="Expand bench to 8 slots"
-            >
-              Bench 8
-            </button>
-            <button
-              className={styles.benchSizeBtn}
-              onClick={activeGs.shrinkBench}
-              disabled={benchSize === 5}
-              title="Shrink bench to 5 slots (overflow discarded)"
-            >
-              Bench 5
-            </button>
+        {/* Column 2: Discard */}
+        <div
+          className={`${styles.discardColumn} ${dragOverZone === 'discard' ? styles.discardColumnActive : ''}`}
+          {...dropHandlers('discard')}
+        >
+          <div className={styles.colActionHeader}>
+            <span className={`${styles.colLabel} ${styles.colLabelDiscard}`}>Discard ({discardCards.length})</span>
+          </div>
+          <div className={styles.colScrollArea}>
+            <div className={styles.columnCardGrid}>
+              {discardCards.map((card, i) => (
+                <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'discard', index: i } }}>
+                  <div className={styles.columnCardItem}>{renderCard(card)}</div>
+                </DragCard>
+              ))}
+              {discardCards.length === 0 && (
+                <p className={styles.emptyHint}>{dragOverZone === 'discard' ? 'Drop here' : 'Drag cards here'}</p>
+              )}
+            </div>
           </div>
         </div>
-        <div className={styles.boardLayout}>
-          <div className={styles.activeArea}>
-            {renderSlot(boardActive, 'active', 'Active', { zone: 'active' }, (ei) => ({ zone: 'active-energy', energyIndex: ei }), styles.activeSlot, 'active')}
-            {renderSlot(boardStadium, 'stadium', 'Stadium', { zone: 'stadium' }, (_ei) => ({ zone: 'stadium' }), styles.stadiumSlot)}
+
+        {/* Column 3: Board — primary visual focus */}
+        <div className={styles.boardColumn}>
+          <div className={styles.boardHeader}>
+            <div className={`${styles.colLabel} ${styles.colLabelBoard}`}>Board ({boardCount})</div>
+            <div className={styles.benchSizeControls}>
+              <button
+                className={styles.benchSizeBtn}
+                onClick={activeGs.expandBench}
+                disabled={benchSize === 8}
+                title="Expand bench to 8 slots"
+              >
+                Bench 8
+              </button>
+              <button
+                className={styles.benchSizeBtn}
+                onClick={activeGs.shrinkBench}
+                disabled={benchSize === 5}
+                title="Shrink bench to 5 slots (overflow discarded)"
+              >
+                Bench 5
+              </button>
+            </div>
           </div>
-          <div className={styles.benchArea}>
-            {boardBench.map((slot, i) => renderSlot(
-              slot,
-              `bench-${i}` as Destination,
-              'Bench',
-              { zone: 'bench', slotIndex: i },
-              (ei) => ({ zone: 'bench-energy', slotIndex: i, energyIndex: ei }),
-              styles.benchSlot,
-              i,
-            ))}
+          <div className={styles.boardLayout}>
+            <div className={styles.activeArea}>
+              {renderSlot(boardActive, 'active', 'Active', { zone: 'active' }, (ei) => ({ zone: 'active-energy', energyIndex: ei }), styles.activeSlot, 'active')}
+              {renderSlot(boardStadium, 'stadium', 'Stadium', { zone: 'stadium' }, (_ei) => ({ zone: 'stadium' }), styles.stadiumSlot)}
+            </div>
+            <div className={styles.benchArea}>
+              {boardBench.map((slot, i) => renderSlot(
+                slot,
+                `bench-${i}` as Destination,
+                'Bench',
+                { zone: 'bench', slotIndex: i },
+                (ei) => ({ zone: 'bench-energy', slotIndex: i, energyIndex: ei }),
+                styles.benchSlot,
+                i,
+              ))}
+            </div>
           </div>
         </div>
+
+        {/* Column 4: Prizes */}
+        <div
+          className={`${styles.prizesColumn} ${dragOverZone === 'prize' ? styles.prizesColumnActive : ''}`}
+          {...dropHandlers('prize')}
+        >
+          <div className={styles.colActionHeader}>
+            <span className={styles.colLabel}>Prizes ({prizeCards.length})</span>
+          </div>
+          <div className={styles.colScrollArea}>
+            <div className={styles.columnCardGrid}>
+              {prizeCards.map((card, i) => (
+                <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'prize', index: i } }}>
+                  <div className={`${styles.columnCardItem} ${styles.prizeCardItem}`}>{renderCard(card)}</div>
+                </DragCard>
+              ))}
+              {prizeCards.length === 0 && (
+                <p className={styles.emptyHint}>{dragOverZone === 'prize' ? 'Drop here' : '—'}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
       </div>
 
       {/* Deck picker modal */}
