@@ -399,6 +399,27 @@
   font-style: italic;
 }
 
+/* ── Drop-active styles for non-board zones ──────────── */
+
+.stripGroupDropActive {
+  outline: 2px dashed rgba(99, 102, 241, 0.6);
+  outline-offset: -2px;
+  background: rgba(99, 102, 241, 0.06);
+  border-radius: 6px;
+}
+
+.drawPanelDropActive {
+  border-color: rgba(99, 102, 241, 0.7) !important;
+  border-style: dashed !important;
+  background: rgba(99, 102, 241, 0.06) !important;
+}
+
+.deckPanelDropActive {
+  border-color: rgba(59, 130, 246, 0.7) !important;
+  border-style: dashed !important;
+  background: rgba(59, 130, 246, 0.06) !important;
+}
+
 /* ── Row 4: Board ────────────────────────────────────── */
 
 .boardDiscardRow {

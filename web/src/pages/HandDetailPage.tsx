@@ -26,7 +26,10 @@ function shuffle<T>(arr: T[]): T[] {
 
 type BoardSlot = { cards: CardEntry[]; damage: number }
 
-type Destination = 'active' | 'bench-0' | 'bench-1' | 'bench-2' | 'bench-3' | 'bench-4' | 'bench-5' | 'bench-6' | 'bench-7' | 'stadium' | 'discard'
+type Destination =
+  | 'hand' | 'drawn' | 'thinned' | 'deck' | 'next' | 'prize'
+  | 'active' | 'bench-0' | 'bench-1' | 'bench-2' | 'bench-3' | 'bench-4'
+  | 'bench-5' | 'bench-6' | 'bench-7' | 'stadium' | 'discard'
 
 type GameState = {
   handCards: CardEntry[]
@@ -62,22 +65,6 @@ function addToSlot(slot: BoardSlot | null, card: CardEntry): BoardSlot {
   return { ...slot, cards: [...slot.cards, card] }
 }
 
-function placeCard(state: GameState, card: CardEntry, dest: Destination): GameState {
-  if (dest === 'discard') {
-    return { ...state, discardCards: [...state.discardCards, card] }
-  }
-  if (dest === 'active') {
-    return { ...state, boardActive: addToSlot(state.boardActive, card) }
-  }
-  if (dest === 'stadium') {
-    return { ...state, boardStadium: addToSlot(state.boardStadium, card) }
-  }
-  const idx = parseInt(dest.split('-')[1])
-  const bench = [...state.boardBench]
-  bench[idx] = addToSlot(bench[idx], card)
-  return { ...state, boardBench: bench }
-}
-
 function removeAt<T>(arr: T[], i: number): T[] {
   return [...arr.slice(0, i), ...arr.slice(i + 1)]
 }
@@ -86,6 +73,82 @@ function totalBoardCards(g: GameState): number {
   return (g.boardActive?.cards.length ?? 0) +
     g.boardBench.reduce((n, s) => n + (s?.cards.length ?? 0), 0) +
     (g.boardStadium?.cards.length ?? 0)
+}
+
+/** Place card(s) into any destination zone. */
+function placeCards(state: GameState, cards: CardEntry[], dest: Destination): GameState {
+  switch (dest) {
+    case 'hand':
+      return { ...state, handCards: [...state.handCards, ...cards] }
+    case 'drawn':
+      return { ...state, drawnCards: [...state.drawnCards, ...cards] }
+    case 'thinned':
+      return { ...state, thinnedCards: [...state.thinnedCards, ...cards] }
+    case 'deck':
+      return { ...state, remainingDeck: shuffle([...state.remainingDeck, ...cards]) }
+    case 'next': {
+      const extras = state.nextCard ? [state.nextCard, ...cards.slice(1)] : cards.slice(1)
+      return {
+        ...state,
+        nextCard: cards[0],
+        remainingDeck: extras.length > 0 ? shuffle([...state.remainingDeck, ...extras]) : state.remainingDeck,
+      }
+    }
+    case 'prize':
+      return { ...state, prizeCards: [...state.prizeCards, ...cards] }
+    case 'discard':
+      return { ...state, discardCards: [...state.discardCards, ...cards] }
+    case 'active': {
+      let s = state
+      for (const card of cards) s = { ...s, boardActive: addToSlot(s.boardActive, card) }
+      return s
+    }
+    case 'stadium': {
+      let s = state
+      for (const card of cards) s = { ...s, boardStadium: addToSlot(s.boardStadium, card) }
+      return s
+    }
+    default: {
+      const idx = parseInt(dest.split('-')[1])
+      let s = state
+      for (const card of cards) {
+        const bench = [...s.boardBench]
+        bench[idx] = addToSlot(bench[idx], card)
+        s = { ...s, boardBench: bench }
+      }
+      return s
+    }
+  }
+}
+
+function boardKeyOf(source: DragSource): string | null {
+  if (source.zone === 'active') return 'active'
+  if (source.zone === 'bench') return `bench-${source.slotIndex}`
+  if (source.zone === 'stadium') return 'stadium'
+  return null
+}
+
+function isBoardDest(dest: Destination): boolean {
+  return dest === 'active' || dest.startsWith('bench-') || dest === 'stadium'
+}
+
+function getBoardSlot(state: GameState, key: string): BoardSlot | null {
+  if (key === 'active') return state.boardActive
+  if (key === 'stadium') return state.boardStadium
+  if (key.startsWith('bench-')) return state.boardBench[parseInt(key.split('-')[1])]
+  return null
+}
+
+function setBoardSlot(state: GameState, key: string, slot: BoardSlot | null): GameState {
+  if (key === 'active') return { ...state, boardActive: slot }
+  if (key === 'stadium') return { ...state, boardStadium: slot }
+  if (key.startsWith('bench-')) {
+    const idx = parseInt(key.split('-')[1])
+    const bench = [...state.boardBench]
+    bench[idx] = slot
+    return { ...state, boardBench: bench }
+  }
+  return state
 }
 
 const EMPTY_GAME: GameState = {
@@ -106,7 +169,6 @@ const EMPTY_GAME: GameState = {
 
 function generateValidHand(entries: CardEntry[]): Hand {
   if (entries.length < 14) {
-    // Not enough cards — return whatever we have
     const pool = entries.flatMap(e => Array(e.count).fill(e))
     const s = shuffle(pool)
     return {
@@ -187,155 +249,122 @@ function useGameState(initial: GameState) {
     })
   }, [apply])
 
-  const moveHandCard = useCallback((idx: number, dest: Destination) => {
+  /** Unified card movement: any zone to any zone. */
+  const moveCard = useCallback((source: DragSource, dest: Destination) => {
     apply(prev => {
-      const card = prev.handCards[idx]
-      if (!card) return prev
-      return placeCard({ ...prev, handCards: removeAt(prev.handCards, idx) }, card, dest)
-    })
-  }, [apply])
+      const srcBoardKey = boardKeyOf(source)
+      const isEnergySrc = source.zone === 'active-energy' || source.zone === 'bench-energy'
 
-  const moveDrawnCard = useCallback((idx: number, dest: Destination) => {
-    apply(prev => {
-      const card = prev.drawnCards[idx]
-      if (!card) return prev
-      return placeCard({ ...prev, drawnCards: removeAt(prev.drawnCards, idx) }, card, dest)
-    })
-  }, [apply])
-
-  const moveThinnedCard = useCallback((idx: number, dest: Destination) => {
-    apply(prev => {
-      const card = prev.thinnedCards[idx]
-      if (!card) return prev
-      return placeCard({ ...prev, thinnedCards: removeAt(prev.thinnedCards, idx) }, card, dest)
-    })
-  }, [apply])
-
-  const moveFromPrize = useCallback((idx: number, dest: Destination) => {
-    apply(prev => {
-      const card = prev.prizeCards[idx]
-      if (!card) return prev
-      return placeCard({ ...prev, prizeCards: removeAt(prev.prizeCards, idx) }, card, dest)
-    })
-  }, [apply])
-
-  const moveNextCard = useCallback((dest: Destination) => {
-    apply(prev => {
-      if (!prev.nextCard) return prev
-      return placeCard({ ...prev, nextCard: null }, prev.nextCard, dest)
-    })
-  }, [apply])
-
-  const moveFromActive = useCallback((dest: Destination) => {
-    apply(prev => {
-      if (!prev.boardActive) return prev
-      if (dest === 'discard') {
-        return { ...prev, boardActive: null, discardCards: [...prev.discardCards, ...prev.boardActive.cards] }
+      // Board-to-board (non-energy): swap entire slots
+      if (srcBoardKey && isBoardDest(dest) && !isEnergySrc) {
+        if (srcBoardKey === dest) return prev
+        const srcSlot = getBoardSlot(prev, srcBoardKey)
+        const destSlot = getBoardSlot(prev, dest)
+        let next = setBoardSlot(prev, srcBoardKey, destSlot)
+        next = setBoardSlot(next, dest, srcSlot)
+        return next
       }
-      if (dest === 'active') return prev
-      const benchIdx = parseInt(dest.split('-')[1])
-      const bench = [...prev.boardBench]
-      const target = bench[benchIdx]
-      bench[benchIdx] = prev.boardActive
-      return { ...prev, boardActive: target, boardBench: bench }
-    })
-  }, [apply])
 
-  const moveFromBench = useCallback((slotIdx: number, dest: Destination) => {
-    apply(prev => {
-      const slot = prev.boardBench[slotIdx]
-      if (!slot) return prev
-      if (dest === 'discard') {
-        const bench = [...prev.boardBench]
-        bench[slotIdx] = null
-        return { ...prev, boardBench: bench, discardCards: [...prev.discardCards, ...slot.cards] }
+      // Extract card(s) from source
+      let cards: CardEntry[]
+      let updated: GameState
+
+      switch (source.zone) {
+        case 'hand': {
+          const card = prev.handCards[source.index]
+          if (!card) return prev
+          cards = [card]
+          updated = { ...prev, handCards: removeAt(prev.handCards, source.index) }
+          break
+        }
+        case 'drawn': {
+          const card = prev.drawnCards[source.index]
+          if (!card) return prev
+          cards = [card]
+          updated = { ...prev, drawnCards: removeAt(prev.drawnCards, source.index) }
+          break
+        }
+        case 'thinned': {
+          const card = prev.thinnedCards[source.index]
+          if (!card) return prev
+          cards = [card]
+          updated = { ...prev, thinnedCards: removeAt(prev.thinnedCards, source.index) }
+          break
+        }
+        case 'next': {
+          if (!prev.nextCard) return prev
+          cards = [prev.nextCard]
+          updated = { ...prev, nextCard: null }
+          break
+        }
+        case 'prize': {
+          const card = prev.prizeCards[source.index]
+          if (!card) return prev
+          cards = [card]
+          updated = { ...prev, prizeCards: removeAt(prev.prizeCards, source.index) }
+          break
+        }
+        case 'discard': {
+          const card = prev.discardCards[source.index]
+          if (!card) return prev
+          cards = [card]
+          updated = { ...prev, discardCards: removeAt(prev.discardCards, source.index) }
+          break
+        }
+        case 'active': {
+          if (!prev.boardActive) return prev
+          cards = prev.boardActive.cards
+          updated = { ...prev, boardActive: null }
+          break
+        }
+        case 'bench': {
+          const slot = prev.boardBench[source.slotIndex]
+          if (!slot) return prev
+          cards = slot.cards
+          const bench = [...prev.boardBench]
+          bench[source.slotIndex] = null
+          updated = { ...prev, boardBench: bench }
+          break
+        }
+        case 'stadium': {
+          if (!prev.boardStadium) return prev
+          cards = prev.boardStadium.cards
+          updated = { ...prev, boardStadium: null }
+          break
+        }
+        case 'active-energy': {
+          if (!prev.boardActive) return prev
+          const energyIndices = prev.boardActive.cards
+            .map((c, i) => c.section === 'energy' ? i : -1)
+            .filter(i => i !== -1)
+          const actualIndex = energyIndices[source.energyIndex]
+          if (actualIndex === undefined) return prev
+          cards = [prev.boardActive.cards[actualIndex]]
+          const newCards = removeAt(prev.boardActive.cards, actualIndex)
+          updated = { ...prev, boardActive: newCards.length > 0 ? { ...prev.boardActive, cards: newCards } : null }
+          break
+        }
+        case 'bench-energy': {
+          const bSlot = prev.boardBench[source.slotIndex]
+          if (!bSlot) return prev
+          const energyIndices = bSlot.cards
+            .map((c, i) => c.section === 'energy' ? i : -1)
+            .filter(i => i !== -1)
+          const actualIndex = energyIndices[source.energyIndex]
+          if (actualIndex === undefined) return prev
+          cards = [bSlot.cards[actualIndex]]
+          const newCards = removeAt(bSlot.cards, actualIndex)
+          const bench = [...prev.boardBench]
+          bench[source.slotIndex] = newCards.length > 0 ? { ...bSlot, cards: newCards } : null
+          updated = { ...prev, boardBench: bench }
+          break
+        }
+        default:
+          return prev
       }
-      if (dest === 'active') {
-        const bench = [...prev.boardBench]
-        bench[slotIdx] = prev.boardActive
-        return { ...prev, boardActive: slot, boardBench: bench }
-      }
-      const targetIdx = parseInt(dest.split('-')[1])
-      if (targetIdx === slotIdx) return prev
-      const bench = [...prev.boardBench]
-      bench[slotIdx] = bench[targetIdx]
-      bench[targetIdx] = slot
-      return { ...prev, boardBench: bench }
-    })
-  }, [apply])
 
-  const moveDiscardCard = useCallback((idx: number, dest: Destination) => {
-    apply(prev => {
-      const card = prev.discardCards[idx]
-      if (!card) return prev
-      return placeCard({ ...prev, discardCards: removeAt(prev.discardCards, idx) }, card, dest)
-    })
-  }, [apply])
-
-  const moveEnergyFromActive = useCallback((energyIndex: number, dest: Destination) => {
-    apply(prev => {
-      if (!prev.boardActive) return prev
-      const energyIndices = prev.boardActive.cards
-        .map((c, i) => c.section === 'energy' ? i : -1)
-        .filter(i => i !== -1)
-      const actualIndex = energyIndices[energyIndex]
-      if (actualIndex === undefined) return prev
-      const energy = prev.boardActive.cards[actualIndex]
-      const newCards = removeAt(prev.boardActive.cards, actualIndex)
-      const newActive = newCards.length > 0 ? { ...prev.boardActive, cards: newCards } : null
-      return placeCard({ ...prev, boardActive: newActive }, energy, dest)
-    })
-  }, [apply])
-
-  const moveFromStadium = useCallback((dest: Destination) => {
-    apply(prev => {
-      if (!prev.boardStadium) return prev
-      if (dest === 'discard') {
-        return { ...prev, boardStadium: null, discardCards: [...prev.discardCards, ...prev.boardStadium.cards] }
-      }
-      if (dest === 'stadium') return prev
-      // Move entire stadium slot (all cards) to destination; treat each card individually
-      const cards = prev.boardStadium.cards
-      let next: GameState = { ...prev, boardStadium: null }
-      for (const card of cards) next = placeCard(next, card, dest)
-      return next
-    })
-  }, [apply])
-
-  const expandBench = useCallback(() => {
-    apply(prev => {
-      if (prev.benchSize === 8) return prev
-      return { ...prev, benchSize: 8, boardBench: [...prev.boardBench, null, null, null] }
-    })
-  }, [apply])
-
-  const shrinkBench = useCallback(() => {
-    apply(prev => {
-      if (prev.benchSize === 5) return prev
-      const overflowCards = prev.boardBench.slice(5).flatMap(slot => slot?.cards ?? [])
-      return {
-        ...prev,
-        benchSize: 5,
-        boardBench: prev.boardBench.slice(0, 5),
-        discardCards: [...prev.discardCards, ...overflowCards],
-      }
-    })
-  }, [apply])
-
-  const moveEnergyFromBench = useCallback((slotIdx: number, energyIndex: number, dest: Destination) => {
-    apply(prev => {
-      const slot = prev.boardBench[slotIdx]
-      if (!slot) return prev
-      const energyIndices = slot.cards
-        .map((c, i) => c.section === 'energy' ? i : -1)
-        .filter(i => i !== -1)
-      const actualIndex = energyIndices[energyIndex]
-      if (actualIndex === undefined) return prev
-      const energy = slot.cards[actualIndex]
-      const newCards = removeAt(slot.cards, actualIndex)
-      const bench = [...prev.boardBench]
-      bench[slotIdx] = newCards.length > 0 ? { ...slot, cards: newCards } : null
-      return placeCard({ ...prev, boardBench: bench }, energy, dest)
+      if (!cards.length) return prev
+      return placeCards(updated, cards, dest)
     })
   }, [apply])
 
@@ -405,6 +434,26 @@ function useGameState(initial: GameState) {
     })
   }, [apply])
 
+  const expandBench = useCallback(() => {
+    apply(prev => {
+      if (prev.benchSize === 8) return prev
+      return { ...prev, benchSize: 8, boardBench: [...prev.boardBench, null, null, null] }
+    })
+  }, [apply])
+
+  const shrinkBench = useCallback(() => {
+    apply(prev => {
+      if (prev.benchSize === 5) return prev
+      const overflowCards = prev.boardBench.slice(5).flatMap(slot => slot?.cards ?? [])
+      return {
+        ...prev,
+        benchSize: 5,
+        boardBench: prev.boardBench.slice(0, 5),
+        discardCards: [...prev.discardCards, ...overflowCards],
+      }
+    })
+  }, [apply])
+
   return {
     game,
     history,
@@ -412,17 +461,7 @@ function useGameState(initial: GameState) {
     handleUndo,
     handleDraw,
     handleThin,
-    moveHandCard,
-    moveDrawnCard,
-    moveThinnedCard,
-    moveFromPrize,
-    moveNextCard,
-    moveFromActive,
-    moveFromBench,
-    moveFromStadium,
-    moveDiscardCard,
-    moveEnergyFromActive,
-    moveEnergyFromBench,
+    moveCard,
     adjustDamage,
     handleReshuffle,
     handleShuffleToBottom,
@@ -584,19 +623,7 @@ export default function HandDetailPage() {
     if (!src) return
     dragSourceRef.current = null
     const gs = activePlayerRef.current === 'player' ? playerGsRef.current : opponentGsRef.current
-    switch (src.zone) {
-      case 'hand': gs.moveHandCard(src.index, dest); break
-      case 'drawn': gs.moveDrawnCard(src.index, dest); break
-      case 'thinned': gs.moveThinnedCard(src.index, dest); break
-      case 'next': gs.moveNextCard(dest); break
-      case 'prize': gs.moveFromPrize(src.index, dest); break
-      case 'active': gs.moveFromActive(dest); break
-      case 'bench': gs.moveFromBench(src.slotIndex, dest); break
-      case 'discard': gs.moveDiscardCard(src.index, dest); break
-      case 'active-energy': gs.moveEnergyFromActive(src.energyIndex, dest); break
-      case 'bench-energy': gs.moveEnergyFromBench(src.slotIndex, src.energyIndex, dest); break
-      case 'stadium': gs.moveFromStadium(dest); break
-    }
+    gs.moveCard(src, dest)
   }, [])
 
   /* ── Guard: no state ───────────────────────────────── */
@@ -782,7 +809,10 @@ export default function HandDetailPage() {
 
       {/* Row 1: Hand + Next + Prizes */}
       <div className={styles.dealStrip}>
-        <div className={styles.stripGroup}>
+        <div
+          className={`${styles.stripGroup} ${dragOverZone === 'hand' ? styles.stripGroupDropActive : ''}`}
+          {...dropHandlers('hand')}
+        >
           <div className={styles.stripLabel}>Hand</div>
           <div className={styles.stripCards}>
             {handCards.map((card, i) => (
@@ -790,11 +820,14 @@ export default function HandDetailPage() {
                 <div className={styles.stripCard}>{renderCard(card)}</div>
               </DragCard>
             ))}
-            {handCards.length === 0 && <span className={styles.zoneEmpty}>Empty</span>}
+            {handCards.length === 0 && <span className={styles.zoneEmpty}>{dragOverZone === 'hand' ? 'Drop here' : 'Empty'}</span>}
           </div>
         </div>
         <div className={styles.stripDivider} />
-        <div className={`${styles.stripGroup} ${styles.nextGroup}`}>
+        <div
+          className={`${styles.stripGroup} ${styles.nextGroup} ${dragOverZone === 'next' ? styles.stripGroupDropActive : ''}`}
+          {...dropHandlers('next')}
+        >
           <div className={styles.stripLabel}>Next</div>
           <div className={styles.stripCards}>
             {nextCard ? (
@@ -802,12 +835,15 @@ export default function HandDetailPage() {
                 <div className={styles.stripCard}>{renderCard(nextCard)}</div>
               </DragCard>
             ) : (
-              <span className={styles.zoneEmpty}>—</span>
+              <span className={styles.zoneEmpty}>{dragOverZone === 'next' ? 'Drop here' : '—'}</span>
             )}
           </div>
         </div>
         <div className={styles.stripDivider} />
-        <div className={styles.stripGroup}>
+        <div
+          className={`${styles.stripGroup} ${dragOverZone === 'prize' ? styles.stripGroupDropActive : ''}`}
+          {...dropHandlers('prize')}
+        >
           <div className={styles.stripLabel}>Prizes</div>
           <div className={styles.stripCards}>
             {prizeCards.length > 0
@@ -816,7 +852,7 @@ export default function HandDetailPage() {
                     <div className={`${styles.stripCard} ${styles.prizeCard}`}>{renderCard(card)}</div>
                   </DragCard>
                 ))
-              : <span className={styles.zoneEmpty}>—</span>
+              : <span className={styles.zoneEmpty}>{dragOverZone === 'prize' ? 'Drop here' : '—'}</span>
             }
           </div>
         </div>
@@ -824,7 +860,10 @@ export default function HandDetailPage() {
 
       {/* Row 2: Drawn/Thinned + Deck + Discard */}
       <div className={styles.drawDeckRow}>
-        <div className={styles.drawPanel}>
+        <div
+          className={`${styles.drawPanel} ${dragOverZone === 'drawn' ? styles.drawPanelDropActive : ''}`}
+          {...dropHandlers('drawn')}
+        >
           <div className={styles.actionHeader}>
             <span className={styles.sectionLabel}>
               Drawn ({drawnCards.length}){thinnedCards.length > 0 ? ` / Thinned (${thinnedCards.length})` : ''}
@@ -843,14 +882,17 @@ export default function HandDetailPage() {
               </DragCard>
             ))}
             {drawnCards.length === 0 && thinnedCards.length === 0 && (
-              <p className={styles.emptyHint}>Click Draw to pull from deck</p>
+              <p className={styles.emptyHint}>{dragOverZone === 'drawn' ? 'Drop here' : 'Click Draw to pull from deck'}</p>
             )}
           </div>
         </div>
-        <div className={styles.deckPanel}>
+        <div
+          className={`${styles.deckPanel} ${dragOverZone === 'deck' ? styles.deckPanelDropActive : ''}`}
+          {...dropHandlers('deck')}
+        >
           <div className={styles.actionHeader}>
             <span className={styles.sectionLabel}>Deck ({remainingDeck.length})</span>
-            <span className={styles.deckHint}>click to thin</span>
+            <span className={styles.deckHint}>click to thin · drop to shuffle in</span>
           </div>
           <div className={styles.deckScrollRow}>
             {sortedWithOriginalIndex.map(({ card, originalIndex }) => (
