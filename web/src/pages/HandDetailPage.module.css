@@ -169,6 +169,30 @@
   color: #ddd6fe;
 }
 
+.clearAbilitiesBtn {
+  padding: 5px 12px;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: var(--radius);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: rgba(239, 68, 68, 0.07);
+  color: #fca5a5;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.clearAbilitiesBtn:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.16);
+  border-color: rgba(239, 68, 68, 0.65);
+  color: #fecaca;
+}
+
+.clearAbilitiesBtn:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+}
+
 /* ── Main horizontal row ─────────────────────────────── */
 
 .mainRow {
@@ -351,6 +375,7 @@
   overflow: hidden;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
+  position: relative;
 }
 
 .nextCardItem img {
@@ -624,6 +649,7 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
   flex-shrink: 0;
   transition: transform 0.1s ease;
+  position: relative;
 }
 
 .energyCard:hover {
@@ -785,6 +811,102 @@
   font-weight: 400;
   text-transform: none;
   letter-spacing: 0;
+}
+
+/* ── Ability marker badge ────────────────────────────── */
+
+.abilityMarkerBadge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(239, 68, 68, 0.88);
+  color: white;
+  font-size: 0.48rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 2px 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 0 0 4px 4px;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Context menu ────────────────────────────────────── */
+
+.contextMenu {
+  position: fixed;
+  z-index: 1000;
+  background: #1a1a24;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  min-width: 190px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  padding: 4px;
+}
+
+.contextMenuTitle {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding: 6px 10px 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.contextMenuItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 7px 10px;
+  border: none;
+  background: none;
+  color: var(--color-text);
+  font-size: 0.78rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.1s ease;
+  white-space: nowrap;
+}
+
+.contextMenuItem:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.contextMenuItemMarked {
+  color: #f87171;
+}
+
+.contextMenuDivider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  margin: 4px 0;
+}
+
+/* ── Hover zoom overlay ──────────────────────────────── */
+
+.zoomOverlay {
+  position: fixed;
+  z-index: 999;
+  pointer-events: none;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 16px 56px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.zoomImage {
+  width: 240px;
+  height: auto;
+  display: block;
 }
 
 /* ── Card placeholder ────────────────────────────────── */
