@@ -27,7 +27,9 @@ function shuffle<T>(arr: T[]): T[] {
 type BoardSlot = { cards: CardEntry[]; damage: number }
 
 type Destination =
-  | 'hand' | 'drawn' | 'thinned' | 'deck' | 'next' | 'prize'
+  | 'hand' | 'drawn' | 'thinned'
+  | 'deck' | 'deck-top' | 'deck-bottom'
+  | 'next' | 'prize'
   | 'active' | 'bench-0' | 'bench-1' | 'bench-2' | 'bench-3' | 'bench-4'
   | 'bench-5' | 'bench-6' | 'bench-7' | 'stadium' | 'discard'
 
@@ -57,6 +59,16 @@ type DragSource =
   | { zone: 'active-energy'; energyIndex: number }
   | { zone: 'bench-energy'; slotIndex: number; energyIndex: number }
   | { zone: 'stadium' }
+  | { zone: 'deck'; index: number }
+  | { zone: 'active-pokemon'; pokemonIndex: number }
+  | { zone: 'bench-pokemon'; slotIndex: number; pokemonIndex: number }
+
+type ContextMenuState = {
+  x: number
+  y: number
+  card: CardEntry
+  source: DragSource
+}
 
 /* ── Helpers ─────────────────────────────────────────── */
 
@@ -86,6 +98,10 @@ function placeCards(state: GameState, cards: CardEntry[], dest: Destination): Ga
       return { ...state, thinnedCards: [...state.thinnedCards, ...cards] }
     case 'deck':
       return { ...state, remainingDeck: shuffle([...state.remainingDeck, ...cards]) }
+    case 'deck-top':
+      return { ...state, remainingDeck: [...cards, ...state.remainingDeck] }
+    case 'deck-bottom':
+      return { ...state, remainingDeck: [...state.remainingDeck, ...cards] }
     case 'next': {
       const extras = state.nextCard ? [state.nextCard, ...cards.slice(1)] : cards.slice(1)
       return {
@@ -255,7 +271,7 @@ function useGameState(initial: GameState) {
       const srcBoardKey = boardKeyOf(source)
       const isEnergySrc = source.zone === 'active-energy' || source.zone === 'bench-energy'
 
-      // Board-to-board (non-energy): swap entire slots
+      // Board-to-board (non-energy, whole-slot): swap entire slots
       if (srcBoardKey && isBoardDest(dest) && !isEnergySrc) {
         if (srcBoardKey === dest) return prev
         const srcSlot = getBoardSlot(prev, srcBoardKey)
@@ -289,6 +305,13 @@ function useGameState(initial: GameState) {
           if (!card) return prev
           cards = [card]
           updated = { ...prev, thinnedCards: removeAt(prev.thinnedCards, source.index) }
+          break
+        }
+        case 'deck': {
+          const card = prev.remainingDeck[source.index]
+          if (!card) return prev
+          cards = [card]
+          updated = { ...prev, remainingDeck: removeAt(prev.remainingDeck, source.index) }
           break
         }
         case 'next': {
@@ -356,6 +379,33 @@ function useGameState(initial: GameState) {
           const newCards = removeAt(bSlot.cards, actualIndex)
           const bench = [...prev.boardBench]
           bench[source.slotIndex] = newCards.length > 0 ? { ...bSlot, cards: newCards } : null
+          updated = { ...prev, boardBench: bench }
+          break
+        }
+        case 'active-pokemon': {
+          if (!prev.boardActive) return prev
+          const nonEnergyIndices = prev.boardActive.cards
+            .map((c, i) => c.section !== 'energy' ? i : -1)
+            .filter((i): i is number => i !== -1)
+          const actualIndex = nonEnergyIndices[source.pokemonIndex]
+          if (actualIndex === undefined) return prev
+          cards = [prev.boardActive.cards[actualIndex]]
+          const newCards = removeAt(prev.boardActive.cards, actualIndex)
+          updated = { ...prev, boardActive: newCards.length > 0 ? { ...prev.boardActive, cards: newCards } : null }
+          break
+        }
+        case 'bench-pokemon': {
+          const bpSlot = prev.boardBench[source.slotIndex]
+          if (!bpSlot) return prev
+          const nonEnergyIndices = bpSlot.cards
+            .map((c, i) => c.section !== 'energy' ? i : -1)
+            .filter((i): i is number => i !== -1)
+          const actualIndex = nonEnergyIndices[source.pokemonIndex]
+          if (actualIndex === undefined) return prev
+          cards = [bpSlot.cards[actualIndex]]
+          const newCards = removeAt(bpSlot.cards, actualIndex)
+          const bench = [...prev.boardBench]
+          bench[source.slotIndex] = newCards.length > 0 ? { ...bpSlot, cards: newCards } : null
           updated = { ...prev, boardBench: bench }
           break
         }
@@ -485,6 +535,69 @@ function DragCard({ onDragStart, children }: { onDragStart: () => void; children
   )
 }
 
+/* ── Context menu ────────────────────────────────────── */
+
+function ContextMenu({
+  menu,
+  isAbilityMarked,
+  onDeckTop,
+  onDeckShuffle,
+  onDeckBottom,
+  onToggleAbility,
+  onClose,
+}: {
+  menu: ContextMenuState
+  isAbilityMarked: boolean
+  onDeckTop: () => void
+  onDeckShuffle: () => void
+  onDeckBottom: () => void
+  onToggleAbility: () => void
+  onClose: () => void
+}) {
+  const menuRef = useRef<HTMLDivElement>(null)
+  const [pos, setPos] = useState({ x: menu.x, y: menu.y })
+
+  useEffect(() => {
+    const el = menuRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    let x = menu.x
+    let y = menu.y
+    if (x + rect.width > window.innerWidth - 8) x = window.innerWidth - rect.width - 8
+    if (y + rect.height > window.innerHeight - 8) y = window.innerHeight - rect.height - 8
+    setPos({ x: Math.max(8, x), y: Math.max(8, y) })
+  }, [menu.x, menu.y])
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (!menuRef.current?.contains(e.target as Node)) onClose()
+    }
+    window.addEventListener('mousedown', handler)
+    return () => window.removeEventListener('mousedown', handler)
+  }, [onClose])
+
+  return (
+    <div
+      ref={menuRef}
+      className={styles.contextMenu}
+      style={{ left: pos.x, top: pos.y }}
+      onContextMenu={e => e.preventDefault()}
+    >
+      <div className={styles.contextMenuTitle}>{menu.card.name}</div>
+      <button className={styles.contextMenuItem} onClick={onDeckTop}>Top of deck</button>
+      <button className={styles.contextMenuItem} onClick={onDeckShuffle}>Shuffle into deck</button>
+      <button className={styles.contextMenuItem} onClick={onDeckBottom}>Bottom of deck</button>
+      <div className={styles.contextMenuDivider} />
+      <button
+        className={`${styles.contextMenuItem} ${isAbilityMarked ? styles.contextMenuItemMarked : ''}`}
+        onClick={onToggleAbility}
+      >
+        {isAbilityMarked ? 'Clear ability marker' : 'Mark ability used'}
+      </button>
+    </div>
+  )
+}
+
 /* ── DeckPickerModal ─────────────────────────────────── */
 
 function DeckPickerModal({ onSelect, onClose }: { onSelect: (id: string) => void; onClose: () => void }) {
@@ -561,6 +674,14 @@ export default function HandDetailPage() {
   const [playerImageMap] = useCardImages(state?.entries ?? [])
   const [opponentImageMap] = useCardImages(opponentEntries)
 
+  // Context menu + ability markers
+  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null)
+  const [abilityMarked, setAbilityMarked] = useState<Set<CardEntry>>(() => new Set())
+
+  // Hover zoom
+  const [zoomedCard, setZoomedCard] = useState<{ imgUrl: string; x: number; y: number } | null>(null)
+  const hoverTimerRef = useRef<ReturnType<typeof setTimeout>>()
+
   // Stable refs so keyboard/drop handlers don't go stale
   const activePlayerRef = useRef(activePlayer)
   activePlayerRef.current = activePlayer
@@ -580,6 +701,15 @@ export default function HandDetailPage() {
         const gs = activePlayerRef.current === 'player' ? playerGsRef.current : opponentGsRef.current
         gs.handleUndo()
       }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
+
+  // Close context menu on Escape
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setContextMenu(null)
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
@@ -626,6 +756,27 @@ export default function HandDetailPage() {
     gs.moveCard(src, dest)
   }, [])
 
+  const handleContextAction = useCallback((action: 'deck-top' | 'deck-shuffle' | 'deck-bottom' | 'toggle-ability') => {
+    if (!contextMenu) return
+    const { card, source } = contextMenu
+    const gs = activePlayerRef.current === 'player' ? playerGsRef.current : opponentGsRef.current
+
+    if (action === 'toggle-ability') {
+      setAbilityMarked(prev => {
+        const next = new Set(prev)
+        if (next.has(card)) next.delete(card)
+        else next.add(card)
+        return next
+      })
+    } else {
+      const dest: Destination = action === 'deck-top' ? 'deck-top' : action === 'deck-bottom' ? 'deck-bottom' : 'deck'
+      gs.moveCard(source, dest)
+    }
+    setContextMenu(null)
+  }, [contextMenu])
+
+  const clearAbilityMarkers = useCallback(() => setAbilityMarked(new Set()), [])
+
   /* ── Guard: no state ───────────────────────────────── */
 
   if (!state) {
@@ -654,11 +805,13 @@ export default function HandDetailPage() {
       return a.card.name.localeCompare(b.card.name)
     })
 
-  const renderCard = (card: CardEntry, className?: string) => {
+  /* ── Card renderer (image/placeholder only) ───────── */
+
+  const renderCard = (card: CardEntry) => {
     const key = imageKey(card)
     const img = activeImageMap.get(key)
     return img ? (
-      <img className={className} src={cardImageUrl(img, 'low')} alt={card.name} title={card.name} />
+      <img src={cardImageUrl(img, 'low')} alt={card.name} title={card.name} />
     ) : (
       <div className={styles.cardPlaceholder}>
         <div className={styles.placeholderText}>
@@ -667,6 +820,42 @@ export default function HandDetailPage() {
       </div>
     )
   }
+
+  /** Returns onContextMenu + hover-zoom handlers for a card container. */
+  const cardHandlers = (card: CardEntry, source: DragSource) => {
+    const key = imageKey(card)
+    const imgData = activeImageMap.get(key)
+    const imgUrl = imgData ? cardImageUrl(imgData, 'low') : undefined
+    return {
+      onContextMenu: (e: React.MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setContextMenu({ x: e.clientX, y: e.clientY, card, source })
+      },
+      onMouseEnter: (e: React.MouseEvent) => {
+        if (!imgUrl) return
+        clearTimeout(hoverTimerRef.current)
+        const el = e.currentTarget as HTMLElement
+        hoverTimerRef.current = setTimeout(() => {
+          const rect = el.getBoundingClientRect()
+          const zoomW = 240
+          const zoomH = 336
+          let x = rect.right + 10
+          let y = rect.top
+          if (x + zoomW > window.innerWidth - 8) x = rect.left - zoomW - 10
+          if (y + zoomH > window.innerHeight - 8) y = window.innerHeight - zoomH - 8
+          setZoomedCard({ imgUrl, x: Math.max(8, x), y: Math.max(8, y) })
+        }, 600)
+      },
+      onMouseLeave: () => {
+        clearTimeout(hoverTimerRef.current)
+        setZoomedCard(null)
+      },
+    }
+  }
+
+  const abilityBadge = (card: CardEntry) =>
+    abilityMarked.has(card) ? <div className={styles.abilityMarkerBadge}>Used</div> : null
 
   /* ── Drop event helpers ────────────────────────────── */
 
@@ -695,6 +884,13 @@ export default function HandDetailPage() {
     const energy = slot?.cards.filter(c => c.section === 'energy') ?? []
     const hasPokemon = pokemon.length > 0
 
+    // Derive per-pokemon context menu source from the slot's drag source
+    const getPokemonSource = (pokemonIdx: number): DragSource => {
+      if (dragStart.zone === 'active') return { zone: 'active-pokemon', pokemonIndex: pokemonIdx }
+      if (dragStart.zone === 'bench') return { zone: 'bench-pokemon', slotIndex: dragStart.slotIndex, pokemonIndex: pokemonIdx }
+      return dragStart
+    }
+
     return (
       <div
         className={`${styles.boardSlot} ${slotClass} ${isOver ? styles.boardSlotDropActive : ''} ${slot ? styles.boardSlotOccupied : ''}`}
@@ -715,8 +911,10 @@ export default function HandDetailPage() {
                     className={styles.stackedPokemon}
                     style={{ zIndex: i }}
                     title={card.name}
+                    {...cardHandlers(card, getPokemonSource(i))}
                   >
                     {renderCard(card)}
+                    {abilityBadge(card)}
                   </div>
                 ))}
               </div>
@@ -725,8 +923,9 @@ export default function HandDetailPage() {
               <div className={styles.energyRow}>
                 {energy.map((card, i) => (
                   <DragCard key={i} onDragStart={() => { dragSourceRef.current = energyDragStart(i) }}>
-                    <div className={styles.energyCard} title={card.name}>
+                    <div className={styles.energyCard} {...cardHandlers(card, energyDragStart(i))}>
                       {renderCard(card)}
+                      {abilityBadge(card)}
                     </div>
                   </DragCard>
                 ))}
@@ -792,6 +991,14 @@ export default function HandDetailPage() {
           <span className={styles.deckCount}>{remainingDeck.length} in deck</span>
           <button className={styles.reshuffleBtn} onClick={activeGs.handleReshuffle} title="Shuffle all non-boarded, non-discarded cards back into the deck">Reshuffle</button>
           <button className={styles.shuffleBottomBtn} onClick={activeGs.handleShuffleToBottom} title="Shuffle hand and drawn/thinned cards to the bottom of the deck">Shuffle to Bottom</button>
+          <button
+            className={styles.clearAbilitiesBtn}
+            onClick={clearAbilityMarkers}
+            disabled={abilityMarked.size === 0}
+            title="Clear all ability used markers"
+          >
+            Clear Abilities
+          </button>
           <button className={styles.drawHandBtn} onClick={() => activeGs.handleDrawToHand(6)} disabled={remainingDeck.length === 0} title="Draw 6 cards to hand">Draw 6</button>
           <button className={styles.drawHandBtn} onClick={() => activeGs.handleDrawToHand(8)} disabled={remainingDeck.length === 0} title="Draw 8 cards to hand">Draw 8</button>
           <button className={styles.undoBtn} onClick={activeGs.handleUndo} disabled={activeHistory.length === 0} title="Undo last action">Undo</button>
@@ -827,7 +1034,10 @@ export default function HandDetailPage() {
               <div className={styles.columnCardGrid}>
                 {handCards.map((card, i) => (
                   <DragCard key={`hand-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'hand', index: i } }}>
-                    <div className={styles.columnCardItem}>{renderCard(card)}</div>
+                    <div className={styles.columnCardItem} {...cardHandlers(card, { zone: 'hand', index: i })}>
+                      {renderCard(card)}
+                      {abilityBadge(card)}
+                    </div>
                   </DragCard>
                 ))}
               </div>
@@ -840,7 +1050,10 @@ export default function HandDetailPage() {
                 <div className={styles.columnCardGrid}>
                   {drawnCards.map((card, i) => (
                     <DragCard key={`drawn-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'drawn', index: i } }}>
-                      <div className={`${styles.columnCardItem} ${styles.drawnCardEntry}`}>{renderCard(card)}</div>
+                      <div className={`${styles.columnCardItem} ${styles.drawnCardEntry}`} {...cardHandlers(card, { zone: 'drawn', index: i })}>
+                        {renderCard(card)}
+                        {abilityBadge(card)}
+                      </div>
                     </DragCard>
                   ))}
                 </div>
@@ -854,14 +1067,17 @@ export default function HandDetailPage() {
                 <div className={styles.columnCardGrid}>
                   {thinnedCards.map((card, i) => (
                     <DragCard key={`thinned-${i}`} onDragStart={() => { dragSourceRef.current = { zone: 'thinned', index: i } }}>
-                      <div className={`${styles.columnCardItem} ${styles.thinnedCardItem}`}>{renderCard(card)}</div>
+                      <div className={`${styles.columnCardItem} ${styles.thinnedCardItem}`} {...cardHandlers(card, { zone: 'thinned', index: i })}>
+                        {renderCard(card)}
+                        {abilityBadge(card)}
+                      </div>
                     </DragCard>
                   ))}
                 </div>
               </>
             )}
 
-            {/* Remaining deck for thinning */}
+            {/* Remaining deck — click to thin, drag to move, right-click for options */}
             {remainingDeck.length > 0 && (
               <div
                 className={`${styles.deckSection} ${dragOverZone === 'deck' ? styles.deckSectionDropActive : ''}`}
@@ -872,14 +1088,20 @@ export default function HandDetailPage() {
                 </div>
                 <div className={styles.deckCardGrid}>
                   {sortedWithOriginalIndex.map(({ card, originalIndex }) => (
-                    <div
+                    <DragCard
                       key={originalIndex}
-                      className={`${styles.columnCardItem} ${styles.deckCardItem}`}
-                      onClick={() => activeGs.handleThin(originalIndex)}
-                      title={`Thin ${card.name}`}
+                      onDragStart={() => { dragSourceRef.current = { zone: 'deck', index: originalIndex } }}
                     >
-                      {renderCard(card)}
-                    </div>
+                      <div
+                        className={`${styles.columnCardItem} ${styles.deckCardItem}`}
+                        onClick={() => activeGs.handleThin(originalIndex)}
+                        title={`Thin ${card.name}`}
+                        {...cardHandlers(card, { zone: 'deck', index: originalIndex })}
+                      >
+                        {renderCard(card)}
+                        {abilityBadge(card)}
+                      </div>
+                    </DragCard>
                   ))}
                 </div>
               </div>
@@ -899,7 +1121,10 @@ export default function HandDetailPage() {
               <div className={styles.colSubLabel}>Next</div>
               {nextCard ? (
                 <DragCard onDragStart={() => { dragSourceRef.current = { zone: 'next' } }}>
-                  <div className={styles.nextCardItem}>{renderCard(nextCard)}</div>
+                  <div className={styles.nextCardItem} {...cardHandlers(nextCard, { zone: 'next' })}>
+                    {renderCard(nextCard)}
+                    {abilityBadge(nextCard)}
+                  </div>
                 </DragCard>
               ) : (
                 <span className={styles.zoneEmpty}>Drop here</span>
@@ -920,7 +1145,10 @@ export default function HandDetailPage() {
             <div className={styles.columnCardGrid}>
               {discardCards.map((card, i) => (
                 <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'discard', index: i } }}>
-                  <div className={styles.columnCardItem}>{renderCard(card)}</div>
+                  <div className={styles.columnCardItem} {...cardHandlers(card, { zone: 'discard', index: i })}>
+                    {renderCard(card)}
+                    {abilityBadge(card)}
+                  </div>
                 </DragCard>
               ))}
               {discardCards.length === 0 && (
@@ -984,7 +1212,10 @@ export default function HandDetailPage() {
             <div className={styles.columnCardGrid}>
               {prizeCards.map((card, i) => (
                 <DragCard key={i} onDragStart={() => { dragSourceRef.current = { zone: 'prize', index: i } }}>
-                  <div className={`${styles.columnCardItem} ${styles.prizeCardItem}`}>{renderCard(card)}</div>
+                  <div className={`${styles.columnCardItem} ${styles.prizeCardItem}`} {...cardHandlers(card, { zone: 'prize', index: i })}>
+                    {renderCard(card)}
+                    {abilityBadge(card)}
+                  </div>
                 </DragCard>
               ))}
               {prizeCards.length === 0 && (
@@ -995,6 +1226,29 @@ export default function HandDetailPage() {
         </div>
 
       </div>
+
+      {/* Context menu */}
+      {contextMenu && (
+        <ContextMenu
+          menu={contextMenu}
+          isAbilityMarked={abilityMarked.has(contextMenu.card)}
+          onDeckTop={() => handleContextAction('deck-top')}
+          onDeckShuffle={() => handleContextAction('deck-shuffle')}
+          onDeckBottom={() => handleContextAction('deck-bottom')}
+          onToggleAbility={() => handleContextAction('toggle-ability')}
+          onClose={() => setContextMenu(null)}
+        />
+      )}
+
+      {/* Hover zoom overlay */}
+      {zoomedCard && (
+        <div
+          className={styles.zoomOverlay}
+          style={{ left: zoomedCard.x, top: zoomedCard.y }}
+        >
+          <img src={zoomedCard.imgUrl} alt="" className={styles.zoomImage} />
+        </div>
+      )}
 
       {/* Deck picker modal */}
       {showDeckPicker && (
