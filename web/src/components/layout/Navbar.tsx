@@ -1,7 +1,13 @@
 import { Link, NavLink } from 'react-router-dom'
+import type { User } from '@/types/auth'
 import styles from './Navbar.module.css'
 
-export default function Navbar() {
+interface Props {
+  user: User
+  onLogout: () => void
+}
+
+export default function Navbar({ user, onLogout }: Props) {
   return (
     <header className={styles.header}>
       <nav className={styles.nav}>
@@ -22,6 +28,12 @@ export default function Navbar() {
           >
             Import
           </NavLink>
+        </div>
+        <div className={styles.account}>
+          <span className={styles.email}>{user.email}</span>
+          <button className={styles.logout} onClick={onLogout}>
+            Log out
+          </button>
         </div>
       </nav>
     </header>

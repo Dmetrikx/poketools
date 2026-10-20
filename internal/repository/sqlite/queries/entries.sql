@@ -1,3 +1,6 @@
+-- Entry mutations are scoped by deck_id; the service verifies the caller owns
+-- the deck first, so together they keep entries per-user.
+
 -- name: ListEntriesByDeck :many
 SELECT id, deck_id, card_id, name, set_code, number, count, section, position, image_url
 FROM deck_entries
@@ -13,18 +16,18 @@ WHERE id = ?;
 INSERT INTO deck_entries (id, deck_id, card_id, name, set_code, number, count, section, position, image_url)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
--- name: UpdateEntryCount :exec
+-- name: UpdateEntryCount :execrows
 UPDATE deck_entries
 SET count = ?
-WHERE id = ?;
+WHERE id = ? AND deck_id = ?;
 
--- name: UpdateEntryImageUrl :exec
+-- name: UpdateEntryImageUrl :execrows
 UPDATE deck_entries
 SET image_url = ?
-WHERE id = ?;
+WHERE id = ? AND deck_id = ?;
 
--- name: DeleteEntry :exec
-DELETE FROM deck_entries WHERE id = ?;
+-- name: DeleteEntry :execrows
+DELETE FROM deck_entries WHERE id = ? AND deck_id = ?;
 
 -- name: DeleteEntriesByDeck :exec
 DELETE FROM deck_entries WHERE deck_id = ?;

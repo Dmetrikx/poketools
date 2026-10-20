@@ -1,6 +1,13 @@
 package deck
 
-import "time"
+import (
+	"errors"
+	"time"
+)
+
+// ErrNotFound is returned when a deck or entry doesn't exist or belongs to
+// another user — callers can't tell the two apart.
+var ErrNotFound = errors.New("not found")
 
 type Section string
 
@@ -33,6 +40,7 @@ type CardEntry struct {
 
 type Deck struct {
 	ID        string      `json:"id"`
+	UserID    string      `json:"-"`
 	Name      string      `json:"name"`
 	Format    string      `json:"format"` // "standard", "expanded"
 	Entries   []CardEntry `json:"entries"`

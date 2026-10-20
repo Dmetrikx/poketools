@@ -1,13 +1,14 @@
 # Poketools
 
-A Pokemon TCG deck builder. Import, edit, and export decklists — similar to [Limitless TCG](https://limitlesstcg.com) and RK9. Built to support simulation jobs and additional tooling in the future.
+A multi-user Pokemon TCG deck builder. Import, edit, and export decklists — similar to [Limitless TCG](https://limitlesstcg.com) and RK9. Built to support simulation jobs and additional tooling in the future.
 
 ## Stack
 
 | Layer | Technology |
 |---|---|
 | Backend | Go, [chi](https://github.com/go-chi/chi) router |
-| Database | SQLite via [modernc/sqlite](https://pkg.go.dev/modernc.org/sqlite) (CGO-free) |
+| Database | SQLite via [modernc/sqlite](https://pkg.go.dev/modernc.org/sqlite) (CGO-free), numbered migrations |
+| Auth | Email + bcrypt, server-side sessions stored hashed in SQLite |
 | DB queries | [sqlc](https://sqlc.dev) — type-safe Go generated from SQL |
 | Card data | [TCGdex API](https://tcgdex.dev) with in-memory cache |
 | Frontend | React 18 + TypeScript, Vite |
@@ -16,8 +17,8 @@ A Pokemon TCG deck builder. Import, edit, and export decklists — similar to [L
 
 ## Prerequisites
 
-- **Go** 1.25+
-- **Node.js** 18+ with npm
+- **Go** 1.25.x
+- **Node.js** 22 with npm (matches CI and the Dockerfile)
 - **sqlc** (only needed when changing SQL queries): `go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest`
 
 ---
@@ -32,9 +33,14 @@ cd poketools
 # 2. Install frontend dependencies
 cd web && npm install && cd ..
 
-# 3. Run everything
+# 3. Build the frontend once (web/dist is embedded into the Go binary)
+make build-frontend
+
+# 4. Run everything
 make dev
 ```
+
+Open http://localhost:5173 and create an account.
 
 `make dev` starts both servers concurrently:
 
@@ -55,39 +61,41 @@ poketools/
 │   └── server/main.go          # Entry point — wires all dependencies
 │
 ├── internal/
-│   ├── api/                    # HTTP handlers (deck_handler.go, card_handler.go)
+│   ├── api/                    # HTTP handlers (auth, deck, card) + RequireAuth middleware
+│   ├── auth/                   # Accounts: signup/login, sessions, context helpers
 │   ├── card/                   # Card domain type + CardService (proxies TCGdex)
-│   ├── config/                 # Env-based config (PORT, DATABASE_PATH, ENV)
-│   ├── deck/                   # Deck domain types + DeckService
+│   ├── config/                 # Env-based config (PORT, DATABASE_PATH, ENV, ALLOW_SIGNUP)
+│   ├── deck/                   # Deck domain types + DeckService (scoped per user)
 │   ├── format/
 │   │   ├── formatter.go        # DeckFormatter interface
 │   │   ├── ptcglive/           # PTCG Live parser + tests
 │   │   └── limitless/          # Limitless TCG parser + tests
 │   ├── repository/
-│   │   ├── db.go               # Open DB + run schema migrations
-│   │   ├── deck_repository.go  # DeckRepository interface
+│   │   ├── db.go               # Open DB (pragmas in DSN) + migration runner
+│   │   ├── migrations/         # NNNN_name.sql, applied in order, immutable once applied
 │   │   └── sqlite/
-│   │       ├── schema.sql      # Source-of-truth DDL (edit this, then run sqlc)
-│   │       ├── queries/        # SQL input for sqlc
-│   │       │   ├── decks.sql
-│   │       │   └── entries.sql
-│   │       ├── deck_repository.go   # SQLite implementation
+│   │       ├── queries/        # SQL input for sqlc (decks, entries, users, sessions)
+│   │       ├── deck_repository.go   # deck.Repository implementation
+│   │       ├── user_repository.go   # auth.Repository implementation
 │   │       └── *.sql.go        # sqlc-generated (do not edit)
-│   └── server/
-│       ├── router.go           # chi router + all route definitions
-│       └── server.go           # http.Server + graceful shutdown
+│   ├── server/
+│   │   ├── router.go           # chi router: public auth routes, protected /api, SPA
+│   │   ├── router_test.go      # End-to-end API tests
+│   │   └── server.go           # http.Server + graceful shutdown
+│   └── version/                # Build version (ldflags)
 │
 ├── pkg/
 │   └── tcgdex/                 # TCGdex API client (client.go, types.go, cache.go)
 │
 ├── web/                        # React + TypeScript frontend
 │   └── src/
-│       ├── api/                # Typed API wrappers (client.ts, decks.ts, cards.ts)
-│       ├── types/              # Shared TypeScript types (deck.ts, card.ts)
-│       ├── pages/              # HomePage, DeckEditorPage, ImportPage, PracticeHandsPage, HandDetailPage
+│       ├── api/                # Typed API wrappers (client.ts, auth.ts, decks.ts, cards.ts)
+│       ├── types/              # Shared TypeScript types (auth.ts, deck.ts, card.ts)
+│       ├── pages/              # LoginPage, HomePage, DeckEditorPage, ImportPage, PracticeHandsPage
 │       ├── components/         # UI components (layout/, deck/, card/)
-│       └── hooks/              # useDecks, useDeck, useCardSearch, useCardImages, useDebounce
+│       └── hooks/              # useAuth, useDecks, useDeck, useCardSearch, useCardImages, useDebounce
 │
+├── .github/workflows/          # ci.yml, fly-deploy.yml (deploys after CI passes)
 ├── sqlc.yaml                   # sqlc configuration
 ├── Makefile
 └── go.mod
@@ -99,12 +107,16 @@ poketools/
 
 ```bash
 make dev             # Run backend + frontend concurrently
-make dev-backend     # Go API server only (port 8080)
+make dev-backend     # Build + exec the Go API server (refuses if :8080 is taken)
 make dev-frontend    # Vite dev server only (port 5173)
-make build           # Production build (frontend → binary with embed.FS)
-make test            # go test ./...
-make test-v          # go test -v ./...
+make kill-stale      # Kill a leftover dev server holding :8080
+make build           # Production build (frontend → binary with embed.FS, version via ldflags)
+make test            # go test -race ./...
+make test-v          # go test -race -v ./...
 make sqlc            # Regenerate DB query code from SQL
+make deploy-check    # Tests, vet, frontend build, clean tree — ready to push to main
+make deploy-status   # fly status
+make deploy-logs     # fly logs
 make clean           # Remove bin/ and web/dist/
 make help            # List all targets
 ```
@@ -119,19 +131,29 @@ The server reads configuration from environment variables. All have sensible def
 |---|---|---|
 | `PORT` | `8080` | HTTP listen port |
 | `DATABASE_PATH` | `poketools.db` | SQLite file path |
-| `ENV` | `development` | `development` or `production` |
+| `ENV` | `development` | `development` or `production` (non-development sets `Secure` on the session cookie) |
+| `ALLOW_SIGNUP` | `true` | Set to `false` to close registration |
 
 ---
 
 ## API Reference
 
-All endpoints are under `/api`.
+All endpoints are under `/api`. Everything except `/api/auth/*` requires a session cookie (`poketools_session`) and returns `401` without one. Decks are private to their owner; another user's deck or entry returns `404`.
+
+### Auth
+
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/api/auth/signup` | Create an account `{ email, password }` (8–72 chars) and log in. `403` when signups are closed, `409` if the email is taken |
+| `POST` | `/api/auth/login` | Log in `{ email, password }` |
+| `POST` | `/api/auth/logout` | End the session |
+| `GET` | `/api/auth/me` | `{ user \| null, allowSignup }`, always `200` |
 
 ### Decks
 
 | Method | Path | Description |
 |---|---|---|
-| `GET` | `/api/decks` | List all decks |
+| `GET` | `/api/decks` | List your decks |
 | `POST` | `/api/decks` | Create a deck `{ name, format }` |
 | `GET` | `/api/decks/:id` | Get deck with all entries |
 | `PUT` | `/api/decks/:id` | Update deck metadata `{ name, format }` |
@@ -180,14 +202,16 @@ GET /health  →  200 "ok"
 
 ## Database
 
-The schema is defined in `internal/repository/sqlite/schema.sql`. The application applies it automatically on startup — there is no separate migration step during development.
+The schema lives in numbered migrations under `internal/repository/migrations/`, applied automatically on startup and recorded (with checksums) in `schema_migrations`.
 
 ```sql
-decks        (id, name, format, created_at, updated_at)
+users        (id, email, password_hash, created_at)
+sessions     (id = sha256(token), user_id, created_at, expires_at)
+decks        (id, user_id, name, format, created_at, updated_at)
 deck_entries (id, deck_id, card_id, name, set_code, number, count, section, position, image_url)
 ```
 
-`section` is constrained to `pokemon | trainer | energy`. `image_url` stores per-entry custom art selections (default `''`).
+Timestamps are epoch milliseconds. `section` is constrained to `pokemon | trainer | energy`. `image_url` stores per-entry custom art selections (default `''`).
 
 ---
 
@@ -214,9 +238,9 @@ Steps:
 
 Queries are generated by sqlc — **do not edit `*.sql.go` files directly**.
 
-1. Edit SQL in `internal/repository/sqlite/queries/` (or `schema.sql` for schema changes)
+1. Edit SQL in `internal/repository/sqlite/queries/`. For schema changes, add a new `internal/repository/migrations/NNNN_name.sql`; never edit one that has already been applied
 2. Run `make sqlc` to regenerate
-3. Update `internal/repository/sqlite/deck_repository.go` if method signatures changed
+3. Update the adapters in `internal/repository/sqlite/` if method signatures changed
 
 ---
 
@@ -246,37 +270,14 @@ brew install flyctl
 fly auth login
 ```
 
-### First-time setup (already done)
+### How deploys happen
 
-```bash
-fly launch          # generates fly.toml + provisions app + volume
-fly deploy          # builds and deploys
-```
+**Push to `main`. That's the only path to production.**
 
-### Deploy a specific branch
+1. `.github/workflows/ci.yml` runs on every PR and push to main: `go vet`, `go build`, `go test -race`, and the frontend type-check + build.
+2. `.github/workflows/fly-deploy.yml` runs when CI completes on main. It deploys only if CI succeeded, checks out exactly the commit CI tested, and passes its short SHA as the `VERSION` build arg (logged at startup).
 
-Fly deploys whatever is in your **current working directory** — it does not care about git branches. To deploy a branch:
-
-```bash
-git checkout <branch-name>
-fly deploy
-```
-
-This builds the Docker image from the local source on that branch and pushes it to the existing app (`poketools-k5-rwq`). There is only one live deployment at a time; each `fly deploy` replaces it.
-
-### Promote main to production
-
-```bash
-git checkout main
-fly deploy
-```
-
-### Switching back to a POC branch
-
-```bash
-git checkout feature/opponent-deck
-fly deploy
-```
+Run `make deploy-check` before pushing. There's deliberately no `make deploy`: two paths that can disagree about what's running is worse than one slow one. The only GitHub secret is `FLY_API_TOKEN`.
 
 ### Rollback to a previous release
 
@@ -316,7 +317,7 @@ SELECT * FROM decks;
 
 ### Volume and data notes
 
-- The volume (`poketools_data`) persists across deploys — your deck data survives redeployments.
+- The volume (`poketools_data`) persists across deploys — deck and account data survive redeployments.
 - `min_machines_running = 0` means Fly scales the VM to zero when idle. The first request after sleep has a cold-start delay (~1–2s). Acceptable for personal use.
 - If you ever delete the app, the volume is deleted too. Back up your data first:
 
@@ -326,7 +327,7 @@ fly ssh console -C "sqlite3 /data/poketools.db .dump" > backup.sql
 
 ### Environment variables
 
-Managed in `fly.toml` under `[env]`. Secrets (if needed) go through:
+Non-secret config is managed in `fly.toml` under `[env]`. Secrets (if ever needed) go through `fly secrets set`, never `[env]`:
 
 ```bash
 fly secrets set MY_SECRET=value
@@ -337,3 +338,4 @@ fly secrets set MY_SECRET=value
 | `PORT` | `8080` |
 | `DATABASE_PATH` | `/data/poketools.db` |
 | `ENV` | `production` |
+| `ALLOW_SIGNUP` | unset (`true`). Set `ALLOW_SIGNUP = "false"` under `[env]` to close registration |
