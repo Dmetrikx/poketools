@@ -244,31 +244,9 @@ go test -run TestImport ./internal/format/ptcglive  # Single test
 - Gallery supports increment/decrement, remove, and art picker (select/save art per entry)
 - Art selections saved to the entry's `imageUrl` field and persisted to the DB
 
-## Hand Detail Page (Game Simulation)
+## Removed: Game Board
 
-Route: `/decks/:id/practice/:handIndex` — navigated to from `PracticeHandsPage` by clicking a hand panel.
-
-State is passed via React Router `location.state` (type `{ hand: Hand, entries: CardEntry[] }`). No backend calls are made on this page.
-
-**Game State** (`GameState` type):
-- `handCards` — cards in hand (from opening deal)
-- `nextCard` — top card after hand (burn card)
-- `remainingDeck` — draw pile
-- `drawnCards` — cards drawn one at a time via "Draw" button
-- `thinnedCards` — cards removed from deck via thin action (deck reshuffles after)
-- `boardCards` — cards moved to the board zone
-- `discardCards` — cards moved to the discard zone
-
-**Actions**:
-- **Draw** — pull top card of remaining deck into drawn pile
-- **Thin** — remove a card from remaining deck (sorted view), deck reshuffles
-- **Board / Discard** — hover any hand/drawn/thinned/next card to reveal buttons that move it to the board or discard zone
-- **Reshuffle** — shuffle all non-boarded, non-discarded cards back into the deck
-- **Shuffle to Bottom** — send hand + drawn + thinned cards to bottom of deck
-- **Draw 6 / Draw 8** — draw N cards from remaining deck directly into hand
-- **Undo** — revert to previous game state (full history stack); also triggered by Cmd/Ctrl+Z
-
-**HoverCard component**: wraps any card image and shows "Board" / "Discard" action buttons on mouse enter.
+The drag-and-drop game board (`HandDetailPage`, reached from Practice Hands) was removed to be redesigned later. It was frontend-only (no backend state). Recover it from git history: PRs #3 and #5–#10, last version at `8aa2b34`.
 
 ## Configuration
 

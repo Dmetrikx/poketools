@@ -6,7 +6,7 @@ import { cardsApi } from '@/api/cards'
 import type { CardEntry } from '@/types/deck'
 import styles from './PracticeHandsPage.module.css'
 
-export interface Hand {
+interface Hand {
   hand: CardEntry[]
   prizes: CardEntry[]
   nextCard: CardEntry
@@ -250,11 +250,7 @@ export default function PracticeHandsPage() {
 
       <div className={styles.handsGrid}>
         {hands.map((h, idx) => (
-          <div
-            key={idx}
-            className={styles.handPanel}
-            onClick={() => navigate(`/decks/${id}/practice/${idx}`, { state: { hand: h, entries } })}
-          >
+          <div key={idx} className={styles.handPanel}>
             <div className={styles.handHeader}>
               <span className={styles.handNumber}>Hand {idx + 1}</span>
               {h.mulligans > 0 && (
