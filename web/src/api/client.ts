@@ -8,11 +8,21 @@ export class ApiError extends Error {
   }
 }
 
+// Dispatched on window when a protected endpoint returns 401, so useAuth can
+// drop back to the login page. Auth endpoints are excluded: a failed login is
+// a 401 the login form handles itself.
+export const UNAUTHORIZED_EVENT = 'auth:unauthorized'
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`/api${path}`, {
-    headers: { 'Content-Type': 'application/json', ...init?.headers },
     ...init,
+    headers: { 'Content-Type': 'application/json', ...init?.headers },
+    credentials: 'same-origin',
   })
+
+  if (res.status === 401 && !path.startsWith('/auth/')) {
+    window.dispatchEvent(new Event(UNAUTHORIZED_EVENT))
+  }
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({ error: res.statusText }))
@@ -33,7 +43,8 @@ export const api = {
     request<T>(path, { method: 'PUT', body: JSON.stringify(body) }),
   delete: (path: string) => request<void>(path, { method: 'DELETE' }),
   getText: async (path: string): Promise<string> => {
-    const res = await fetch(`/api${path}`)
+    const res = await fetch(`/api${path}`, { credentials: 'same-origin' })
+    if (res.status === 401) window.dispatchEvent(new Event(UNAUTHORIZED_EVENT))
     if (!res.ok) throw new ApiError(res.status, res.statusText)
     return res.text()
   },

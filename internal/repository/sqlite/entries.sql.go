@@ -52,13 +52,21 @@ func (q *Queries) DeleteEntriesByDeck(ctx context.Context, deckID string) error 
 	return err
 }
 
-const deleteEntry = `-- name: DeleteEntry :exec
-DELETE FROM deck_entries WHERE id = ?
+const deleteEntry = `-- name: DeleteEntry :execrows
+DELETE FROM deck_entries WHERE id = ? AND deck_id = ?
 `
 
-func (q *Queries) DeleteEntry(ctx context.Context, id string) error {
-	_, err := q.db.ExecContext(ctx, deleteEntry, id)
-	return err
+type DeleteEntryParams struct {
+	ID     string `db:"id" json:"id"`
+	DeckID string `db:"deck_id" json:"deck_id"`
+}
+
+func (q *Queries) DeleteEntry(ctx context.Context, arg DeleteEntryParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deleteEntry, arg.ID, arg.DeckID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
 const getEntry = `-- name: GetEntry :one
@@ -86,12 +94,15 @@ func (q *Queries) GetEntry(ctx context.Context, id string) (DeckEntry, error) {
 }
 
 const listEntriesByDeck = `-- name: ListEntriesByDeck :many
+
 SELECT id, deck_id, card_id, name, set_code, number, count, section, position, image_url
 FROM deck_entries
 WHERE deck_id = ?
 ORDER BY section, position
 `
 
+// Entry mutations are scoped by deck_id; the service verifies the caller owns
+// the deck first, so together they keep entries per-user.
 func (q *Queries) ListEntriesByDeck(ctx context.Context, deckID string) ([]DeckEntry, error) {
 	rows, err := q.db.QueryContext(ctx, listEntriesByDeck, deckID)
 	if err != nil {
@@ -126,36 +137,44 @@ func (q *Queries) ListEntriesByDeck(ctx context.Context, deckID string) ([]DeckE
 	return items, nil
 }
 
-const updateEntryCount = `-- name: UpdateEntryCount :exec
+const updateEntryCount = `-- name: UpdateEntryCount :execrows
 UPDATE deck_entries
 SET count = ?
-WHERE id = ?
+WHERE id = ? AND deck_id = ?
 `
 
 type UpdateEntryCountParams struct {
-	Count int64  `db:"count" json:"count"`
-	ID    string `db:"id" json:"id"`
+	Count  int64  `db:"count" json:"count"`
+	ID     string `db:"id" json:"id"`
+	DeckID string `db:"deck_id" json:"deck_id"`
 }
 
-func (q *Queries) UpdateEntryCount(ctx context.Context, arg UpdateEntryCountParams) error {
-	_, err := q.db.ExecContext(ctx, updateEntryCount, arg.Count, arg.ID)
-	return err
+func (q *Queries) UpdateEntryCount(ctx context.Context, arg UpdateEntryCountParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, updateEntryCount, arg.Count, arg.ID, arg.DeckID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
-const updateEntryImageUrl = `-- name: UpdateEntryImageUrl :exec
+const updateEntryImageUrl = `-- name: UpdateEntryImageUrl :execrows
 UPDATE deck_entries
 SET image_url = ?
-WHERE id = ?
+WHERE id = ? AND deck_id = ?
 `
 
 type UpdateEntryImageUrlParams struct {
 	ImageUrl string `db:"image_url" json:"image_url"`
 	ID       string `db:"id" json:"id"`
+	DeckID   string `db:"deck_id" json:"deck_id"`
 }
 
-func (q *Queries) UpdateEntryImageUrl(ctx context.Context, arg UpdateEntryImageUrlParams) error {
-	_, err := q.db.ExecContext(ctx, updateEntryImageUrl, arg.ImageUrl, arg.ID)
-	return err
+func (q *Queries) UpdateEntryImageUrl(ctx context.Context, arg UpdateEntryImageUrlParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, updateEntryImageUrl, arg.ImageUrl, arg.ID, arg.DeckID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
 const upsertEntry = `-- name: UpsertEntry :exec

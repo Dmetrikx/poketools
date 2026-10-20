@@ -26,7 +26,7 @@ func TestMigrate_FreshDatabase(t *testing.T) {
 	}
 
 	// Every table the app depends on must exist after a single migrate.
-	for _, table := range []string{"decks", "deck_entries"} {
+	for _, table := range []string{"users", "sessions", "decks", "deck_entries"} {
 		var name string
 		err := db.QueryRow(
 			`SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?`, table,

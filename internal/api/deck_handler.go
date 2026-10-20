@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strings"
 
@@ -24,7 +25,7 @@ func NewDeckHandler(svc *deck.Service) *DeckHandler {
 
 // List handles GET /api/decks
 func (h *DeckHandler) List(w http.ResponseWriter, r *http.Request) {
-	decks, err := h.svc.List(r.Context())
+	decks, err := h.svc.List(r.Context(), userID(r))
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -42,7 +43,7 @@ func (h *DeckHandler) Create(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
-	d, err := h.svc.Create(r.Context(), body.Name, body.Format)
+	d, err := h.svc.Create(r.Context(), userID(r), body.Name, body.Format)
 	if err != nil {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
@@ -53,9 +54,9 @@ func (h *DeckHandler) Create(w http.ResponseWriter, r *http.Request) {
 // Get handles GET /api/decks/{id}
 func (h *DeckHandler) Get(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	d, err := h.svc.Get(r.Context(), id)
+	d, err := h.svc.Get(r.Context(), userID(r), id)
 	if err != nil {
-		writeError(w, http.StatusNotFound, err.Error())
+		writeDeckError(w, http.StatusInternalServerError, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, d)
@@ -72,9 +73,9 @@ func (h *DeckHandler) Update(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
-	d, err := h.svc.Update(r.Context(), id, body.Name, body.Format)
+	d, err := h.svc.Update(r.Context(), userID(r), id, body.Name, body.Format)
 	if err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeDeckError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, d)
@@ -83,8 +84,8 @@ func (h *DeckHandler) Update(w http.ResponseWriter, r *http.Request) {
 // Delete handles DELETE /api/decks/{id}
 func (h *DeckHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	if err := h.svc.Delete(r.Context(), id); err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+	if err := h.svc.Delete(r.Context(), userID(r), id); err != nil {
+		writeDeckError(w, http.StatusInternalServerError, err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -100,9 +101,9 @@ func (h *DeckHandler) AddEntry(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
-	created, err := h.svc.AddEntry(r.Context(), deckID, entry)
+	created, err := h.svc.AddEntry(r.Context(), userID(r), deckID, entry)
 	if err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeDeckError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusCreated, created)
@@ -110,6 +111,7 @@ func (h *DeckHandler) AddEntry(w http.ResponseWriter, r *http.Request) {
 
 // UpdateEntry handles PUT /api/decks/{id}/entries/{eid}
 func (h *DeckHandler) UpdateEntry(w http.ResponseWriter, r *http.Request) {
+	deckID := chi.URLParam(r, "id")
 	entryID := chi.URLParam(r, "eid")
 	var body struct {
 		Count int `json:"count"`
@@ -118,8 +120,8 @@ func (h *DeckHandler) UpdateEntry(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
-	if err := h.svc.UpdateEntry(r.Context(), entryID, body.Count); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+	if err := h.svc.UpdateEntry(r.Context(), userID(r), deckID, entryID, body.Count); err != nil {
+		writeDeckError(w, http.StatusBadRequest, err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -127,6 +129,7 @@ func (h *DeckHandler) UpdateEntry(w http.ResponseWriter, r *http.Request) {
 
 // UpdateEntryArt handles PUT /api/decks/{id}/entries/{eid}/art
 func (h *DeckHandler) UpdateEntryArt(w http.ResponseWriter, r *http.Request) {
+	deckID := chi.URLParam(r, "id")
 	entryID := chi.URLParam(r, "eid")
 	var body struct {
 		ImageURL string `json:"imageUrl"`
@@ -135,8 +138,8 @@ func (h *DeckHandler) UpdateEntryArt(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
-	if err := h.svc.UpdateEntryImageURL(r.Context(), entryID, body.ImageURL); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+	if err := h.svc.UpdateEntryImageURL(r.Context(), userID(r), deckID, entryID, body.ImageURL); err != nil {
+		writeDeckError(w, http.StatusBadRequest, err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -144,9 +147,10 @@ func (h *DeckHandler) UpdateEntryArt(w http.ResponseWriter, r *http.Request) {
 
 // DeleteEntry handles DELETE /api/decks/{id}/entries/{eid}
 func (h *DeckHandler) DeleteEntry(w http.ResponseWriter, r *http.Request) {
+	deckID := chi.URLParam(r, "id")
 	entryID := chi.URLParam(r, "eid")
-	if err := h.svc.DeleteEntry(r.Context(), entryID); err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
+	if err := h.svc.DeleteEntry(r.Context(), userID(r), deckID, entryID); err != nil {
+		writeDeckError(w, http.StatusInternalServerError, err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -184,7 +188,7 @@ func (h *DeckHandler) Import(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if body.Save {
-		saved, err := h.svc.Import(r.Context(), d)
+		saved, err := h.svc.Import(r.Context(), userID(r), d)
 		if err != nil {
 			writeError(w, http.StatusInternalServerError, err.Error())
 			return
@@ -199,9 +203,9 @@ func (h *DeckHandler) Import(w http.ResponseWriter, r *http.Request) {
 // Export handles GET /api/decks/{id}/export?format=ptcglive|limitless
 func (h *DeckHandler) Export(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	d, err := h.svc.Get(r.Context(), id)
+	d, err := h.svc.Get(r.Context(), userID(r), id)
 	if err != nil {
-		writeError(w, http.StatusNotFound, err.Error())
+		writeDeckError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -218,6 +222,16 @@ func (h *DeckHandler) Export(w http.ResponseWriter, r *http.Request) {
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
+
+// writeDeckError responds 404 for deck.ErrNotFound (including another user's
+// deck) and with the given fallback status otherwise.
+func writeDeckError(w http.ResponseWriter, fallback int, err error) {
+	if errors.Is(err, deck.ErrNotFound) {
+		writeError(w, http.StatusNotFound, "not found")
+		return
+	}
+	writeError(w, fallback, err.Error())
+}
 
 func formatterFor(fmt string) format.DeckFormatter {
 	switch strings.ToLower(fmt) {

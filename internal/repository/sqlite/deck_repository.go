@@ -3,13 +3,14 @@ package sqlitedb
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/dariomendez/poketools/internal/deck"
 )
 
-// SQLiteDeckRepository implements repository.DeckRepository using sqlc Queries.
+// SQLiteDeckRepository implements deck.Repository using sqlc Queries.
 type SQLiteDeckRepository struct {
 	q  *Queries
 	db *sql.DB
@@ -19,8 +20,8 @@ func NewDeckRepository(db *sql.DB) *SQLiteDeckRepository {
 	return &SQLiteDeckRepository{q: New(db), db: db}
 }
 
-func (r *SQLiteDeckRepository) List(ctx context.Context) ([]*deck.Deck, error) {
-	rows, err := r.q.ListDecks(ctx)
+func (r *SQLiteDeckRepository) List(ctx context.Context, userID string) ([]*deck.Deck, error) {
+	rows, err := r.q.ListDecks(ctx, userID)
 	if err != nil {
 		return nil, fmt.Errorf("list decks: %w", err)
 	}
@@ -31,8 +32,11 @@ func (r *SQLiteDeckRepository) List(ctx context.Context) ([]*deck.Deck, error) {
 	return decks, nil
 }
 
-func (r *SQLiteDeckRepository) Get(ctx context.Context, id string) (*deck.Deck, error) {
-	row, err := r.q.GetDeck(ctx, id)
+func (r *SQLiteDeckRepository) Get(ctx context.Context, userID, id string) (*deck.Deck, error) {
+	row, err := r.q.GetDeck(ctx, GetDeckParams{ID: id, UserID: userID})
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, deck.ErrNotFound
+	}
 	if err != nil {
 		return nil, fmt.Errorf("get deck %s: %w", id, err)
 	}
@@ -46,6 +50,7 @@ func (r *SQLiteDeckRepository) Get(ctx context.Context, id string) (*deck.Deck, 
 func (r *SQLiteDeckRepository) Create(ctx context.Context, d *deck.Deck) error {
 	err := r.q.CreateDeck(ctx, CreateDeckParams{
 		ID:        d.ID,
+		UserID:    d.UserID,
 		Name:      d.Name,
 		Format:    d.Format,
 		CreatedAt: d.CreatedAt.UnixMilli(),
@@ -58,23 +63,19 @@ func (r *SQLiteDeckRepository) Create(ctx context.Context, d *deck.Deck) error {
 }
 
 func (r *SQLiteDeckRepository) Update(ctx context.Context, d *deck.Deck) error {
-	err := r.q.UpdateDeck(ctx, UpdateDeckParams{
+	n, err := r.q.UpdateDeck(ctx, UpdateDeckParams{
 		Name:      d.Name,
 		Format:    d.Format,
 		UpdatedAt: d.UpdatedAt.UnixMilli(),
 		ID:        d.ID,
+		UserID:    d.UserID,
 	})
-	if err != nil {
-		return fmt.Errorf("update deck: %w", err)
-	}
-	return nil
+	return rowsAffected(n, err, "update deck")
 }
 
-func (r *SQLiteDeckRepository) Delete(ctx context.Context, id string) error {
-	if err := r.q.DeleteDeck(ctx, id); err != nil {
-		return fmt.Errorf("delete deck: %w", err)
-	}
-	return nil
+func (r *SQLiteDeckRepository) Delete(ctx context.Context, userID, id string) error {
+	n, err := r.q.DeleteDeck(ctx, DeleteDeckParams{ID: id, UserID: userID})
+	return rowsAffected(n, err, "delete deck")
 }
 
 func (r *SQLiteDeckRepository) AddEntry(ctx context.Context, entry *deck.CardEntry) error {
@@ -96,33 +97,27 @@ func (r *SQLiteDeckRepository) AddEntry(ctx context.Context, entry *deck.CardEnt
 	return nil
 }
 
-func (r *SQLiteDeckRepository) UpdateEntryImageURL(ctx context.Context, id string, imageURL string) error {
-	err := r.q.UpdateEntryImageUrl(ctx, UpdateEntryImageUrlParams{
+func (r *SQLiteDeckRepository) UpdateEntryImageURL(ctx context.Context, deckID, id string, imageURL string) error {
+	n, err := r.q.UpdateEntryImageUrl(ctx, UpdateEntryImageUrlParams{
 		ImageUrl: imageURL,
 		ID:       id,
+		DeckID:   deckID,
 	})
-	if err != nil {
-		return fmt.Errorf("update entry image url: %w", err)
-	}
-	return nil
+	return rowsAffected(n, err, "update entry image url")
 }
 
-func (r *SQLiteDeckRepository) UpdateEntry(ctx context.Context, id string, count int) error {
-	err := r.q.UpdateEntryCount(ctx, UpdateEntryCountParams{
-		Count: int64(count),
-		ID:    id,
+func (r *SQLiteDeckRepository) UpdateEntry(ctx context.Context, deckID, id string, count int) error {
+	n, err := r.q.UpdateEntryCount(ctx, UpdateEntryCountParams{
+		Count:  int64(count),
+		ID:     id,
+		DeckID: deckID,
 	})
-	if err != nil {
-		return fmt.Errorf("update entry: %w", err)
-	}
-	return nil
+	return rowsAffected(n, err, "update entry")
 }
 
-func (r *SQLiteDeckRepository) DeleteEntry(ctx context.Context, id string) error {
-	if err := r.q.DeleteEntry(ctx, id); err != nil {
-		return fmt.Errorf("delete entry: %w", err)
-	}
-	return nil
+func (r *SQLiteDeckRepository) DeleteEntry(ctx context.Context, deckID, id string) error {
+	n, err := r.q.DeleteEntry(ctx, DeleteEntryParams{ID: id, DeckID: deckID})
+	return rowsAffected(n, err, "delete entry")
 }
 
 // ReplaceEntries deletes all existing entries for the deck and inserts the new set.
@@ -162,9 +157,22 @@ func (r *SQLiteDeckRepository) ReplaceEntries(ctx context.Context, deckID string
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
+// rowsAffected maps the result of a scoped :execrows mutation: zero rows means
+// the target doesn't exist or isn't the caller's.
+func rowsAffected(n int64, err error, op string) error {
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+	if n == 0 {
+		return deck.ErrNotFound
+	}
+	return nil
+}
+
 func deckFromRow(row Deck, entries []DeckEntry) *deck.Deck {
 	d := &deck.Deck{
 		ID:        row.ID,
+		UserID:    row.UserID,
 		Name:      row.Name,
 		Format:    row.Format,
 		CreatedAt: time.UnixMilli(row.CreatedAt).UTC(),

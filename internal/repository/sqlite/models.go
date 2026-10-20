@@ -6,6 +6,7 @@ package sqlitedb
 
 type Deck struct {
 	ID        string `db:"id" json:"id"`
+	UserID    string `db:"user_id" json:"user_id"`
 	Name      string `db:"name" json:"name"`
 	Format    string `db:"format" json:"format"`
 	CreatedAt int64  `db:"created_at" json:"created_at"`
@@ -23,4 +24,18 @@ type DeckEntry struct {
 	Section  string `db:"section" json:"section"`
 	Position int64  `db:"position" json:"position"`
 	ImageUrl string `db:"image_url" json:"image_url"`
+}
+
+type Session struct {
+	ID        string `db:"id" json:"id"`
+	UserID    string `db:"user_id" json:"user_id"`
+	CreatedAt int64  `db:"created_at" json:"created_at"`
+	ExpiresAt int64  `db:"expires_at" json:"expires_at"`
+}
+
+type User struct {
+	ID           string `db:"id" json:"id"`
+	Email        string `db:"email" json:"email"`
+	PasswordHash string `db:"password_hash" json:"password_hash"`
+	CreatedAt    int64  `db:"created_at" json:"created_at"`
 }

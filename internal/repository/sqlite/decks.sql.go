@@ -10,12 +10,13 @@ import (
 )
 
 const createDeck = `-- name: CreateDeck :exec
-INSERT INTO decks (id, name, format, created_at, updated_at)
-VALUES (?, ?, ?, ?, ?)
+INSERT INTO decks (id, user_id, name, format, created_at, updated_at)
+VALUES (?, ?, ?, ?, ?, ?)
 `
 
 type CreateDeckParams struct {
 	ID        string `db:"id" json:"id"`
+	UserID    string `db:"user_id" json:"user_id"`
 	Name      string `db:"name" json:"name"`
 	Format    string `db:"format" json:"format"`
 	CreatedAt int64  `db:"created_at" json:"created_at"`
@@ -25,6 +26,7 @@ type CreateDeckParams struct {
 func (q *Queries) CreateDeck(ctx context.Context, arg CreateDeckParams) error {
 	_, err := q.db.ExecContext(ctx, createDeck,
 		arg.ID,
+		arg.UserID,
 		arg.Name,
 		arg.Format,
 		arg.CreatedAt,
@@ -33,26 +35,40 @@ func (q *Queries) CreateDeck(ctx context.Context, arg CreateDeckParams) error {
 	return err
 }
 
-const deleteDeck = `-- name: DeleteDeck :exec
-DELETE FROM decks WHERE id = ?
+const deleteDeck = `-- name: DeleteDeck :execrows
+DELETE FROM decks WHERE id = ? AND user_id = ?
 `
 
-func (q *Queries) DeleteDeck(ctx context.Context, id string) error {
-	_, err := q.db.ExecContext(ctx, deleteDeck, id)
-	return err
+type DeleteDeckParams struct {
+	ID     string `db:"id" json:"id"`
+	UserID string `db:"user_id" json:"user_id"`
+}
+
+func (q *Queries) DeleteDeck(ctx context.Context, arg DeleteDeckParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deleteDeck, arg.ID, arg.UserID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
 const getDeck = `-- name: GetDeck :one
-SELECT id, name, format, created_at, updated_at
+SELECT id, user_id, name, format, created_at, updated_at
 FROM decks
-WHERE id = ?
+WHERE id = ? AND user_id = ?
 `
 
-func (q *Queries) GetDeck(ctx context.Context, id string) (Deck, error) {
-	row := q.db.QueryRowContext(ctx, getDeck, id)
+type GetDeckParams struct {
+	ID     string `db:"id" json:"id"`
+	UserID string `db:"user_id" json:"user_id"`
+}
+
+func (q *Queries) GetDeck(ctx context.Context, arg GetDeckParams) (Deck, error) {
+	row := q.db.QueryRowContext(ctx, getDeck, arg.ID, arg.UserID)
 	var i Deck
 	err := row.Scan(
 		&i.ID,
+		&i.UserID,
 		&i.Name,
 		&i.Format,
 		&i.CreatedAt,
@@ -62,13 +78,17 @@ func (q *Queries) GetDeck(ctx context.Context, id string) (Deck, error) {
 }
 
 const listDecks = `-- name: ListDecks :many
-SELECT id, name, format, created_at, updated_at
+
+SELECT id, user_id, name, format, created_at, updated_at
 FROM decks
+WHERE user_id = ?
 ORDER BY updated_at DESC
 `
 
-func (q *Queries) ListDecks(ctx context.Context) ([]Deck, error) {
-	rows, err := q.db.QueryContext(ctx, listDecks)
+// Every deck query is scoped by user_id: a deck that belongs to someone else
+// must be indistinguishable from one that doesn't exist.
+func (q *Queries) ListDecks(ctx context.Context, userID string) ([]Deck, error) {
+	rows, err := q.db.QueryContext(ctx, listDecks, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -78,6 +98,7 @@ func (q *Queries) ListDecks(ctx context.Context) ([]Deck, error) {
 		var i Deck
 		if err := rows.Scan(
 			&i.ID,
+			&i.UserID,
 			&i.Name,
 			&i.Format,
 			&i.CreatedAt,
@@ -96,10 +117,10 @@ func (q *Queries) ListDecks(ctx context.Context) ([]Deck, error) {
 	return items, nil
 }
 
-const updateDeck = `-- name: UpdateDeck :exec
+const updateDeck = `-- name: UpdateDeck :execrows
 UPDATE decks
 SET name = ?, format = ?, updated_at = ?
-WHERE id = ?
+WHERE id = ? AND user_id = ?
 `
 
 type UpdateDeckParams struct {
@@ -107,14 +128,19 @@ type UpdateDeckParams struct {
 	Format    string `db:"format" json:"format"`
 	UpdatedAt int64  `db:"updated_at" json:"updated_at"`
 	ID        string `db:"id" json:"id"`
+	UserID    string `db:"user_id" json:"user_id"`
 }
 
-func (q *Queries) UpdateDeck(ctx context.Context, arg UpdateDeckParams) error {
-	_, err := q.db.ExecContext(ctx, updateDeck,
+func (q *Queries) UpdateDeck(ctx context.Context, arg UpdateDeckParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, updateDeck,
 		arg.Name,
 		arg.Format,
 		arg.UpdatedAt,
 		arg.ID,
+		arg.UserID,
 	)
-	return err
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
