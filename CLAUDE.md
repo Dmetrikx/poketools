@@ -2,279 +2,196 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## What this is
+
+**Poketools** is a multi-user Pokémon TCG deck builder: import, edit and export decklists (PTCG Live, Limitless), pick card art, and generate practice opening hands. It's a Go REST API with a React + TypeScript SPA embedded in the binary, SQLite on a Fly.io volume.
+
+It follows the same layout and conventions as the user's other projects started from go-fly-template (calendario, necroLog, palTracker). When in doubt, match necroLog.
+
 ## Quick Start Commands
 
 ```bash
 make dev              # Run backend + frontend concurrently (port 8080 + 5173)
-make dev-backend      # Go API server only (port 8080)
+make dev-backend      # Build + exec the Go API server (refuses if :8080 is taken)
 make dev-frontend     # Vite dev server only (port 5173)
-make test             # Run all Go tests
-make test-v           # Run tests with verbose output
+make kill-stale       # Kill a leftover dev server holding :8080
+make test             # All Go tests, with -race
 make sqlc             # Regenerate sqlc query code after modifying SQL
-make build            # Production build (frontend compiled into binary)
-make clean            # Remove build artifacts (bin/, web/dist/)
+make build            # Production build (frontend compiled into binary, version via ldflags)
+make deploy-check     # Tests + vet + frontend build + clean tree: ready to push to main
+make deploy-status    # fly status
+make deploy-logs      # fly logs
 ```
 
-## Architecture Overview
-
-**Poketools** is a Pokemon TCG deck builder with a Go REST API backend + React TypeScript frontend.
+## Architecture
 
 ### Technology Stack
-- **Backend**: Go 1.25+ with chi HTTP router
-- **Database**: SQLite (modernc/sqlite, CGO-free) with sqlc for type-safe queries
-- **Card Data**: TCGdex API with in-memory 15-minute cache
-- **Frontend**: React 18 + TypeScript with Vite
-- **Import/Export**: Pluggable format system (PTCG Live, Limitless TCG)
+- **Backend**: Go 1.25 with chi router
+- **Database**: SQLite (modernc/sqlite, CGO-free), sqlc for queries, numbered migrations
+- **Auth**: email + bcrypt passwords, server-side sessions (hashed tokens in SQLite)
+- **Card data**: TCGdex API with in-memory 15-minute cache
+- **Frontend**: React 18 + TypeScript + Vite, CSS modules
+
+### Invariants
+
+- **Every deck query is scoped by `user_id`.** A deck that belongs to someone else must be indistinguishable from one that doesn't exist (`deck.ErrNotFound` → 404). Entry mutations are scoped by `deck_id` *and* the service checks deck ownership first, so a user can't reach another user's entry by pairing it with their own deck ID. `internal/server/router_test.go` (`TestAPI_DecksAreIsolatedPerUser`) enforces this: extend it when adding deck/entry endpoints.
+- **Handlers get the user from the context**, via `userID(r)` in `internal/api/auth_middleware.go` (backed by `auth.UserFrom`). Never accept a user ID from the request body or query.
+- **Migrations are immutable.** Files in `internal/repository/migrations/` are checksummed into `schema_migrations`; editing one that has run anywhere is a startup error. Add a new `NNNN_name.sql` instead.
+- **Timestamps are INTEGER epoch milliseconds (UTC)** in the database. The domain uses `time.Time`; the sqlite adapters convert (`UnixMilli` / `time.UnixMilli(...).UTC()`).
+- **SQLite pragmas go in the DSN** (`repository.Open`), never `db.Exec`. `foreign_keys` and `busy_timeout` are per-connection; Exec only configures one pooled connection.
+- **The `/*` SPA route stays outside `RequireAuth`.** The login page is served by it. And its fallback rewrites to `/`, not `/index.html` (FileServer redirects `/index.html` → `./`, which loops on nested routes).
+- **Only `sha256(token)` is stored for sessions.** The raw token exists only in the `poketools_session` cookie (HttpOnly, SameSite=Lax, Secure outside development).
+- **Secrets go through `fly secrets set`**, never `[env]` in fly.toml. Never bulk-import a `.env` into fly secrets.
 
 ### Key Design Decisions
 
-**Handler Package Placement**
-- HTTP handlers live in `internal/api/` (not in domain packages like `internal/deck/`)
-- Reason: Format packages (`internal/format/`) import deck types → circular import if handlers were in deck package
-- Keep handlers as thin wrappers around service layer
+**Handler package placement**: HTTP handlers live in `internal/api/`, not in domain packages. Format packages import deck types, so handlers in `deck` would create an import cycle. Keep handlers thin.
 
-**Code Generation**
-- sqlc is the source of truth for database queries
-- **Never edit** `internal/repository/sqlite/*.sql.go` files directly
-- Modify SQL in `internal/repository/sqlite/queries/` or `schema.sql`, then run `make sqlc`
+**Interfaces live with their consumer**: `deck.Repository` and `auth.Repository` are defined in the domain package; `internal/repository/sqlite/*_repository.go` implements them. Tests use fakes, not mocks.
 
-**Format System**
-- `internal/format/formatter.go` defines a single interface (`DeckFormatter` with `Import()` and `Export()`)
-- Each format gets its own package: `ptcglive/`, `limitless/`, etc.
-- Format selection happens in `internal/api/deck_handler.go` via `formatterFor()`
-- Adding formats is straightforward: implement the interface + add router case
+**Code generation**: sqlc reads the schema from `internal/repository/migrations/` and queries from `internal/repository/sqlite/queries/`. **Never edit** `*.sql.go`; change the SQL and run `make sqlc`.
 
-**Card Data**
-- `pkg/tcgdex/` is a self-contained public package with HTTP client + cache
-- To swap card sources, implement the `card.TCGdexClient` interface and wire in `cmd/server/main.go`
-- Energy cards receive special treatment: always fetch `swsh` set for images (set-agnostic)
+**Format system**: `internal/format/formatter.go` defines `DeckFormatter` (`Import` / `Export`). Each format is its own package; selection is `formatterFor()` in `internal/api/deck_handler.go`.
+
+**Card data**: `pkg/tcgdex/` is a self-contained client + cache. Basic energy always resolves to the `swsh` set for images.
 
 ### Dependency Injection Flow
 ```
 cmd/server/main.go
   ├─ config.Load()
-  ├─ repository.Open() → *sql.DB
-  ├─ sqlitedb.NewDeckRepository(db)
-  ├─ deck.NewService(deckRepo)
-  ├─ api.NewDeckHandler(deckSvc)
-  ├─ tcgdex.New() → TCGdex client with cache
-  ├─ card.NewService(tcgdexClient)
-  ├─ api.NewCardHandler(cardSvc)
-  └─ server.New() + server.Start()
+  ├─ repository.Open() + repository.Migrate()
+  ├─ auth.NewService(sqlitedb.NewUserRepository(db))
+  ├─ api.NewAuthHandler(authSvc, cfg.AllowSignup, cfg.IsDevelopment())
+  ├─ deck.NewService(sqlitedb.NewDeckRepository(db)) → api.NewDeckHandler
+  ├─ card.NewService(tcgdex.New()) → api.NewCardHandler
+  ├─ go cleanupSessions(ctx, authSvc)      # hourly expired-session purge
+  └─ server.NewRouter(authSvc, authHandler, deckHandler, cardHandler) → server.New().Start()
 ```
 
 ## Project Structure
 
 ```
-cmd/server/main.go                   # Entry point, wires all dependencies
+cmd/server/main.go                   # Entry point, wiring, session cleanup ticker
 
 internal/
-  api/                               # HTTP handlers (thin layer)
-    deck_handler.go                  # Deck CRUD + import/export
+  api/                               # HTTP handlers (thin)
+    auth_handler.go                  # signup / login / logout / me, session cookie
+    auth_middleware.go               # RequireAuth, userID(r)
+    deck_handler.go                  # Deck CRUD, entries, import/export
     card_handler.go                  # Card search + detail
-    response.go                      # Common response types
-
-  card/                              # Card domain
-    service.go                       # CardService (proxies TCGdex)
-    types.go                         # Card type
-
+    response.go                      # writeJSON / writeError
+  auth/                              # Accounts domain
+    auth.go                          # User, Session, errors, WithUser/UserFrom
+    service.go                       # Signup, Login, Logout, Authenticate, Repository
+  card/                              # Card domain (proxies TCGdex)
+  config/config.go                   # PORT, DATABASE_PATH, ENV, ALLOW_SIGNUP
   deck/                              # Deck domain
-    service.go                       # DeckService
-    types.go                         # Deck + Entry types, sections enum
-
-  format/                            # DeckFormatter interface + implementations
-    formatter.go                     # DeckFormatter interface
-    ptcglive/parser.go               # PTCG Live format
-    ptcglive/parser_test.go
-    limitless/parser.go              # Limitless TCG format
-    limitless/parser_test.go
-
-  config/                            # Environment-based config
-    config.go                        # Loads PORT, DATABASE_PATH, ENV
-
-  repository/                        # Repository abstraction
-    deck_repository.go               # DeckRepository interface
-    db.go                            # Open(path), Migrate(db)
+    deck.go                          # Deck, CardEntry, Section, ErrNotFound
+    service.go                       # Service + Repository (all methods take userID)
+  format/                            # DeckFormatter + ptcglive/, limitless/
+  repository/
+    db.go                            # Open (DSN pragmas), Migrate (checksummed runner)
+    migrations/NNNN_*.sql            # Schema, applied in order (immutable once applied)
     sqlite/
-      schema.sql                     # Source of truth for DDL
-      queries/
-        decks.sql                    # Deck queries
-        entries.sql                  # Entry queries
-      deck_repository.go             # SQLite implementation
-      *.sql.go                       # sqlc-generated (DO NOT EDIT)
+      queries/*.sql                  # sqlc input
+      deck_repository.go             # deck.Repository implementation
+      user_repository.go             # auth.Repository implementation
+      *.sql.go, models.go            # sqlc-generated (DO NOT EDIT)
+  server/
+    router.go                        # Public auth routes, RequireAuth group, SPA
+    router_test.go                   # End-to-end API tests over a real SQLite DB
+    server.go                        # http.Server with timeouts, graceful shutdown
+  version/version.go                 # Build version (ldflags, VCS fallback)
 
-  server/                            # HTTP server wiring
-    router.go                        # chi router, route definitions
-    server.go                        # http.Server, graceful shutdown
+pkg/tcgdex/                          # TCGdex client + 15-minute cache
 
-pkg/tcgdex/                          # Public TCGdex API client
-  client.go                          # HTTP client
-  types.go                           # Card, Set types from TCGdex API
-  cache.go                           # 15-minute in-memory cache
-
-web/
-  src/
-    api/
-      client.ts                      # Base HTTP client
-      decks.ts                       # Deck API methods
-      cards.ts                       # Card API methods
-    types/
-      deck.ts                        # TypeScript Deck interface
-      card.ts                        # TypeScript Card interface
-    pages/
-      HomePage.tsx                   # Deck list + create (gallery thumbnails)
-      DeckEditorPage.tsx             # Edit entries + import/export (default: gallery view)
-      ImportPage.tsx                 # Paste decklist + select format
-      PracticeHandsPage.tsx          # Generate 10 opening hands
-      HandDetailPage.tsx             # Hand simulation (draw, thin, board, discard, undo)
-    components/
-      layout/                        # Nav, layout wrapper
-      deck/
-        DeckGalleryView.tsx          # Gallery view for deck editor (cards as images)
-        DeckThumbnail.tsx            # Deck card thumbnail for home page
-        CardRow.tsx                  # List-view row for a card entry
-        SectionGroup.tsx             # Groups entries by section
-        CardImageModal.tsx           # Art picker modal
-      card/                          # Card search + selection
-    hooks/
-      useDecks.ts                    # Fetch + manage deck list
-      useDeck.ts                     # Fetch single deck
-      useCardSearch.ts               # Search cards with debounce
-      useCardImages.ts               # Resolve card images; returns [imageMap, overrideImage]
-      useDebounce.ts                 # Debounce hook
+web/src/
+  api/                               # client.ts (fetch wrapper, 401 event), auth.ts, decks.ts, cards.ts
+  hooks/                             # useAuth, useDecks, useDeck, useCardSearch, useCardImages, useDebounce
+  pages/                             # LoginPage, HomePage, DeckEditorPage, ImportPage, PracticeHandsPage
+  components/layout/                 # AppShell, Navbar (user email + logout)
+  components/deck/, components/card/
+  types/                             # auth.ts, deck.ts, card.ts
 ```
 
 ## Database
 
-**Schema** is defined in `internal/repository/sqlite/schema.sql`. Migrations run automatically on startup.
+Schema lives in `internal/repository/migrations/`, applied on startup by `repository.Migrate`:
+- `0001_init.sql`: baseline decks/entries (drops pre-runner tables)
+- `0002_accounts.sql`: users, sessions, and decks recreated with `user_id`
 
 **Tables**:
-- `decks(id, name, format, created_at, updated_at)` — deck metadata
-- `deck_entries(id, deck_id, card_id, name, set_code, number, count, section, position, image_url)` — individual cards
-  - `section` is constrained to `pokemon | trainer | energy`
-  - `image_url` stores per-entry custom art selection (default `''`)
+- `users(id, email UNIQUE COLLATE NOCASE, password_hash, created_at)`
+- `sessions(id = sha256(token), user_id → users, created_at, expires_at)`
+- `decks(id, user_id → users, name, format, created_at, updated_at)`
+- `deck_entries(id, deck_id → decks, card_id, name, set_code, number, count, section, position, image_url)`, where `section ∈ pokemon | trainer | energy`
 
-**Modifying Queries**:
-1. Edit SQL in `internal/repository/sqlite/queries/` (`.sql` files)
-2. Run `make sqlc` to regenerate `*.sql.go` files
-3. Update `internal/repository/sqlite/deck_repository.go` if method signatures changed
+All foreign keys `ON DELETE CASCADE`.
+
+**Changing the schema**: add `internal/repository/migrations/NNNN_name.sql`, run `make sqlc`, update the adapter in `internal/repository/sqlite/`. SQLite can't `ADD COLUMN ... NOT NULL` without a default (or with a FK + non-null default); recreate the table instead.
+
+**sqlc pitfalls**: use `:execrows` for scoped UPDATE/DELETE so the adapter can map 0 rows to `ErrNotFound` (see `rowsAffected` in `deck_repository.go`).
 
 ## API Routes
 
-All routes are under `/api`:
-
-**Decks**
-- `GET /decks` — list all decks
-- `POST /decks` — create deck
-- `GET /decks/:id` — get deck with entries
-- `PUT /decks/:id` — update deck metadata
-- `DELETE /decks/:id` — delete deck
-
-**Deck Entries**
-- `POST /decks/:id/entries` — add card
-- `PUT /decks/:id/entries/:eid` — update count/imageUrl
-- `PUT /decks/:id/entries/:eid/art` — update entry's custom art image URL
-- `DELETE /decks/:id/entries/:eid` — remove card
-
-**Import/Export**
-- `POST /decks/import?format=ptcglive|limitless` — parse text, optionally save
-- `GET /decks/:id/export?format=ptcglive|limitless` — export as text
-
-**Cards**
-- `GET /cards/search?q=charizard&set=OBF` — search TCGdex
-- `GET /cards/:id` — get card detail
-
-**Health**
+**Public**
+- `POST /api/auth/signup` `{email, password}` → 201 `{user}` + cookie (403 if `ALLOW_SIGNUP=false`, 409 if email taken, 400 on validation)
+- `POST /api/auth/login` `{email, password}` → 200 `{user}` + cookie, 401 on bad credentials
+- `POST /api/auth/logout` → 204, clears cookie
+- `GET /api/auth/me` → 200 `{user | null, allowSignup}` (never 401)
 - `GET /health` → `200 "ok"`
+- `GET /*` → SPA
+
+**Behind `RequireAuth`** (401 without a valid session)
+- `GET|POST /api/decks`, `POST /api/decks/import?format=ptcglive|limitless`
+- `GET|PUT|DELETE /api/decks/{id}`, `GET /api/decks/{id}/export?format=...`
+- `POST /api/decks/{id}/entries`, `PUT|DELETE /api/decks/{id}/entries/{eid}`, `PUT /api/decks/{id}/entries/{eid}/art`
+- `GET /api/cards/search?q=&set=`, `GET /api/cards/{id}`
 
 ## Testing
 
-Tests follow Go conventions with `*_test.go` files alongside source code.
+Standard library `testing` only, with fakes over mocks. `make test` runs with `-race`.
 
-**Test Patterns**:
-- Format parsers use table-driven imports/exports + roundtrip validation
-- Example: `internal/format/ptcglive/parser_test.go`
-  - `TestImport`: Parse sample decklist, verify structure
-  - `TestRoundtrip`: Import → Export → Re-import, compare totals
-- Use standard library `testing` package (no external frameworks)
+- `internal/auth/service_test.go`: service against a fake repository (bcrypt at `MinCost`, injectable clock)
+- `internal/server/router_test.go`: the real router over a temp SQLite DB with cookie-jar clients; covers auth, isolation between users, and the SPA fallback
+- `internal/repository/db_test.go`: migration runner, pragma-per-connection, pre-runner schema replacement
+- `internal/format/*/parser_test.go`: import + roundtrip per format
 
-**Run Tests**:
-```bash
-make test           # All tests
-make test-v         # Verbose
-go test ./...       # Manual invocation
-go test -run TestImport ./internal/format/ptcglive  # Single test
-```
-
-## Adding a New Decklist Format
-
-1. Create `internal/format/yourformat/parser.go` implementing `DeckFormatter`
-   - Implement `Import(text string) (*deck.Deck, error)` and `Export(d *deck.Deck) (string, error)`
-2. Add `parser_test.go` with import + roundtrip tests
-3. Add case in `internal/api/deck_handler.go` → `formatterFor()` function to register it
-4. Routes already handle the `?format=` query param generically
+`internal/server` tests need `web/dist` to exist (it's embedded). CI creates a placeholder; locally, run `make build-frontend` once.
 
 ## Frontend Patterns
 
-**API Client**:
-- Typed wrappers in `src/api/` (`decks.ts`, `cards.ts`)
-- Base client in `src/api/client.ts` handles `Content-Type`, error handling
-- All requests go to `/api/*` (Vite dev proxies to Go backend)
+- `src/api/client.ts` wraps fetch; any 401 from a non-auth endpoint dispatches `auth:unauthorized`, which `useAuth` turns into a return to the login page.
+- `App.tsx` renders `LoginPage` in place of the routes when there's no user, so the user lands back on the URL they opened.
+- Practice Hands caches generated hands in `localStorage` keyed by deck ID.
+- `useCardImages` keeps a module-level image cache; `overrideImage` powers the art picker, persisted via the entry's `imageUrl`.
+- Energy images try the `swsh` set first, then the entry's own set.
 
-**Hooks**:
-- Data fetching: `useDecks`, `useDeck`, `useCardSearch`
-- Side effects: `useDebounce` for search input
-- Image resolution: `useCardImages` — returns `[imageMap, overrideImage]`
-  - Module-level cache (`imageCache`) persists across unmount/remount and page navigation
-  - `overrideImage(key, url)` lets callers manually set an image (art picker)
-  - Supports `imageUrl` field on entries for persisted/saved art selections
+## Configuration
 
-**Component Organization**:
-- Page components in `src/pages/` correspond to route paths
-- Reusable components in `src/components/` with CSS modules
-- Props pass data down, events bubble up
+| Variable | Default | |
+|---|---|---|
+| `PORT` | `8080` | |
+| `DATABASE_PATH` | `poketools.db` | `/data/poketools.db` on Fly |
+| `ENV` | `development` | anything else turns on `Secure` cookies |
+| `ALLOW_SIGNUP` | `true` | `false` closes registration (403) |
 
-**Energy Card Image Handling**:
-- Frontend detects energy cards by `section === 'energy'`
-- Tries swsh set first, falls back to original setCode
-- Backend complements this: `CardService.Get()` detects basic energy, forces swsh lookup
+## Deployment (Fly.io)
 
-**Deck Editor View Modes**:
-- Default view is gallery (`DeckGalleryView`) — cards displayed as images grouped by section
-- Gallery supports increment/decrement, remove, and art picker (select/save art per entry)
-- Art selections saved to the entry's `imageUrl` field and persisted to the DB
+App `poketools-k5-rwq`, region `lax`, volume `poketools_data` at `/data`, scale-to-zero.
+
+**There is exactly one path to production: push to main.** `ci.yml` runs vet, build, race tests and the frontend build; `fly-deploy.yml` triggers on CI's `workflow_run`, deploys only if CI succeeded, checks out exactly the tested SHA, and passes it as `VERSION`. Deliberately no `make deploy`. Run `make deploy-check` before pushing.
 
 ## Removed: Game Board
 
 The drag-and-drop game board (`HandDetailPage`, reached from Practice Hands) was removed to be redesigned later. It was frontend-only (no backend state). Recover it from git history: PRs #3 and #5–#10, last version at `8aa2b34`.
 
-## Configuration
+## Adding a New Decklist Format
 
-Environment variables (defaults provided for development):
-```
-PORT=8080                    # HTTP listen port
-DATABASE_PATH=poketools.db   # SQLite file
-ENV=development              # development or production
-```
+1. Create `internal/format/yourformat/parser.go` implementing `DeckFormatter`
+2. Add `parser_test.go` with import + roundtrip tests
+3. Add a case in `formatterFor()` in `internal/api/deck_handler.go`
 
-## Development Tips
+## Related
 
-**Vite proxy issue**: The Vite dev server proxies `/api/*` to `http://localhost:8080`. Make sure the Go backend is running (`make dev-backend`).
-
-**CORS**: Development CORS allows `localhost:5173` and `localhost:8080`. For other origins, update `internal/server/router.go`.
-
-**sqlc installation**: Required only when modifying SQL queries. Install via:
-```bash
-go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
-```
-
-**IDE Setup**: The `.idea/` directory is gitignored. IntelliJ projects rebuild on open.
-
-## Utility Scripts
-
-- `scripts/clear_tables.sh` — clears deck and deck_entries tables from SQLite database. Usage: `./scripts/clear_tables.sh [DATABASE_PATH]`
-
-## Related Documentation
-
-- README.md — Project overview, getting started, detailed API reference
-- STUDY_GUIDE.md — Implementation walkthrough, feature notes (reference for understanding changes)
+- README.md: overview, getting started, API reference, Fly operations
