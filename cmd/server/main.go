@@ -14,6 +14,7 @@ import (
 	"github.com/dariomendez/poketools/internal/repository"
 	sqlitedb "github.com/dariomendez/poketools/internal/repository/sqlite"
 	"github.com/dariomendez/poketools/internal/server"
+	"github.com/dariomendez/poketools/internal/version"
 	"github.com/dariomendez/poketools/pkg/tcgdex"
 )
 
@@ -24,6 +25,7 @@ func main() {
 	slog.SetDefault(logger)
 
 	cfg := config.Load()
+	slog.Info("starting poketools", "version", version.String(), "env", cfg.Env)
 
 	// ── Database ─────────────────────────────────────────────────────────────
 	db, err := repository.Open(cfg.DatabasePath)
@@ -33,7 +35,7 @@ func main() {
 	}
 	defer db.Close()
 
-	if err := repository.Migrate(db); err != nil {
+	if err := repository.Migrate(db, logger); err != nil {
 		slog.Error("failed to run migrations", "err", err)
 		os.Exit(1)
 	}

@@ -70,7 +70,11 @@ func NewRouter(deckHandler *api.DeckHandler, cardHandler *api.CardHandler) http.
 			path = "index.html"
 		}
 		if _, err := dist.Open(path); err != nil {
-			r.URL.Path = "/index.html"
+			// Rewrite to "/" rather than "/index.html": http.FileServer
+			// redirects a request for "/index.html" to "./", which on a
+			// nested route like /decks/abc/practice resolves to /decks/abc/
+			// and misses again, looping until the browser gives up.
+			r.URL.Path = "/"
 		}
 		fileServer.ServeHTTP(w, r)
 	})

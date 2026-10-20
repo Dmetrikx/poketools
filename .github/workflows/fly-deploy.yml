@@ -1,18 +1,25 @@
 # See https://fly.io/docs/app-guides/continuous-deployment-with-github-actions/
+#
+# Deploys only after CI has passed on main, and deploys exactly the commit CI
+# tested (head_sha), not whatever main points to by the time this runs.
 
 name: Fly Deploy
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
 jobs:
   deploy:
     name: Deploy app
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
     runs-on: ubuntu-latest
-    concurrency: deploy-group    # optional: ensure only one action runs at a time
+    concurrency: deploy-group    # ensure only one deploy runs at a time
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only
+      - run: flyctl deploy --remote-only --build-arg VERSION=$(git rev-parse --short HEAD)
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

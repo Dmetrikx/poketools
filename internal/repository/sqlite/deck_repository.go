@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/dariomendez/poketools/internal/deck"
 )
@@ -47,8 +48,8 @@ func (r *SQLiteDeckRepository) Create(ctx context.Context, d *deck.Deck) error {
 		ID:        d.ID,
 		Name:      d.Name,
 		Format:    d.Format,
-		CreatedAt: d.CreatedAt,
-		UpdatedAt: d.UpdatedAt,
+		CreatedAt: d.CreatedAt.UnixMilli(),
+		UpdatedAt: d.UpdatedAt.UnixMilli(),
 	})
 	if err != nil {
 		return fmt.Errorf("create deck: %w", err)
@@ -60,7 +61,7 @@ func (r *SQLiteDeckRepository) Update(ctx context.Context, d *deck.Deck) error {
 	err := r.q.UpdateDeck(ctx, UpdateDeckParams{
 		Name:      d.Name,
 		Format:    d.Format,
-		UpdatedAt: d.UpdatedAt,
+		UpdatedAt: d.UpdatedAt.UnixMilli(),
 		ID:        d.ID,
 	})
 	if err != nil {
@@ -166,8 +167,8 @@ func deckFromRow(row Deck, entries []DeckEntry) *deck.Deck {
 		ID:        row.ID,
 		Name:      row.Name,
 		Format:    row.Format,
-		CreatedAt: row.CreatedAt,
-		UpdatedAt: row.UpdatedAt,
+		CreatedAt: time.UnixMilli(row.CreatedAt).UTC(),
+		UpdatedAt: time.UnixMilli(row.UpdatedAt).UTC(),
 	}
 	for _, e := range entries {
 		d.Entries = append(d.Entries, deck.CardEntry{
