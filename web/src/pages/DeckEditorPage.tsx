@@ -5,6 +5,7 @@ import { useCardImages, imageKey } from '@/hooks/useCardImages'
 import CardSearch from '@/components/card/CardSearch'
 import SectionGroup from '@/components/deck/SectionGroup'
 import DeckGalleryView from '@/components/deck/DeckGalleryView'
+import PracticeHandModal from '@/components/practice/PracticeHandModal'
 import type { CardBrief } from '@/types/card'
 import type { CardEntry, Section } from '@/types/deck'
 import styles from './DeckEditorPage.module.css'
@@ -20,6 +21,7 @@ export default function DeckEditorPage() {
   const [exportText, setExportText] = useState('')
   const [exporting, setExporting] = useState(false)
   const [viewMode, setViewMode] = useState<ViewMode>('gallery')
+  const [showPractice, setShowPractice] = useState(false)
 
   // Always call hooks before early returns
   const entries = deck?.entries ?? []
@@ -99,7 +101,7 @@ export default function DeckEditorPage() {
                 onClick={() => setViewMode('gallery')}
               >Gallery</button>
             </div>
-            <button className={styles.actionBtn} onClick={() => navigate(`/decks/${id}/practice`)}>
+            <button className={styles.actionBtn} onClick={() => setShowPractice(true)}>
               Practice Hands
             </button>
             <button className={styles.actionBtn} onClick={() => handleExport('ptcglive')} disabled={exporting}>
@@ -159,6 +161,10 @@ export default function DeckEditorPage() {
           </div>
         )}
       </div>
+
+      {showPractice && (
+        <PracticeHandModal deck={deck} imageMap={imageMap} onClose={() => setShowPractice(false)} />
+      )}
     </div>
   )
 }

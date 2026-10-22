@@ -107,8 +107,10 @@ pkg/tcgdex/                          # TCGdex client + 15-minute cache
 
 web/src/
   api/                               # client.ts (fetch wrapper, 401 event), auth.ts, decks.ts, cards.ts
-  hooks/                             # useAuth, useDecks, useDeck, useCardSearch, useCardImages, useDebounce
-  pages/                             # LoginPage, HomePage, DeckEditorPage, ImportPage, PracticeHandsPage
+  hooks/                             # useAuth, useDecks, useDeck, useCardSearch, useCardImages, useBasicPokemon, useDebounce
+  pages/                             # LoginPage, HomePage, DeckEditorPage, ImportPage
+  components/practice/               # PracticeHandModal, DeckFan, PlayingCard (flip)
+  practice/deal.ts                   # Shuffle + mulligan dealing, deck sort
   components/layout/                 # AppShell, Navbar (user email + logout)
   components/deck/, components/card/
   types/                             # auth.ts, deck.ts, card.ts
@@ -163,7 +165,7 @@ Standard library `testing` only, with fakes over mocks. `make test` runs with `-
 
 - `src/api/client.ts` wraps fetch; any 401 from a non-auth endpoint dispatches `auth:unauthorized`, which `useAuth` turns into a return to the login page.
 - `App.tsx` renders `LoginPage` in place of the routes when there's no user, so the user lands back on the URL they opened.
-- Practice Hands caches generated hands in `localStorage` keyed by deck ID.
+- Practice Hands is a modal on the Deck Editor: one dealt hand, face-down prizes and next card (click to flip), and the remaining deck in a scrollable fan with "seen" marks for prize checking. The hand and its reveal/mark state persist in `localStorage` (`practice-hand-{deckId}`) and are discarded when the deck's contents change; basic-Pokémon overrides persist under `practice-overrides-{deckId}`.
 - `useCardImages` keeps a module-level image cache; `overrideImage` powers the art picker, persisted via the entry's `imageUrl`.
 - Energy images try the `swsh` set first, then the entry's own set.
 

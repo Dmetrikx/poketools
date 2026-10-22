@@ -3,7 +3,6 @@ import AppShell from '@/components/layout/AppShell'
 import HomePage from '@/pages/HomePage'
 import DeckEditorPage from '@/pages/DeckEditorPage'
 import ImportPage from '@/pages/ImportPage'
-import PracticeHandsPage from '@/pages/PracticeHandsPage'
 import LoginPage from '@/pages/LoginPage'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -22,7 +21,6 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/decks/:id" element={<DeckEditorPage />} />
-        <Route path="/decks/:id/practice" element={<PracticeHandsPage />} />
         <Route path="/import" element={<ImportPage />} />
       </Routes>
     </AppShell>
