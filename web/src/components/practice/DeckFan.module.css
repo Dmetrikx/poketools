@@ -95,9 +95,10 @@
 }
 
 /* Like a real deck, only the few cards at the center of your vision are
-   clear: the fan darkens toward both edges. --focus is the clear width. */
+   clear: the fan darkens toward both edges. --focus is the clear width,
+   capped at half the fan (a % of the gradient) so narrow screens shade too. */
 .viewport {
-  --focus: 300px;
+  --focus: min(300px, 50%);
   --shade: 10, 11, 16;
   position: relative;
   border-radius: 8px;
