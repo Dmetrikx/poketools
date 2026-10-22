@@ -17,8 +17,11 @@ const DRAG_THRESHOLD = 5
 
 /**
  * The remaining deck spread face up in an overlapping fan that scrolls
- * sideways. The hovered (or arrow-key focused) card lifts out of the fan;
- * clicking a card marks it as seen.
+ * sideways, top of the deck on the left and the bottom card at the far right.
+ * It opens scrolled fully right, with the bottom card at the center, so
+ * thumbing through means scrolling left toward the top. The hovered (or
+ * arrow-key focused) card lifts out of the fan; clicking a card marks it as
+ * seen.
  */
 export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClearMarks }: Props) {
   const [sorted, setSorted] = useState(false)
@@ -48,10 +51,10 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
 
   useEffect(() => () => cancelAnimationFrame(scrollFrame.current), [])
 
-  // Pick the deck up at its middle, before the first paint so it doesn't jump.
+  // Pick the deck up at its bottom card, before the first paint so it doesn't jump.
   useLayoutEffect(() => {
     const strip = stripRef.current
-    if (strip) strip.scrollLeft = (strip.scrollWidth - strip.clientWidth) / 2
+    if (strip) strip.scrollLeft = strip.scrollWidth - strip.clientWidth
   }, [])
 
   // Browsers don't refresh hover while content scrolls under a still pointer
