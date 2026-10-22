@@ -25,9 +25,19 @@ func (r *SQLiteDeckRepository) List(ctx context.Context, userID string) ([]*deck
 	if err != nil {
 		return nil, fmt.Errorf("list decks: %w", err)
 	}
+	covers, err := r.q.ListCoversByUser(ctx, userID)
+	if err != nil {
+		return nil, fmt.Errorf("list covers: %w", err)
+	}
+	byDeck := make(map[string][]deck.CardEntry)
+	for _, c := range covers {
+		byDeck[c.DeckID] = append(byDeck[c.DeckID], entryFromRow(c.DeckEntry))
+	}
 	decks := make([]*deck.Deck, 0, len(rows))
 	for _, row := range rows {
-		decks = append(decks, deckFromRow(row, nil))
+		d := deckFromRow(row, nil)
+		d.Covers = byDeck[row.ID]
+		decks = append(decks, d)
 	}
 	return decks, nil
 }
@@ -44,7 +54,15 @@ func (r *SQLiteDeckRepository) Get(ctx context.Context, userID, id string) (*dec
 	if err != nil {
 		return nil, fmt.Errorf("list entries for deck %s: %w", id, err)
 	}
-	return deckFromRow(row, entries), nil
+	covers, err := r.q.ListCoversByDeck(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("list covers for deck %s: %w", id, err)
+	}
+	d := deckFromRow(row, entries)
+	for _, c := range covers {
+		d.Covers = append(d.Covers, entryFromRow(c.DeckEntry))
+	}
+	return d, nil
 }
 
 func (r *SQLiteDeckRepository) Create(ctx context.Context, d *deck.Deck) error {
@@ -155,6 +173,28 @@ func (r *SQLiteDeckRepository) ReplaceEntries(ctx context.Context, deckID string
 	return tx.Commit()
 }
 
+// SetCovers replaces the deck's covers with entryIDs, one per slot in order.
+func (r *SQLiteDeckRepository) SetCovers(ctx context.Context, deckID string, entryIDs []string) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin tx: %w", err)
+	}
+	defer tx.Rollback() //nolint:errcheck
+
+	q := r.q.WithTx(tx)
+
+	if err := q.DeleteCoversByDeck(ctx, deckID); err != nil {
+		return fmt.Errorf("delete existing covers: %w", err)
+	}
+	for slot, id := range entryIDs {
+		if err := q.InsertCover(ctx, InsertCoverParams{DeckID: deckID, Slot: int64(slot), EntryID: id}); err != nil {
+			return fmt.Errorf("insert cover: %w", err)
+		}
+	}
+
+	return tx.Commit()
+}
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 // rowsAffected maps the result of a scoped :execrows mutation: zero rows means
@@ -179,18 +219,22 @@ func deckFromRow(row Deck, entries []DeckEntry) *deck.Deck {
 		UpdatedAt: time.UnixMilli(row.UpdatedAt).UTC(),
 	}
 	for _, e := range entries {
-		d.Entries = append(d.Entries, deck.CardEntry{
-			ID:       e.ID,
-			DeckID:   e.DeckID,
-			CardID:   e.CardID,
-			Name:     e.Name,
-			SetCode:  e.SetCode,
-			Number:   e.Number,
-			Count:    int(e.Count),
-			Section:  deck.Section(e.Section),
-			Position: int(e.Position),
-			ImageURL: e.ImageUrl,
-		})
+		d.Entries = append(d.Entries, entryFromRow(e))
 	}
 	return d
+}
+
+func entryFromRow(e DeckEntry) deck.CardEntry {
+	return deck.CardEntry{
+		ID:       e.ID,
+		DeckID:   e.DeckID,
+		CardID:   e.CardID,
+		Name:     e.Name,
+		SetCode:  e.SetCode,
+		Number:   e.Number,
+		Count:    int(e.Count),
+		Section:  deck.Section(e.Section),
+		Position: int(e.Position),
+		ImageURL: e.ImageUrl,
+	}
 }

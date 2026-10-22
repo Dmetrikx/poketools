@@ -103,10 +103,10 @@ export default function PracticeHandModal({ deck, imageMap, onClose }: Props) {
   return (
     // mousedown, not click: a drag that ends outside the modal must not close it
     <div className={styles.overlay} onMouseDown={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className={styles.modal} role="dialog" aria-label="Practice hand">
+      <div className={styles.modal} role="dialog" aria-label="Test draw">
         <div className={styles.header}>
           <div className={styles.titleRow}>
-            <h2 className={styles.title}>Practice hand</h2>
+            <h2 className={styles.title}>Test draw</h2>
             {hand && hand.mulligans > 0 && (
               <span className={styles.mulliganBadge}>
                 {hand.mulligans} {hand.mulligans === 1 ? 'mulligan' : 'mulligans'}

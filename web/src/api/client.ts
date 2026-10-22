@@ -42,10 +42,4 @@ export const api = {
   put: <T>(path: string, body?: unknown) =>
     request<T>(path, { method: 'PUT', body: JSON.stringify(body) }),
   delete: (path: string) => request<void>(path, { method: 'DELETE' }),
-  getText: async (path: string): Promise<string> => {
-    const res = await fetch(`/api${path}`, { credentials: 'same-origin' })
-    if (res.status === 401) window.dispatchEvent(new Event(UNAUTHORIZED_EVENT))
-    if (!res.ok) throw new ApiError(res.status, res.statusText)
-    return res.text()
-  },
 }

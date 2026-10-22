@@ -58,10 +58,5 @@ export function useDeck(id: string) {
     })
   }, [id])
 
-  const exportDeck = useCallback(
-    (formatter: 'ptcglive' | 'limitless' = 'ptcglive') => decksApi.export(id, formatter),
-    [id],
-  )
-
-  return { deck, loading, error, reload: load, addEntry, updateEntry, updateEntryArt, deleteEntry, exportDeck }
+  return { deck, loading, error, reload: load, addEntry, updateEntry, updateEntryArt, deleteEntry }
 }

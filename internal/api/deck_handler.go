@@ -156,7 +156,25 @@ func (h *DeckHandler) DeleteEntry(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// ── Import / Export ───────────────────────────────────────────────────────────
+// SetCovers handles PUT /api/decks/{id}/covers
+// Body: { "entryIds": ["...", "..."] }
+func (h *DeckHandler) SetCovers(w http.ResponseWriter, r *http.Request) {
+	deckID := chi.URLParam(r, "id")
+	var body struct {
+		EntryIDs []string `json:"entryIds"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+	if err := h.svc.SetCovers(r.Context(), userID(r), deckID, body.EntryIDs); err != nil {
+		writeDeckError(w, http.StatusBadRequest, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+// ── Import ───────────────────────────────────────────────────────────────────
 
 // Import handles POST /api/decks/import
 // Body: { "text": "...", "name": "My Deck", "format": "standard", "save": true }
@@ -198,27 +216,6 @@ func (h *DeckHandler) Import(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, d)
-}
-
-// Export handles GET /api/decks/{id}/export?format=ptcglive|limitless
-func (h *DeckHandler) Export(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-	d, err := h.svc.Get(r.Context(), userID(r), id)
-	if err != nil {
-		writeDeckError(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	formatter := formatterFor(r.URL.Query().Get("format"))
-	text, err := formatter.Export(d)
-	if err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(text)) //nolint:errcheck
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────

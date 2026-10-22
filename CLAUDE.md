@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-**Poketools** is a multi-user Pokémon TCG deck builder: import, edit and export decklists (PTCG Live, Limitless), pick card art, and generate practice opening hands. It's a Go REST API with a React + TypeScript SPA embedded in the binary, SQLite on a Fly.io volume.
+**Poketools** is a multi-user Pokémon TCG deck builder: import decklists (PTCG Live, Limitless) and **test draw** opening hands, which is the core feature. Decks can also be edited and given custom card art and two cover cards. There's deliberately no export. It's a Go REST API with a React + TypeScript SPA embedded in the binary, SQLite on a Fly.io volume.
 
 It follows the same layout and conventions as the user's other projects started from go-fly-template (calendario, necroLog, palTracker). When in doubt, match necroLog.
 
@@ -77,7 +77,7 @@ internal/
   api/                               # HTTP handlers (thin)
     auth_handler.go                  # signup / login / logout / me, session cookie
     auth_middleware.go               # RequireAuth, userID(r)
-    deck_handler.go                  # Deck CRUD, entries, import/export
+    deck_handler.go                  # Deck CRUD, entries, covers, import
     card_handler.go                  # Card search + detail
     response.go                      # writeJSON / writeError
   auth/                              # Accounts domain
@@ -107,10 +107,11 @@ pkg/tcgdex/                          # TCGdex client + 15-minute cache
 
 web/src/
   api/                               # client.ts (fetch wrapper, 401 event), auth.ts, decks.ts, cards.ts
-  hooks/                             # useAuth, useDecks, useDeck, useCardSearch, useCardImages, useBasicPokemon, useDebounce
+  hooks/                             # useAuth, useDecks, useDeck, useCardSearch, useCardImages, useBasicPokemon, useDeckCovers, useDebounce
   pages/                             # LoginPage, HomePage, DeckEditorPage, ImportPage
   components/practice/               # PracticeHandModal, DeckFan, PlayingCard (flip)
   practice/deal.ts                   # Shuffle + mulligan dealing, deck sort
+  deck/covers.ts                     # Default cover pick (highest HP) + slot swap
   components/layout/                 # AppShell, Navbar (user email + logout)
   components/deck/, components/card/
   types/                             # auth.ts, deck.ts, card.ts
@@ -121,12 +122,14 @@ web/src/
 Schema lives in `internal/repository/migrations/`, applied on startup by `repository.Migrate`:
 - `0001_init.sql`: baseline decks/entries (drops pre-runner tables)
 - `0002_accounts.sql`: users, sessions, and decks recreated with `user_id`
+- `0003_deck_covers.sql`: up to two cover cards per deck
 
 **Tables**:
 - `users(id, email UNIQUE COLLATE NOCASE, password_hash, created_at)`
 - `sessions(id = sha256(token), user_id → users, created_at, expires_at)`
 - `decks(id, user_id → users, name, format, created_at, updated_at)`
 - `deck_entries(id, deck_id → decks, card_id, name, set_code, number, count, section, position, image_url)`, where `section ∈ pokemon | trainer | energy`
+- `deck_covers(deck_id → decks, slot ∈ 0 | 1, entry_id → deck_entries)`: a deleted entry takes its cover with it
 
 All foreign keys `ON DELETE CASCADE`.
 
@@ -146,7 +149,7 @@ All foreign keys `ON DELETE CASCADE`.
 
 **Behind `RequireAuth`** (401 without a valid session)
 - `GET|POST /api/decks`, `POST /api/decks/import?format=ptcglive|limitless`
-- `GET|PUT|DELETE /api/decks/{id}`, `GET /api/decks/{id}/export?format=...`
+- `GET|PUT|DELETE /api/decks/{id}`, `PUT /api/decks/{id}/covers` `{entryIds}` (≤ 2 of the deck's entries)
 - `POST /api/decks/{id}/entries`, `PUT|DELETE /api/decks/{id}/entries/{eid}`, `PUT /api/decks/{id}/entries/{eid}/art`
 - `GET /api/cards/search?q=&set=`, `GET /api/cards/{id}`
 
@@ -155,7 +158,7 @@ All foreign keys `ON DELETE CASCADE`.
 Standard library `testing` only, with fakes over mocks. `make test` runs with `-race`.
 
 - `internal/auth/service_test.go`: service against a fake repository (bcrypt at `MinCost`, injectable clock)
-- `internal/server/router_test.go`: the real router over a temp SQLite DB with cookie-jar clients; covers auth, isolation between users, and the SPA fallback
+- `internal/server/router_test.go`: the real router over a temp SQLite DB with cookie-jar clients; covers auth, isolation between users, deck covers, and the SPA fallback
 - `internal/repository/db_test.go`: migration runner, pragma-per-connection, pre-runner schema replacement
 - `internal/format/*/parser_test.go`: import + roundtrip per format
 
@@ -165,7 +168,8 @@ Standard library `testing` only, with fakes over mocks. `make test` runs with `-
 
 - `src/api/client.ts` wraps fetch; any 401 from a non-auth endpoint dispatches `auth:unauthorized`, which `useAuth` turns into a return to the login page.
 - `App.tsx` renders `LoginPage` in place of the routes when there's no user, so the user lands back on the URL they opened.
-- Practice Hands is a modal on the Deck Editor: one dealt hand, face-down prizes and next card (click to flip), and the remaining deck in a scrollable fan with "seen" marks for prize checking. The hand and its reveal/mark state persist in `localStorage` (`practice-hand-{deckId}`) and are discarded when the deck's contents change; basic-Pokémon overrides persist under `practice-overrides-{deckId}`.
+- Test Draw (code name "practice", in `PracticeHandModal`) is a modal on the Deck Editor. It is the app's core feature: each home deck tile has a primary "Test draw" button that opens `/decks/{id}?draw=1`, which opens the modal straight away. The modal shows one dealt hand, face-down prizes and next card (click to flip), and the remaining deck in a scrollable fan with "seen" marks for prize checking. The hand and its reveal/mark state persist in `localStorage` (`practice-hand-{deckId}`) and are discarded when the deck's contents change; basic-Pokémon overrides persist under `practice-overrides-{deckId}`.
+- Cover cards: `useDeckCovers` uses the saved `covers`. For any empty slot (a new deck, or a cover whose entry was deleted), it picks the highest-HP Pokémon with `fillCovers` and saves the pick with `PUT /covers`. Users change a cover by clicking it in the editor header (`CoverPickerModal`). Entry → TCGdex card lookup is shared through `resolveCard` in `api/cards.ts`.
 - `useCardImages` keeps a module-level image cache; `overrideImage` powers the art picker, persisted via the entry's `imageUrl`.
 - Energy images try the `swsh` set first, then the entry's own set.
 
@@ -186,7 +190,7 @@ App `poketools-k5-rwq`, region `lax`, volume `poketools_data` at `/data`, scale-
 
 ## Removed: Game Board
 
-The drag-and-drop game board (`HandDetailPage`, reached from Practice Hands) was removed to be redesigned later. It was frontend-only (no backend state). Recover it from git history: PRs #3 and #5–#10, last version at `8aa2b34`.
+The drag-and-drop game board (`HandDetailPage`, reached from the practice/Test Draw modal) was removed to be redesigned later. It was frontend-only (no backend state). Recover it from git history: PRs #3 and #5–#10, last version at `8aa2b34`.
 
 ## Adding a New Decklist Format
 

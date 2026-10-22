@@ -1,0 +1,93 @@
+.cover {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.large {
+  height: 190px;
+  --card-width: 112px;
+  --overlap: -28px;
+}
+
+.small {
+  height: 92px;
+  --card-width: 56px;
+  --overlap: -14px;
+}
+
+.slot {
+  width: var(--card-width);
+  aspect-ratio: 5 / 7;
+  flex-shrink: 0;
+  border-radius: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  transition: transform 0.2s ease;
+}
+
+.slot0 {
+  transform: rotate(-7deg) translateY(4px);
+  z-index: 1;
+}
+
+.slot1 {
+  margin-left: var(--overlap);
+  transform: rotate(7deg) translateY(4px);
+  z-index: 2;
+}
+
+.cover:hover .slot0 {
+  transform: rotate(-10deg) translate(-6px, 0);
+}
+
+.cover:hover .slot1 {
+  transform: rotate(10deg) translate(6px, 0);
+}
+
+.img,
+.blank {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+
+.img {
+  object-fit: cover;
+}
+
+.blank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background: var(--color-bg);
+  border: 1px dashed var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 0.65rem;
+  text-align: center;
+}
+
+.pulse {
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% { opacity: 0.5; }
+}
+
+.selectable {
+  cursor: pointer;
+}
+
+.selectable:hover .img,
+.selectable:hover .blank,
+.selectable:focus-visible .img,
+.selectable:focus-visible .blank {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
