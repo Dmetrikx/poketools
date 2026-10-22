@@ -26,6 +26,9 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
   const stripRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const drag = useRef({ pressed: false, dragging: false, startX: 0, startScroll: 0 })
+  // Last pointer position over the strip; null once it leaves or the keyboard takes over.
+  const pointer = useRef<{ x: number; y: number } | null>(null)
+  const scrollFrame = useRef(0)
 
   const ordered = useMemo(() => (sorted ? sortCards(cards) : cards), [cards, sorted])
 
@@ -43,7 +46,24 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
     return () => strip.removeEventListener('wheel', onWheel)
   }, [])
 
+  useEffect(() => () => cancelAnimationFrame(scrollFrame.current), [])
+
+  // Browsers don't refresh hover while content scrolls under a still pointer
+  // (mouseenter only fires once the mouse moves), so on scroll, lift
+  // whichever card is now under the pointer.
+  const handleScroll = () => {
+    cancelAnimationFrame(scrollFrame.current)
+    scrollFrame.current = requestAnimationFrame(() => {
+      const p = pointer.current
+      if (!p || drag.current.dragging) return
+      const slot = document.elementFromPoint(p.x, p.y)?.closest<HTMLElement>('[data-index]')
+      if (slot && stripRef.current?.contains(slot)) setActive(Number(slot.dataset.index))
+    })
+  }
+
   const focusCard = (index: number) => {
+    // Keyboard navigation scrolls too; don't let the idle pointer steal focus back.
+    pointer.current = null
     const clamped = Math.max(0, Math.min(ordered.length - 1, index))
     setActive(clamped)
     cardRefs.current[clamped]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
@@ -68,6 +88,7 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
   }
 
   const handlePointerMove = (e: React.PointerEvent) => {
+    pointer.current = { x: e.clientX, y: e.clientY }
     const d = drag.current
     if (!d.pressed) return
     const dx = e.clientX - d.startX
@@ -131,6 +152,8 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
+        onPointerLeave={() => { pointer.current = null }}
+        onScroll={handleScroll}
         aria-label="Remaining deck"
       >
         {ordered.map((card, i) => {
@@ -142,6 +165,7 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
             <div
               key={card.uid}
               ref={el => { cardRefs.current[i] = el }}
+              data-index={i}
               className={`${styles.slot} ${position} ${marked.has(card.uid) ? styles.marked : ''}`}
               style={{ zIndex: i === active ? ordered.length + 1 : i }}
               onMouseEnter={() => { if (!drag.current.dragging) setActive(i) }}
