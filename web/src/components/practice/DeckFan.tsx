@@ -17,9 +17,10 @@ const DRAG_THRESHOLD = 5
 
 /**
  * The remaining deck spread face up in an overlapping fan that scrolls
- * sideways. It opens scrolled fully left, with the bottom card at the center,
- * so thumbing through means scrolling right. The hovered (or arrow-key
- * focused) card lifts out of the fan; clicking a card marks it as seen.
+ * sideways, top of the deck on the left and the bottom card at the far right.
+ * It opens scrolled fully left, with the top card at the center, so thumbing
+ * through means scrolling right. The hovered (or arrow-key focused) card
+ * lifts out of the fan; clicking a card marks it as seen.
  */
 export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClearMarks }: Props) {
   const [sorted, setSorted] = useState(false)
@@ -31,9 +32,7 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
   const pointer = useRef<{ x: number; y: number } | null>(null)
   const scrollFrame = useRef(0)
 
-  // `cards` runs top of deck first. Shuffled, the fan shows it the way a deck
-  // turned face up reads: the bottom card first, the top card at the far right.
-  const ordered = useMemo(() => (sorted ? sortCards(cards) : [...cards].reverse()), [cards, sorted])
+  const ordered = useMemo(() => (sorted ? sortCards(cards) : cards), [cards, sorted])
 
   // Vertical wheel scrolls the fan sideways. React's onWheel is passive, so
   // preventDefault needs a native listener.
