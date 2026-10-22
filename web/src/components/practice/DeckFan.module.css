@@ -1,0 +1,194 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 14px;
+  animation: rise 0.3s ease-out;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+.counter {
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.counter strong {
+  color: var(--color-text);
+}
+
+.activeName {
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toolbarActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.seenCount {
+  color: var(--color-text-muted);
+}
+
+.toolBtn,
+.toggleBtn {
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 5px;
+  border: 1px solid var(--color-border);
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.toolBtn:hover:not(:disabled),
+.toggleBtn:hover {
+  color: var(--color-text);
+}
+
+.toolBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.toggle {
+  display: flex;
+}
+
+.toggle .toggleBtn:first-child {
+  border-radius: 5px 0 0 5px;
+}
+
+.toggle .toggleBtn:last-child {
+  border-radius: 0 5px 5px 0;
+  border-left: none;
+}
+
+.toggleActive {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.toggleActive:hover {
+  color: white;
+}
+
+/* Like a real deck, only the few cards at the center of your vision are
+   clear: the fan darkens toward both edges. --focus is the clear width. */
+.viewport {
+  --focus: 300px;
+  --shade: 10, 11, 16;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.viewport::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    rgba(var(--shade), 0.98) 0%,
+    rgba(var(--shade), 0.85) calc(50% - var(--focus) * 1.2),
+    transparent calc(50% - var(--focus) / 2),
+    transparent calc(50% + var(--focus) / 2),
+    rgba(var(--shade), 0.85) calc(50% + var(--focus) * 1.2),
+    rgba(var(--shade), 0.98) 100%
+  );
+}
+
+.viewport:has(.strip:focus-visible) {
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+/* The fan: room above for the lifted card, and half the strip of padding on
+   each side (less half a card) so the first and last cards reach the center. */
+.strip {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 64px calc(50% - 59px) 18px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  outline: none;
+  cursor: grab;
+}
+
+.strip:active {
+  cursor: grabbing;
+}
+
+.slot {
+  position: relative;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  transition: transform 0.22s cubic-bezier(0.3, 0.7, 0.3, 1), filter 0.2s;
+}
+
+.slot + .slot {
+  margin-left: -72px;
+}
+
+.fanCard {
+  width: 118px;
+}
+
+.active {
+  transform: translateY(-48px) scale(1.35);
+}
+
+/* Cards past the lifted one slide right so the fan parts around it. */
+.afterActive {
+  transform: translateX(64px);
+}
+
+.marked .fanCard {
+  filter: brightness(0.55) saturate(0.6);
+}
+
+.marked.active .fanCard {
+  filter: brightness(0.8);
+}
+
+.check {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #22c55e;
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
