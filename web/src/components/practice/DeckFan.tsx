@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { imageKey } from '@/hooks/useCardImages'
 import { sortCards, type DealtCard } from '@/practice/deal'
 import PlayingCard from './PlayingCard'
@@ -17,8 +17,9 @@ const DRAG_THRESHOLD = 5
 
 /**
  * The remaining deck spread face up in an overlapping fan that scrolls
- * sideways. The hovered (or arrow-key focused) card lifts out of the fan;
- * clicking a card marks it as seen.
+ * sideways. It opens scrolled fully left, with the bottom card at the center,
+ * so thumbing through means scrolling right. The hovered (or arrow-key
+ * focused) card lifts out of the fan; clicking a card marks it as seen.
  */
 export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClearMarks }: Props) {
   const [sorted, setSorted] = useState(false)
@@ -30,7 +31,9 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
   const pointer = useRef<{ x: number; y: number } | null>(null)
   const scrollFrame = useRef(0)
 
-  const ordered = useMemo(() => (sorted ? sortCards(cards) : cards), [cards, sorted])
+  // `cards` runs top of deck first. Shuffled, the fan shows it the way a deck
+  // turned face up reads: the bottom card first, the top card at the far right.
+  const ordered = useMemo(() => (sorted ? sortCards(cards) : [...cards].reverse()), [cards, sorted])
 
   // Vertical wheel scrolls the fan sideways. React's onWheel is passive, so
   // preventDefault needs a native listener.
@@ -47,12 +50,6 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
   }, [])
 
   useEffect(() => () => cancelAnimationFrame(scrollFrame.current), [])
-
-  // Pick the deck up at its middle, before the first paint so it doesn't jump.
-  useLayoutEffect(() => {
-    const strip = stripRef.current
-    if (strip) strip.scrollLeft = (strip.scrollWidth - strip.clientWidth) / 2
-  }, [])
 
   // Browsers don't refresh hover while content scrolls under a still pointer
   // (mouseenter only fires once the mouse moves), so on scroll, lift
