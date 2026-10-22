@@ -94,23 +94,49 @@
   color: white;
 }
 
-/* The fan: room above for the lifted card, generous end padding so the
-   last cards can scroll to the middle. */
+/* Like a real deck, only the few cards at the center of your vision are
+   clear: the fan darkens toward both edges. --focus is the clear width. */
+.viewport {
+  --focus: 300px;
+  --shade: 10, 11, 16;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.viewport::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    rgba(var(--shade), 0.92) 0%,
+    rgba(var(--shade), 0.6) calc(50% - var(--focus) * 1.2),
+    transparent calc(50% - var(--focus) / 2),
+    transparent calc(50% + var(--focus) / 2),
+    rgba(var(--shade), 0.6) calc(50% + var(--focus) * 1.2),
+    rgba(var(--shade), 0.92) 100%
+  );
+}
+
+.viewport:has(.strip:focus-visible) {
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+/* The fan: room above for the lifted card, and half the strip of padding on
+   each side (less half a card) so the first and last cards reach the center. */
 .strip {
   display: flex;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 64px 140px 18px 24px;
+  padding: 64px calc(50% - 59px) 18px;
   scroll-snap-type: x proximity;
   scrollbar-width: thin;
   outline: none;
   cursor: grab;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.strip:focus-visible {
-  box-shadow: 0 0 0 2px var(--color-primary);
 }
 
 .strip:active {

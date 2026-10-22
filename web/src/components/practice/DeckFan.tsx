@@ -143,44 +143,47 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
         </div>
       </div>
 
-      <div
-        ref={stripRef}
-        className={styles.strip}
-        tabIndex={0}
-        onKeyDown={handleKeyDown}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
-        onPointerLeave={() => { pointer.current = null }}
-        onScroll={handleScroll}
-        aria-label="Remaining deck"
-      >
-        {ordered.map((card, i) => {
-          const position =
-            active === null ? '' :
-            i === active ? styles.active :
-            i > active ? styles.afterActive : ''
-          return (
-            <div
-              key={card.uid}
-              ref={el => { cardRefs.current[i] = el }}
-              data-index={i}
-              className={`${styles.slot} ${position} ${marked.has(card.uid) ? styles.marked : ''}`}
-              style={{ zIndex: i === active ? ordered.length + 1 : i }}
-              onMouseEnter={() => { if (!drag.current.dragging) setActive(i) }}
-            >
-              <PlayingCard
-                entry={card.entry}
-                image={imageMap.get(imageKey(card.entry))}
-                faceUp
-                onClick={() => handleCardClick(card.uid)}
-                className={styles.fanCard}
-              />
-              {marked.has(card.uid) && <span className={styles.check}>✓</span>}
-            </div>
-          )
-        })}
+      {/* The viewport holds the focus vignette, which stays put while the strip scrolls */}
+      <div className={styles.viewport}>
+        <div
+          ref={stripRef}
+          className={styles.strip}
+          tabIndex={0}
+          onKeyDown={handleKeyDown}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          onPointerLeave={() => { pointer.current = null }}
+          onScroll={handleScroll}
+          aria-label="Remaining deck"
+        >
+          {ordered.map((card, i) => {
+            const position =
+              active === null ? '' :
+              i === active ? styles.active :
+              i > active ? styles.afterActive : ''
+            return (
+              <div
+                key={card.uid}
+                ref={el => { cardRefs.current[i] = el }}
+                data-index={i}
+                className={`${styles.slot} ${position} ${marked.has(card.uid) ? styles.marked : ''}`}
+                style={{ zIndex: i === active ? ordered.length + 1 : i }}
+                onMouseEnter={() => { if (!drag.current.dragging) setActive(i) }}
+              >
+                <PlayingCard
+                  entry={card.entry}
+                  image={imageMap.get(imageKey(card.entry))}
+                  faceUp
+                  onClick={() => handleCardClick(card.uid)}
+                  className={styles.fanCard}
+                />
+                {marked.has(card.uid) && <span className={styles.check}>✓</span>}
+              </div>
+            )
+          })}
+        </div>
       </div>
     </div>
   )
