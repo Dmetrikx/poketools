@@ -46,13 +46,14 @@ func main() {
 	authSvc := auth.NewService(sqlitedb.NewUserRepository(db))
 	authHandler := api.NewAuthHandler(authSvc, cfg.AllowSignup, cfg.IsDevelopment())
 
-	deckRepo := sqlitedb.NewDeckRepository(db)
-	deckSvc := deck.NewService(deckRepo)
-	deckHandler := api.NewDeckHandler(deckSvc)
-
 	tcgdexClient := tcgdex.New()
 	cardSvc := card.NewService(tcgdexClient)
 	cardHandler := api.NewCardHandler(cardSvc)
+
+	// Imports resolve each entry's TCGdex card through the card service.
+	deckRepo := sqlitedb.NewDeckRepository(db)
+	deckSvc := deck.NewService(deckRepo, cardSvc)
+	deckHandler := api.NewDeckHandler(deckSvc)
 
 	// ── HTTP Server ───────────────────────────────────────────────────────────
 	router := server.NewRouter(authSvc, authHandler, deckHandler, cardHandler)

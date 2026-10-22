@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { cardsApi } from '@/api/cards'
+import { resolveCard } from '@/api/cards'
 import type { CardEntry } from '@/types/deck'
 
 type EntryRef = Pick<CardEntry, 'cardId' | 'name' | 'setCode' | 'number' | 'section' | 'imageUrl'>
@@ -20,10 +20,8 @@ export function cardImageUrl(base: string, quality: 'high' | 'low' = 'high'): st
 const imageCache = new Map<string, string>()
 
 /**
- * Fetches card images for a list of deck entries.
- * - If cardId is set, fetches via GET /api/cards/{id}
- * - Otherwise searches by name + setCode; if that fails (502) or returns empty,
- *   retries without the set and picks the first result with an exact name match.
+ * Fetches card images for a list of deck entries: the entry's saved art, or
+ * the image of its card as found by resolveCard.
  * Returns [imageMap, overrideImage] where overrideImage(key, url) lets callers
  * manually override the displayed image for a given card (art picker).
  */
@@ -97,41 +95,10 @@ export function useCardImages(
       fetchedRef.current.add(key)
 
       const fetchImage = async (): Promise<string | undefined> => {
-        // Use persisted image URL if available
-        if (entry.imageUrl) {
-          return entry.imageUrl
-        }
-
-        if (entry.cardId) {
-          const card = await cardsApi.get(entry.cardId)
-          return card.image
-        }
-
-        // For energy cards, always try swsh set first (set-agnostic)
-        if (entry.section === 'energy') {
-          try {
-            const results = await cardsApi.search(entry.name, 'swsh')
-            if (results.length > 0) return results[0].image
-          } catch {
-            // 502 or other — fall through to fallback
-          }
-        }
-
-        // Try search with set if it's not energy (or swsh didn't work)
-        if (entry.setCode && entry.section !== 'energy') {
-          try {
-            const results = await cardsApi.search(entry.name, entry.setCode)
-            if (results.length > 0) return results[0].image
-          } catch {
-            // 502 or other — fall through to name-only retry
-          }
-        }
-
-        // Fallback: search by name only, pick first exact name match
-        const nameLower = entry.name.toLowerCase()
-        const fallback = await cardsApi.search(entry.name)
-        const match = fallback.find(r => r.name.toLowerCase() === nameLower)
-        return match?.image ?? fallback[0]?.image
+        // A picked art wins; otherwise the exact card's image (the server
+        // swaps basic energy to a print that has one).
+        if (entry.imageUrl) return entry.imageUrl
+        return (await resolveCard(entry))?.image
       }
 
       fetchImage().then(img => {

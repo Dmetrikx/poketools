@@ -102,6 +102,7 @@ func registerAppRoutes(r chi.Router, deckHandler *api.DeckHandler, cardHandler *
 	// Card routes
 	r.Route("/cards", func(r chi.Router) {
 		r.Get("/search", cardHandler.Search)
+		r.Get("/resolve", cardHandler.Resolve)
 		r.Get("/{id}", cardHandler.Get)
 	})
 }
