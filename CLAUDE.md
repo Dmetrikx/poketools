@@ -53,7 +53,7 @@ make deploy-logs      # fly logs
 
 **Format system**: `internal/format/formatter.go` defines `DeckFormatter` (`Import` / `Export`). Each format is its own package; selection is `formatterFor()` in `internal/api/deck_handler.go`.
 
-**Card data**: `pkg/tcgdex/` is a self-contained client + cache. Basic energy always resolves to the `swsh` set for images.
+**Card data**: `pkg/tcgdex/` is a self-contained client + cache. Decklists name cards by PTCG Live set code + number ("Arven SVI 166"); `card.Service.Resolve` maps the code to a TCGdex set through its `abbreviation.official` (`SVI` → `sv01`), then tries `{set}-{number}`, the zero-padded `{set}-{001}` (SV onward), and for gallery numbers `{set}tg-TG01` / `{set}gg-GG01`. Basic energy with an unknown code falls back to a `swsh` print by type. Imports store the result as each entry's `cardId` (`deck.Service.ResolveCardIDs`, through the `deck.CardResolver` interface); lookup failures leave it empty rather than fail the import. Basic energy always resolves to the `swsh` set for images. `Search` drops TCG Pocket cards (the `tcgp` series).
 
 ### Dependency Injection Flow
 ```
@@ -62,8 +62,8 @@ cmd/server/main.go
   ├─ repository.Open() + repository.Migrate()
   ├─ auth.NewService(sqlitedb.NewUserRepository(db))
   ├─ api.NewAuthHandler(authSvc, cfg.AllowSignup, cfg.IsDevelopment())
-  ├─ deck.NewService(sqlitedb.NewDeckRepository(db)) → api.NewDeckHandler
   ├─ card.NewService(tcgdex.New()) → api.NewCardHandler
+  ├─ deck.NewService(sqlitedb.NewDeckRepository(db), cardSvc) → api.NewDeckHandler
   ├─ go cleanupSessions(ctx, authSvc)      # hourly expired-session purge
   └─ server.NewRouter(authSvc, authHandler, deckHandler, cardHandler) → server.New().Start()
 ```
@@ -152,14 +152,15 @@ All foreign keys `ON DELETE CASCADE`.
 - `GET|POST /api/decks`, `POST /api/decks/import?format=ptcglive|limitless` `{text, name?, save?, imageUrls?}`: `save:false` returns a preview; `imageUrls` lines up by index with the parsed entries (400 if longer)
 - `GET|PUT|DELETE /api/decks/{id}`, `PUT /api/decks/{id}/covers` `{entryIds}` (≤ 2 of the deck's entries)
 - `POST /api/decks/{id}/entries`, `PUT|DELETE /api/decks/{id}/entries/{eid}`, `PUT /api/decks/{id}/entries/{eid}/art`
-- `GET /api/cards/search?q=&set=`, `GET /api/cards/{id}`
+- `GET /api/cards/search?q=&set=` (no TCG Pocket cards), `GET /api/cards/resolve?set=&number=&name=` → `{id}` or 404, `GET /api/cards/{id}`
 
 ## Testing
 
 Standard library `testing` only, with fakes over mocks. `make test` runs with `-race`.
 
 - `internal/auth/service_test.go`: service against a fake repository (bcrypt at `MinCost`, injectable clock)
-- `internal/server/router_test.go`: the real router over a temp SQLite DB with cookie-jar clients; covers auth, isolation between users, deck covers, and the SPA fallback
+- `internal/server/router_test.go`: the real router over a temp SQLite DB with cookie-jar clients and an offline `fakeTCGdex`; covers auth, isolation between users, deck covers, import card resolution, and the SPA fallback
+- `internal/card/service_test.go`: `Resolve` ID candidates and Pocket filtering against a fake TCGdex; `pkg/tcgdex/client_test.go`: the client against `httptest`
 - `internal/repository/db_test.go`: migration runner, pragma-per-connection, pre-runner schema replacement
 - `internal/format/*/parser_test.go`: import + roundtrip per format
 
@@ -173,8 +174,9 @@ Standard library `testing` only, with fakes over mocks. `make test` runs with `-
 - Cover cards: `useDeckCovers` uses the saved `covers`. For any empty slot (a new deck, or a cover whose entry was deleted), it picks the highest-HP Pokémon with `fillCovers` and saves the pick with `PUT /covers`. Users change a cover by clicking it in the editor header (`CoverPickerModal`). Entry → TCGdex card lookup is shared through `resolveCard` in `api/cards.ts`.
 - Import is a modal (`ImportDeckModal`) on the home page, opened by the Import button or `/?import=1` (the navbar link; `/import` redirects there). Step 1 parses with `save:false`; step 2 shows the parsed deck in a read-only `DeckGalleryView` where art can be fixed. Picks stay local, overlaid on the image map rather than `overrideImage`, so a cancelled import doesn't touch the shared cache. They're sent as `imageUrls` with the `save:true` request.
 - Art picks save immediately: `CardImageModal` has no Save button. It calls `onPickArt` per pick and reverts if the promise rejects. Every gallery tile carries an "✎ Art" badge so the option is visible.
+- Small cards keep their size; readability comes from `useCardPreview` (`components/card/`): hovering a gallery tile or a face-up practice card for 300ms shows a 300px preview beside it (mouse devices only; face-down cards never preview). Practice cards use `cardImageSrcSet` so retina screens get TCGdex's `high` image instead of a stretched `low` one.
 - `useCardImages` keeps a module-level image cache; `overrideImage` powers the art picker, persisted via the entry's `imageUrl`.
-- Energy images try the `swsh` set first, then the entry's own set.
+- Card images: an entry's saved `imageUrl`, else its card through `resolveCard` (`api/cards.ts`): the stored `cardId`, else `/api/cards/resolve` (entries saved before imports stored IDs), else a name search as a last resort.
 
 ## Configuration
 

@@ -206,6 +206,9 @@ func (h *DeckHandler) Import(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Before both preview and save, so the review shows the exact cards.
+	h.svc.ResolveCardIDs(r.Context(), d.Entries)
+
 	if len(body.ImageURLs) > len(d.Entries) {
 		writeError(w, http.StatusBadRequest, "more imageUrls than entries")
 		return

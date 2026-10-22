@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/cookiejar"
@@ -18,7 +19,33 @@ import (
 	"github.com/dariomendez/poketools/pkg/tcgdex"
 )
 
-// newTestServer wires the real router over a fresh SQLite database.
+// fakeTCGdex is an offline TCGdex: only "Arven SVI 166" (sv01-166) exists.
+type fakeTCGdex struct{}
+
+func (fakeTCGdex) SetIDByCode(_ context.Context, code string) (string, error) {
+	if code == "SVI" {
+		return "sv01", nil
+	}
+	return "", nil
+}
+
+func (fakeTCGdex) GetCard(_ context.Context, id string) (*tcgdex.Card, error) {
+	if id == "sv01-166" {
+		return &tcgdex.Card{ID: id, Name: "Arven", LocalID: "166", Category: "Trainer"}, nil
+	}
+	return nil, tcgdex.ErrNotFound
+}
+
+func (fakeTCGdex) SearchCards(context.Context, string, string) ([]tcgdex.CardBrief, error) {
+	return nil, nil
+}
+
+func (fakeTCGdex) SeriesSetIDs(context.Context, string) ([]string, error) {
+	return nil, nil
+}
+
+// newTestServer wires the real router over a fresh SQLite database, with an
+// offline TCGdex so tests never touch the network.
 func newTestServer(t *testing.T, allowSignup bool) *httptest.Server {
 	t.Helper()
 	db, err := repository.Open(filepath.Join(t.TempDir(), "test.db"))
@@ -31,11 +58,12 @@ func newTestServer(t *testing.T, allowSignup bool) *httptest.Server {
 	}
 
 	authSvc := auth.NewService(sqlitedb.NewUserRepository(db))
+	cardSvc := card.NewService(fakeTCGdex{})
 	router := NewRouter(
 		authSvc,
 		api.NewAuthHandler(authSvc, allowSignup, true),
-		api.NewDeckHandler(deck.NewService(sqlitedb.NewDeckRepository(db))),
-		api.NewCardHandler(card.NewService(tcgdex.New())),
+		api.NewDeckHandler(deck.NewService(sqlitedb.NewDeckRepository(db), cardSvc)),
+		api.NewCardHandler(cardSvc),
 	)
 	srv := httptest.NewServer(router)
 	t.Cleanup(srv.Close)
@@ -306,16 +334,40 @@ func TestAPI_ImportWithArt(t *testing.T) {
 	}
 	var got deck.Deck
 	ash.do("GET", "/api/decks/"+saved.ID, nil, &got)
-	urls := map[string]string{}
+	urls, cardIDs := map[string]string{}, map[string]string{}
 	for _, e := range got.Entries {
 		urls[e.Name] = e.ImageURL
+		cardIDs[e.Name] = e.CardID
 	}
 	if urls["Arven"] != art || urls["Charizard ex"] != "" {
 		t.Errorf("saved art = %v, want Arven=%s and Charizard ex unset", urls, art)
 	}
 
+	// Card IDs are resolved from set code + number, in the preview and the
+	// saved deck; an unknown set code (OBF here) is left empty.
+	if preview.Entries[1].CardID != "sv01-166" || preview.Entries[0].CardID != "" {
+		t.Errorf("preview card IDs = [%q %q], want [\"\" sv01-166]", preview.Entries[0].CardID, preview.Entries[1].CardID)
+	}
+	if cardIDs["Arven"] != "sv01-166" || cardIDs["Charizard ex"] != "" {
+		t.Errorf("saved card IDs = %v, want Arven=sv01-166 and Charizard ex unset", cardIDs)
+	}
+
 	if code := importDeck([]string{"", "", art}, nil); code != http.StatusBadRequest {
 		t.Errorf("import with too many imageUrls: status %d, want 400", code)
+	}
+}
+
+func TestAPI_ResolveCard(t *testing.T) {
+	srv := newTestServer(t, true)
+	ash := newClient(t, srv)
+	ash.signup("ash@example.com")
+
+	var got struct{ ID string }
+	if code := ash.do("GET", "/api/cards/resolve?set=SVI&number=166&name=Arven", nil, &got); code != http.StatusOK || got.ID != "sv01-166" {
+		t.Errorf("resolve SVI 166: status %d, id %q; want 200 sv01-166", code, got.ID)
+	}
+	if code := ash.do("GET", "/api/cards/resolve?set=OBF&number=125&name=Charizard+ex", nil, nil); code != http.StatusNotFound {
+		t.Errorf("resolve unknown set: status %d, want 404", code)
 	}
 }
 

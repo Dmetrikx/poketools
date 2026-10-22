@@ -191,7 +191,8 @@ Decks include `covers`: the entries chosen as cover cards, or empty slots that t
 
 | Method | Path | Description |
 |---|---|---|
-| `GET` | `/api/cards/search` | Search TCGdex. Query params: `?q=charizard&set=OBF` |
+| `GET` | `/api/cards/search` | Search TCGdex (TCG Pocket cards excluded). Query params: `?q=charizard&set=OBF` |
+| `GET` | `/api/cards/resolve` | Decklist line → TCGdex card ID. Query params: `?set=SVI&number=166&name=Arven`; 404 if no match |
 | `GET` | `/api/cards/:id` | Get single card detail |
 
 ### Health

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import type { CardEntry, Section } from '@/types/deck'
 import { imageKey, cardImageUrl } from '@/hooks/useCardImages'
 import CardImageModal from './CardImageModal'
+import { useCardPreview } from '@/components/card/useCardPreview'
 import styles from './DeckGalleryView.module.css'
 
 const SECTIONS: Section[] = ['pokemon', 'trainer', 'energy']
@@ -37,6 +38,7 @@ export default function DeckGalleryView({
   const [orderedEntries, setOrderedEntries] = useState<CardEntry[]>(entries)
   const [dragOverId, setDragOverId] = useState<string | null>(null)
   const dragId = useRef<string | null>(null)
+  const { bind: bindPreview, preview } = useCardPreview()
 
   // Sync local order when entries change from parent (add/remove)
   useEffect(() => {
@@ -125,6 +127,7 @@ export default function DeckGalleryView({
                       className={styles.imgWrapper}
                       onClick={() => setModalEntry(entry)}
                       title="Change art"
+                      {...bindPreview(img)}
                     >
                       {img ? (
                         <img
@@ -171,6 +174,8 @@ export default function DeckGalleryView({
           </div>
         )
       })}
+
+      {preview}
 
       {modalEntry && (
         <CardImageModal

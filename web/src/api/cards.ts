@@ -1,4 +1,4 @@
-import { api } from './client'
+import { api, ApiError } from './client'
 import type { Card, CardBrief } from '@/types/card'
 import type { CardEntry } from '@/types/deck'
 
@@ -6,6 +6,9 @@ import type { CardEntry } from '@/types/deck'
 // Rejected promises are evicted so transient errors are retried.
 const searchCache = new Map<string, Promise<CardBrief[]>>()
 const getCache = new Map<string, Promise<Card>>()
+const resolveCache = new Map<string, Promise<string | undefined>>()
+
+type EntryRef = Pick<CardEntry, 'cardId' | 'name' | 'setCode' | 'number'>
 
 export const cardsApi = {
   search: (q: string, set?: string): Promise<CardBrief[]> => {
@@ -28,22 +31,39 @@ export const cardsApi = {
     }
     return getCache.get(id)!
   },
+
+  /** TCGdex card ID for a decklist line's set code + number; undefined if none. */
+  resolve: (entry: EntryRef): Promise<string | undefined> => {
+    const cacheKey = `${entry.setCode}\x00${entry.number}\x00${entry.name}`
+    if (!resolveCache.has(cacheKey)) {
+      const params = new URLSearchParams({ set: entry.setCode, number: entry.number, name: entry.name })
+      const p = api.get<{ id: string }>(`/cards/resolve?${params.toString()}`)
+        .then(r => r.id)
+        .catch(err => {
+          // 404 means no match: cache that. Anything else is retried next time.
+          if (err instanceof ApiError && err.status === 404) return undefined
+          resolveCache.delete(cacheKey)
+          throw err
+        })
+      resolveCache.set(cacheKey, p)
+    }
+    return resolveCache.get(cacheKey)!
+  },
 }
 
 /**
- * Full TCGdex card for a deck entry. PTCG Live set codes don't match TCGdex
- * IDs, so without a stored cardId this searches by name + set, then by name,
- * preferring an exact name match. Resolves undefined when nothing matches.
+ * Full TCGdex card for a deck entry. Imports store the exact cardId; entries
+ * saved before that are resolved by the server from set code + number. Only
+ * when that fails (a set code TCGdex doesn't know) does this guess by name,
+ * preferring an exact match. Resolves undefined when nothing matches.
  */
-export async function resolveCard(
-  entry: Pick<CardEntry, 'cardId' | 'name' | 'setCode'>,
-): Promise<Card | undefined> {
-  let id = entry.cardId
+export async function resolveCard(entry: EntryRef): Promise<Card | undefined> {
+  let id: string | undefined = entry.cardId
+  if (!id && entry.setCode) {
+    id = await cardsApi.resolve(entry).catch(() => undefined)
+  }
   if (!id) {
-    let results = await cardsApi.search(entry.name, entry.setCode).catch(() => [])
-    if (!results.length) {
-      results = await cardsApi.search(entry.name).catch(() => [])
-    }
+    const results = await cardsApi.search(entry.name).catch(() => [])
     const nameLower = entry.name.toLowerCase()
     id = (results.find(r => r.name.toLowerCase() === nameLower) ?? results[0])?.id
   }

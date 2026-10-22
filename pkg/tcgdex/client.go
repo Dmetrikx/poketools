@@ -4,6 +4,7 @@ package tcgdex
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,6 +13,10 @@ import (
 )
 
 const defaultBaseURL = "https://api.tcgdex.net/v2"
+
+// ErrNotFound is returned when TCGdex answers 404, so callers can tell a
+// missing card from TCGdex being unreachable.
+var ErrNotFound = errors.New("tcgdex: not found")
 
 // Client is a TCGdex API client.
 type Client struct {
@@ -127,6 +132,50 @@ func (c *Client) ListSets(ctx context.Context) ([]SetBrief, error) {
 	return sets, nil
 }
 
+// SetIDByCode returns the ID of the set whose official abbreviation (the code
+// PTCG Live and Limitless print in decklists, e.g. "SVI") is code, or "" when
+// no set has it. Misses are cached too.
+func (c *Client) SetIDByCode(ctx context.Context, code string) (string, error) {
+	cacheKey := "setcode:" + code
+	if v, ok := c.cache.get(cacheKey); ok {
+		return v.(string), nil
+	}
+
+	params := url.Values{}
+	params.Set("abbreviation.official", "eq:"+code)
+	var sets []SetBrief
+	if err := c.get(ctx, fmt.Sprintf("/%s/sets?%s", c.lang, params.Encode()), &sets); err != nil {
+		return "", err
+	}
+	id := ""
+	if len(sets) > 0 {
+		id = sets[0].ID
+	}
+	c.cache.set(cacheKey, id)
+	return id, nil
+}
+
+// SeriesSetIDs returns the IDs of every set in a series (e.g. "tcgp").
+func (c *Client) SeriesSetIDs(ctx context.Context, serieID string) ([]string, error) {
+	cacheKey := "serie:" + serieID
+	if v, ok := c.cache.get(cacheKey); ok {
+		return v.([]string), nil
+	}
+
+	var serie struct {
+		Sets []SetBrief `json:"sets"`
+	}
+	if err := c.get(ctx, fmt.Sprintf("/%s/series/%s", c.lang, serieID), &serie); err != nil {
+		return nil, err
+	}
+	ids := make([]string, 0, len(serie.Sets))
+	for _, s := range serie.Sets {
+		ids = append(ids, s.ID)
+	}
+	c.cache.set(cacheKey, ids)
+	return ids, nil
+}
+
 // ── Internal ─────────────────────────────────────────────────────────────────
 
 func (c *Client) get(ctx context.Context, path string, out any) error {
@@ -143,7 +192,7 @@ func (c *Client) get(ctx context.Context, path string, out any) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusNotFound {
-		return fmt.Errorf("not found: %s", path)
+		return fmt.Errorf("%w: %s", ErrNotFound, path)
 	}
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, 512))

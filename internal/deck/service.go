@@ -3,6 +3,8 @@ package deck
 import (
 	"context"
 	"fmt"
+	"log/slog"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -26,14 +28,64 @@ type Repository interface {
 	SetCovers(ctx context.Context, deckID string, entryIDs []string) error
 }
 
+// CardResolver finds the TCGdex card ID for a decklist line's set code and
+// number, or "" when there's no match.
+type CardResolver interface {
+	Resolve(ctx context.Context, setCode, number, name string) (string, error)
+}
+
 // Service handles deck business logic. Every method takes the ID of the user
 // acting, and only ever touches that user's decks.
 type Service struct {
-	repo Repository
+	repo  Repository
+	cards CardResolver
 }
 
-func NewService(repo Repository) *Service {
-	return &Service{repo: repo}
+func NewService(repo Repository, cards CardResolver) *Service {
+	return &Service{repo: repo, cards: cards}
+}
+
+// maxConcurrentResolves caps parallel TCGdex lookups per import.
+const maxConcurrentResolves = 8
+
+// ResolveCardIDs fills in CardID, in place, for entries that have a set code
+// but no card ID yet. Lookups that fail leave CardID empty (the frontend
+// falls back to its own search), so an import never fails over TCGdex.
+func (s *Service) ResolveCardIDs(ctx context.Context, entries []CardEntry) {
+	type line struct{ setCode, number, name string }
+	pending := map[line][]int{}
+	for i, e := range entries {
+		if e.CardID == "" && e.SetCode != "" {
+			l := line{e.SetCode, e.Number, e.Name}
+			pending[l] = append(pending[l], i)
+		}
+	}
+
+	var (
+		wg  sync.WaitGroup
+		mu  sync.Mutex
+		sem = make(chan struct{}, maxConcurrentResolves)
+	)
+	for l, idxs := range pending {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			sem <- struct{}{}
+			defer func() { <-sem }()
+
+			id, err := s.cards.Resolve(ctx, l.setCode, l.number, l.name)
+			if err != nil {
+				slog.Warn("resolve card", "set", l.setCode, "number", l.number, "err", err)
+				return
+			}
+			mu.Lock()
+			defer mu.Unlock()
+			for _, i := range idxs {
+				entries[i].CardID = id
+			}
+		}()
+	}
+	wg.Wait()
 }
 
 func (s *Service) List(ctx context.Context, userID string) ([]*Deck, error) {
