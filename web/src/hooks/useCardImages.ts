@@ -15,6 +15,14 @@ export function cardImageUrl(base: string, quality: 'high' | 'low' = 'high'): st
   return `${base}/${quality}.webp`
 }
 
+/**
+ * srcset for small cards: 'low' (245px wide) on standard screens, 'high'
+ * (600px) on retina, where 'low' would be stretched and blurry.
+ */
+export function cardImageSrcSet(base: string): string {
+  return `${cardImageUrl(base, 'low')} 1x, ${cardImageUrl(base, 'high')} 2x`
+}
+
 // Module-level cache: survives component unmount/remount and page navigation.
 // Maps imageKey → resolved image URL.
 const imageCache = new Map<string, string>()
