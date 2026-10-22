@@ -177,14 +177,22 @@ func (h *DeckHandler) SetCovers(w http.ResponseWriter, r *http.Request) {
 // ── Import ───────────────────────────────────────────────────────────────────
 
 // Import handles POST /api/decks/import
-// Body: { "text": "...", "name": "My Deck", "format": "standard", "save": true }
+// Body: { "text": "...", "name": "My Deck", "format": "standard", "save": true,
+//
+//	"imageUrls": ["", "https://..."] }
+//
 // Query param: ?format=ptcglive|limitless  (default: ptcglive)
+//
+// imageUrls lines up by index with the parsed entries (the same order a
+// save:false preview returns), so art picked during review is saved with the
+// deck. An empty string keeps the automatic art.
 func (h *DeckHandler) Import(w http.ResponseWriter, r *http.Request) {
 	var body struct {
-		Text   string `json:"text"`
-		Name   string `json:"name"`
-		Format string `json:"format"`
-		Save   bool   `json:"save"`
+		Text      string   `json:"text"`
+		Name      string   `json:"name"`
+		Format    string   `json:"format"`
+		Save      bool     `json:"save"`
+		ImageURLs []string `json:"imageUrls"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		writeError(w, http.StatusBadRequest, "invalid request body")
@@ -196,6 +204,16 @@ func (h *DeckHandler) Import(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		writeError(w, http.StatusUnprocessableEntity, "parse error: "+err.Error())
 		return
+	}
+
+	if len(body.ImageURLs) > len(d.Entries) {
+		writeError(w, http.StatusBadRequest, "more imageUrls than entries")
+		return
+	}
+	for i, url := range body.ImageURLs {
+		if url != "" {
+			d.Entries[i].ImageURL = url
+		}
 	}
 
 	if body.Name != "" {

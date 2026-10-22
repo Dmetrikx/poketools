@@ -17,7 +17,14 @@ export const decksApi = {
   // Import: parse text and optionally save
   import: (
     text: string,
-    opts?: { name?: string; format?: string; save?: boolean; formatter?: string },
+    opts?: {
+      name?: string
+      format?: string
+      save?: boolean
+      formatter?: string
+      /** Art per parsed entry, by index; '' keeps the automatic art. */
+      imageUrls?: string[]
+    },
   ) => {
     const params = new URLSearchParams()
     if (opts?.formatter) params.set('format', opts.formatter)
@@ -27,6 +34,7 @@ export const decksApi = {
       name: opts?.name,
       format: opts?.format,
       save: opts?.save ?? false,
+      imageUrls: opts?.imageUrls,
     })
   },
 

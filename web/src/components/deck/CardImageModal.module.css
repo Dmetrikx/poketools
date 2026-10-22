@@ -92,12 +92,33 @@
   margin-top: 16px;
 }
 
+.altsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
 .altsLabel {
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: rgba(255, 255, 255, 0.4);
-  margin-bottom: 8px;
+}
+
+.status {
+  font-size: 0.75rem;
+  color: var(--color-success, #4ade80);
+}
+
+.statusError {
+  color: var(--color-danger);
+}
+
+.altsEmpty {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .altsStrip {
@@ -126,28 +147,4 @@
 .altSelected {
   opacity: 1;
   border-color: var(--color-primary);
-}
-
-.saveBtn {
-  display: block;
-  width: 100%;
-  margin-top: 12px;
-  padding: 10px 0;
-  border: none;
-  border-radius: 8px;
-  background: var(--color-primary);
-  color: white;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-.saveBtn:hover {
-  opacity: 0.85;
-}
-
-.saveBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }

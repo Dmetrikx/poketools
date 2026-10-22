@@ -1,8 +1,7 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import AppShell from '@/components/layout/AppShell'
 import HomePage from '@/pages/HomePage'
 import DeckEditorPage from '@/pages/DeckEditorPage'
-import ImportPage from '@/pages/ImportPage'
 import LoginPage from '@/pages/LoginPage'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -21,7 +20,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/decks/:id" element={<DeckEditorPage />} />
-        <Route path="/import" element={<ImportPage />} />
+        {/* Import is a modal on the home page now; keep old links working. */}
+        <Route path="/import" element={<Navigate to="/?import=1" replace />} />
       </Routes>
     </AppShell>
   )

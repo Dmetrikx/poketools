@@ -278,6 +278,47 @@ func TestAPI_DeckCovers(t *testing.T) {
 	}
 }
 
+func TestAPI_ImportWithArt(t *testing.T) {
+	srv := newTestServer(t, true)
+	ash := newClient(t, srv)
+	ash.signup("ash@example.com")
+
+	const list = "Pokémon: 4\n4 Charizard ex OBF 125\n\nTrainer: 4\n4 Arven SVI 166\n"
+	importDeck := func(imageURLs []string, out any) int {
+		return ash.do("POST", "/api/decks/import?format=ptcglive", map[string]any{
+			"text": list, "name": "Zard", "save": true, "imageUrls": imageURLs,
+		}, out)
+	}
+
+	// The preview's entry order is what imageUrls lines up with.
+	var preview deck.Deck
+	if code := ash.do("POST", "/api/decks/import?format=ptcglive", map[string]any{"text": list}, &preview); code != http.StatusOK {
+		t.Fatalf("preview: status %d", code)
+	}
+	if len(preview.Entries) != 2 || preview.Entries[1].Name != "Arven" {
+		t.Fatalf("preview entries = %+v", preview.Entries)
+	}
+
+	const art = "https://assets.tcgdex.net/en/sv/sv01/166"
+	var saved deck.Deck
+	if code := importDeck([]string{"", art}, &saved); code != http.StatusCreated {
+		t.Fatalf("import: status %d", code)
+	}
+	var got deck.Deck
+	ash.do("GET", "/api/decks/"+saved.ID, nil, &got)
+	urls := map[string]string{}
+	for _, e := range got.Entries {
+		urls[e.Name] = e.ImageURL
+	}
+	if urls["Arven"] != art || urls["Charizard ex"] != "" {
+		t.Errorf("saved art = %v, want Arven=%s and Charizard ex unset", urls, art)
+	}
+
+	if code := importDeck([]string{"", "", art}, nil); code != http.StatusBadRequest {
+		t.Errorf("import with too many imageUrls: status %d, want 400", code)
+	}
+}
+
 func TestSPAFallback_NestedRoute(t *testing.T) {
 	srv := newTestServer(t, true)
 	resp, err := http.Get(srv.URL + "/decks/abc/practice")

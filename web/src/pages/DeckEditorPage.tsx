@@ -75,6 +75,19 @@ export default function DeckEditorPage() {
     }
   }
 
+  // Show the pick at once and save it; revert the image if the save fails.
+  const handlePickArt = async (entry: CardEntry, url: string) => {
+    const key = imageKey(entry)
+    const previous = imageMap.get(key)
+    overrideImage(key, url)
+    try {
+      await updateEntryArt(entry.id, url)
+    } catch (err) {
+      if (previous) overrideImage(key, previous)
+      throw err
+    }
+  }
+
   return (
     <div className={styles.layout}>
       {/* Left: Search panel */}
@@ -146,11 +159,7 @@ export default function DeckEditorPage() {
               onIncrement={handleIncrement}
               onDecrement={handleDecrement}
               onRemove={e => deleteEntry(e.id)}
-              onSelectArt={(entry, url) => overrideImage(imageKey(entry), url)}
-              onSaveArt={async (entry, url) => {
-                await updateEntryArt(entry.id, url)
-                overrideImage(imageKey(entry), url)
-              }}
+              onPickArt={handlePickArt}
             />
           )}
         </div>

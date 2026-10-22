@@ -14,11 +14,14 @@ const LABELS: Record<Section, string> = {
 interface Props {
   entries: CardEntry[]
   imageMap: Map<string, string>
-  onIncrement: (entry: CardEntry) => void
-  onDecrement: (entry: CardEntry) => void
-  onRemove: (entry: CardEntry) => void
-  onSelectArt: (entry: CardEntry, imageUrl: string) => void
-  onSaveArt: (entry: CardEntry, imageUrl: string) => void | Promise<void>
+  onIncrement?: (entry: CardEntry) => void
+  onDecrement?: (entry: CardEntry) => void
+  onRemove?: (entry: CardEntry) => void
+  /** Persist an art pick; a rejected promise reverts it in the art modal. */
+  onPickArt: (entry: CardEntry, imageUrl: string) => void | Promise<void>
+  /** Hide count controls and disable reordering, for the import review,
+   *  where art picks are kept until the deck is saved. */
+  readOnly?: boolean
 }
 
 export default function DeckGalleryView({
@@ -27,8 +30,8 @@ export default function DeckGalleryView({
   onIncrement,
   onDecrement,
   onRemove,
-  onSelectArt,
-  onSaveArt,
+  onPickArt,
+  readOnly = false,
 }: Props) {
   const [modalEntry, setModalEntry] = useState<CardEntry | null>(null)
   const [orderedEntries, setOrderedEntries] = useState<CardEntry[]>(entries)
@@ -109,16 +112,20 @@ export default function DeckGalleryView({
                 return (
                   <div
                     key={entry.id}
-                    className={`${styles.tile} ${isOver ? styles.dragOver : ''}`}
-                    draggable
+                    className={`${styles.tile} ${isOver ? styles.dragOver : ''} ${readOnly ? styles.static : ''}`}
+                    draggable={!readOnly}
                     onDragStart={e => handleDragStart(e, entry)}
                     onDragOver={e => handleDragOver(e, entry)}
                     onDragLeave={handleDragLeave}
                     onDrop={e => handleDrop(e, entry)}
                     onDragEnd={handleDragEnd}
                   >
-                    {/* Image — click opens modal */}
-                    <div className={styles.imgWrapper} onClick={() => setModalEntry(entry)}>
+                    {/* Image — click opens the art picker */}
+                    <div
+                      className={styles.imgWrapper}
+                      onClick={() => setModalEntry(entry)}
+                      title="Change art"
+                    >
                       {img ? (
                         <img
                           src={cardImageUrl(img)}
@@ -130,29 +137,31 @@ export default function DeckGalleryView({
                         <div className={styles.placeholder}>
                           <span>{entry.name}</span>
                           <span className={styles.placeholderSet}>{entry.setCode} {entry.number}</span>
+                          <span className={styles.pickArt}>Pick art</span>
                         </div>
                       )}
                       <span className={styles.badge}>×{entry.count}</span>
+                      <span className={styles.artBadge} aria-hidden="true">✎ Art</span>
                     </div>
 
                     {/* Hover controls */}
-                    <div className={styles.controls}>
+                    {!readOnly && <div className={styles.controls}>
                       <button
                         className={styles.ctrlBtn}
-                        onClick={e => { e.stopPropagation(); onDecrement(entry) }}
+                        onClick={e => { e.stopPropagation(); onDecrement?.(entry) }}
                         aria-label="Decrease count"
                       >−</button>
                       <button
                         className={styles.ctrlBtn}
-                        onClick={e => { e.stopPropagation(); onIncrement(entry) }}
+                        onClick={e => { e.stopPropagation(); onIncrement?.(entry) }}
                         aria-label="Increase count"
                       >+</button>
                       <button
                         className={`${styles.ctrlBtn} ${styles.removeCtrl}`}
-                        onClick={e => { e.stopPropagation(); onRemove(entry) }}
+                        onClick={e => { e.stopPropagation(); onRemove?.(entry) }}
                         aria-label="Remove card"
                       >×</button>
-                    </div>
+                    </div>}
 
                     <div className={styles.label}>{entry.name}</div>
                   </div>
@@ -168,10 +177,8 @@ export default function DeckGalleryView({
           entry={modalEntry}
           imageUrl={imageMap.get(imageKey(modalEntry))}
           onClose={() => setModalEntry(null)}
-          onSelectArt={url => {
-            onSelectArt(modalEntry, url)
-          }}
-          onSaveArt={url => onSaveArt(modalEntry, url)}
+          onPickArt={url => onPickArt(modalEntry, url)}
+          autosave={!readOnly}
         />
       )}
     </>

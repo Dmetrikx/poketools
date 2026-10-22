@@ -1,8 +1,9 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useDecks } from '@/hooks/useDecks'
 import { useDeckCovers } from '@/hooks/useDeckCovers'
 import DeckCover from '@/components/deck/DeckCover'
+import ImportDeckModal from '@/components/deck/ImportDeckModal'
 import type { DeckSummary } from '@/types/deck'
 import styles from './HomePage.module.css'
 
@@ -11,6 +12,16 @@ export default function HomePage() {
   const [newName, setNewName] = useState('')
   const [creating, setCreating] = useState(false)
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [showImport, setShowImport] = useState(false)
+
+  // ?import=1 (the navbar's Import link) opens the import modal.
+  useEffect(() => {
+    if (searchParams.get('import') === '1') {
+      setShowImport(true)
+      setSearchParams({}, { replace: true })
+    }
+  }, [searchParams, setSearchParams])
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -43,6 +54,9 @@ export default function HomePage() {
           <button className={styles.btn} type="submit" disabled={creating || !newName.trim()}>
             {creating ? 'Creating…' : 'New Deck'}
           </button>
+          <button className={styles.btn} type="button" onClick={() => setShowImport(true)}>
+            Import
+          </button>
         </form>
       </div>
 
@@ -51,7 +65,9 @@ export default function HomePage() {
 
       {!loading && decks.length === 0 && (
         <p className={styles.muted}>
-          No decks yet. <Link to="/import">Import a decklist</Link> to start test drawing.
+          No decks yet.{' '}
+          <button className={styles.linkBtn} onClick={() => setShowImport(true)}>Import a decklist</button>
+          {' '}to start test drawing.
         </p>
       )}
 
@@ -66,6 +82,13 @@ export default function HomePage() {
           />
         ))}
       </div>
+
+      {showImport && (
+        <ImportDeckModal
+          onClose={() => setShowImport(false)}
+          onImported={deck => navigate(`/decks/${deck.id}`)}
+        />
+      )}
     </div>
   )
 }

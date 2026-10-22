@@ -77,7 +77,7 @@ internal/
   api/                               # HTTP handlers (thin)
     auth_handler.go                  # signup / login / logout / me, session cookie
     auth_middleware.go               # RequireAuth, userID(r)
-    deck_handler.go                  # Deck CRUD, entries, covers, import
+    deck_handler.go                  # Deck CRUD, entries, covers, import (+ reviewed art)
     card_handler.go                  # Card search + detail
     response.go                      # writeJSON / writeError
   auth/                              # Accounts domain
@@ -108,12 +108,13 @@ pkg/tcgdex/                          # TCGdex client + 15-minute cache
 web/src/
   api/                               # client.ts (fetch wrapper, 401 event), auth.ts, decks.ts, cards.ts
   hooks/                             # useAuth, useDecks, useDeck, useCardSearch, useCardImages, useBasicPokemon, useDeckCovers, useDebounce
-  pages/                             # LoginPage, HomePage, DeckEditorPage, ImportPage
+  pages/                             # LoginPage, HomePage, DeckEditorPage
   components/practice/               # PracticeHandModal, DeckFan, PlayingCard (flip)
   practice/deal.ts                   # Shuffle + mulligan dealing, deck sort
   deck/covers.ts                     # Default cover pick (highest HP) + slot swap
   components/layout/                 # AppShell, Navbar (user email + logout)
-  components/deck/, components/card/
+  components/deck/                   # ImportDeckModal, DeckGalleryView, CardImageModal (art picker), covers
+  components/card/
   types/                             # auth.ts, deck.ts, card.ts
 ```
 
@@ -148,7 +149,7 @@ All foreign keys `ON DELETE CASCADE`.
 - `GET /*` → SPA
 
 **Behind `RequireAuth`** (401 without a valid session)
-- `GET|POST /api/decks`, `POST /api/decks/import?format=ptcglive|limitless`
+- `GET|POST /api/decks`, `POST /api/decks/import?format=ptcglive|limitless` `{text, name?, save?, imageUrls?}`: `save:false` returns a preview; `imageUrls` lines up by index with the parsed entries (400 if longer)
 - `GET|PUT|DELETE /api/decks/{id}`, `PUT /api/decks/{id}/covers` `{entryIds}` (≤ 2 of the deck's entries)
 - `POST /api/decks/{id}/entries`, `PUT|DELETE /api/decks/{id}/entries/{eid}`, `PUT /api/decks/{id}/entries/{eid}/art`
 - `GET /api/cards/search?q=&set=`, `GET /api/cards/{id}`
@@ -170,6 +171,8 @@ Standard library `testing` only, with fakes over mocks. `make test` runs with `-
 - `App.tsx` renders `LoginPage` in place of the routes when there's no user, so the user lands back on the URL they opened.
 - Test Draw (code name "practice", in `PracticeHandModal`) is a modal on the Deck Editor. It is the app's core feature: each home deck tile has a primary "Test draw" button that opens `/decks/{id}?draw=1`, which opens the modal straight away. The modal shows one dealt hand, face-down prizes and next card (click to flip), and the remaining deck in a scrollable fan with "seen" marks for prize checking. The hand and its reveal/mark state persist in `localStorage` (`practice-hand-{deckId}`) and are discarded when the deck's contents change; basic-Pokémon overrides persist under `practice-overrides-{deckId}`.
 - Cover cards: `useDeckCovers` uses the saved `covers`. For any empty slot (a new deck, or a cover whose entry was deleted), it picks the highest-HP Pokémon with `fillCovers` and saves the pick with `PUT /covers`. Users change a cover by clicking it in the editor header (`CoverPickerModal`). Entry → TCGdex card lookup is shared through `resolveCard` in `api/cards.ts`.
+- Import is a modal (`ImportDeckModal`) on the home page, opened by the Import button or `/?import=1` (the navbar link; `/import` redirects there). Step 1 parses with `save:false`; step 2 shows the parsed deck in a read-only `DeckGalleryView` where art can be fixed. Picks stay local, overlaid on the image map rather than `overrideImage`, so a cancelled import doesn't touch the shared cache. They're sent as `imageUrls` with the `save:true` request.
+- Art picks save immediately: `CardImageModal` has no Save button. It calls `onPickArt` per pick and reverts if the promise rejects. Every gallery tile carries an "✎ Art" badge so the option is visible.
 - `useCardImages` keeps a module-level image cache; `overrideImage` powers the art picker, persisted via the entry's `imageUrl`.
 - Energy images try the `swsh` set first, then the entry's own set.
 

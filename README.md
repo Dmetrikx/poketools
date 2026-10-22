@@ -175,7 +175,7 @@ Decks include `covers`: the entries chosen as cover cards, or empty slots that t
 
 | Method | Path | Description |
 |---|---|---|
-| `POST` | `/api/decks/import` | Parse decklist text → deck. Set `save: true` in body to persist. Query param `?format=ptcglive\|limitless` |
+| `POST` | `/api/decks/import` | Parse decklist text → deck. Set `save: true` in body to persist. Optional `imageUrls` (by entry index) sets art on save. Query param `?format=ptcglive\|limitless` |
 
 **Import request body:**
 ```json
