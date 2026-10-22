@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react'
 import { imageKey } from '@/hooks/useCardImages'
 import { sortCards, type DealtCard } from '@/practice/deal'
 import PlayingCard from './PlayingCard'
@@ -47,6 +47,12 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
   }, [])
 
   useEffect(() => () => cancelAnimationFrame(scrollFrame.current), [])
+
+  // Pick the deck up at its middle, before the first paint so it doesn't jump.
+  useLayoutEffect(() => {
+    const strip = stripRef.current
+    if (strip) strip.scrollLeft = (strip.scrollWidth - strip.clientWidth) / 2
+  }, [])
 
   // Browsers don't refresh hover while content scrolls under a still pointer
   // (mouseenter only fires once the mouse moves), so on scroll, lift

@@ -113,12 +113,12 @@
   pointer-events: none;
   background: linear-gradient(
     to right,
-    rgba(var(--shade), 0.92) 0%,
-    rgba(var(--shade), 0.6) calc(50% - var(--focus) * 1.2),
+    rgba(var(--shade), 0.98) 0%,
+    rgba(var(--shade), 0.85) calc(50% - var(--focus) * 1.2),
     transparent calc(50% - var(--focus) / 2),
     transparent calc(50% + var(--focus) / 2),
-    rgba(var(--shade), 0.6) calc(50% + var(--focus) * 1.2),
-    rgba(var(--shade), 0.92) 100%
+    rgba(var(--shade), 0.85) calc(50% + var(--focus) * 1.2),
+    rgba(var(--shade), 0.98) 100%
   );
 }
 
