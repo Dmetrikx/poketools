@@ -5,52 +5,73 @@ import { cardsApi } from '@/api/cards'
 import { cardImageUrl } from '@/hooks/useCardImages'
 import styles from './CardImageModal.module.css'
 
+type SaveState = 'idle' | 'saving' | 'saved' | 'error'
+
 interface Props {
   entry: CardEntry
   imageUrl: string | undefined
   onClose: () => void
-  onSelectArt: (imageUrl: string) => void
-  onSaveArt: (imageUrl: string) => void | Promise<void>
+  /** Called on every art pick; a rejected promise reverts the pick. */
+  onPickArt: (imageUrl: string) => void | Promise<void>
+  /** False when picks are only kept until a later save (import review). */
+  autosave?: boolean
 }
 
-export default function CardImageModal({ entry, imageUrl, onClose, onSelectArt, onSaveArt }: Props) {
+export default function CardImageModal({ entry, imageUrl, onClose, onPickArt, autosave = true }: Props) {
   const [alts, setAlts] = useState<CardBrief[]>([])
+  const [loadingAlts, setLoadingAlts] = useState(true)
   const [activeUrl, setActiveUrl] = useState<string | undefined>(imageUrl)
-  const [saving, setSaving] = useState(false)
-  const originalUrl = useRef(imageUrl)
+  const [saveState, setSaveState] = useState<SaveState>('idle')
+  // Only the latest pick may update the status or revert.
+  const pickSeq = useRef(0)
 
+  // Capture phase + stopPropagation: Escape closes only this modal, not a
+  // modal it's opened from (the import review).
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key !== 'Escape') return
+      e.stopPropagation()
+      onClose()
     }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
+    window.addEventListener('keydown', handler, true)
+    return () => window.removeEventListener('keydown', handler, true)
   }, [onClose])
 
   // Load all arts for this card name
   useEffect(() => {
     const nameLower = entry.name.toLowerCase()
+    setLoadingAlts(true)
     cardsApi.search(entry.name).then(results => {
       const matching = results.filter(r => r.name.toLowerCase() === nameLower && r.image)
       setAlts(matching)
-    }).catch(() => {})
+    }).catch(() => {}).finally(() => setLoadingAlts(false))
   }, [entry.name])
 
-  const handleSelectArt = (img: string) => {
+  const handlePick = async (img: string) => {
+    if (img === activeUrl) return
+    const previous = activeUrl
+    const seq = ++pickSeq.current
     setActiveUrl(img)
-    onSelectArt(img)
+    setSaveState('saving')
+    try {
+      await onPickArt(img)
+      if (seq === pickSeq.current) setSaveState('saved')
+    } catch {
+      if (seq === pickSeq.current) {
+        setActiveUrl(previous)
+        setSaveState('error')
+      }
+    }
   }
-
-  const displayUrl = activeUrl ?? imageUrl
 
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
         <button className={styles.closeBtn} onClick={onClose} aria-label="Close">×</button>
 
-        {displayUrl ? (
+        {activeUrl ? (
           <img
-            src={cardImageUrl(displayUrl)}
+            src={cardImageUrl(activeUrl)}
             alt={entry.name}
             className={styles.cardImage}
           />
@@ -66,9 +87,18 @@ export default function CardImageModal({ entry, imageUrl, onClose, onSelectArt, 
           <span className={styles.setInfo}>{entry.setCode} · {entry.number}</span>
         </div>
 
-        {alts.length > 1 && (
-          <div className={styles.altsSection}>
-            <div className={styles.altsLabel}>Available arts · click to swap</div>
+        <div className={styles.altsSection}>
+          <div className={styles.altsHeader}>
+            <span className={styles.altsLabel}>
+              {autosave ? 'Choose art · saved automatically' : 'Choose art · saved with the deck'}
+            </span>
+            <span className={`${styles.status} ${saveState === 'error' ? styles.statusError : ''}`} aria-live="polite">
+              {saveState === 'saving' && 'Saving…'}
+              {saveState === 'saved' && (autosave ? 'Saved ✓' : 'Picked ✓')}
+              {saveState === 'error' && "Couldn't save art"}
+            </span>
+          </div>
+          {alts.length > 0 ? (
             <div className={styles.altsStrip}>
               {alts.map(alt => (
                 <img
@@ -77,29 +107,14 @@ export default function CardImageModal({ entry, imageUrl, onClose, onSelectArt, 
                   alt={alt.name}
                   title={alt.id}
                   className={`${styles.altThumb} ${alt.image === activeUrl ? styles.altSelected : ''}`}
-                  onClick={() => handleSelectArt(alt.image!)}
+                  onClick={() => handlePick(alt.image!)}
                 />
               ))}
             </div>
-          </div>
-        )}
-
-        {activeUrl && activeUrl !== originalUrl.current && (
-          <button
-            className={styles.saveBtn}
-            disabled={saving}
-            onClick={async () => {
-              setSaving(true)
-              try {
-                await onSaveArt(activeUrl)
-              } finally {
-                setSaving(false)
-              }
-            }}
-          >
-            {saving ? 'Saving…' : 'Save'}
-          </button>
-        )}
+          ) : (
+            <p className={styles.altsEmpty}>{loadingAlts ? 'Loading arts…' : 'No other arts found for this card.'}</p>
+          )}
+        </div>
       </div>
     </div>
   )

@@ -22,12 +22,9 @@ export default function Navbar({ user, onLogout }: Props) {
           >
             Decks
           </NavLink>
-          <NavLink
-            to="/import"
-            className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}
-          >
+          <Link to="/?import=1" className={styles.link}>
             Import
-          </NavLink>
+          </Link>
         </div>
         <div className={styles.account}>
           <span className={styles.email}>{user.email}</span>
