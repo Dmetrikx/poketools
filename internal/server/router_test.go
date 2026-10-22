@@ -177,11 +177,11 @@ func TestAPI_DecksAreIsolatedPerUser(t *testing.T) {
 		body         any
 	}{
 		{"GET", deckPath, nil},
-		{"GET", deckPath + "/export", nil},
 		{"PUT", deckPath, map[string]string{"name": "stolen"}},
 		{"POST", deckPath + "/entries", deck.CardEntry{CardID: "x", Section: deck.SectionTrainer, Count: 1}},
 		{"PUT", entryPath, map[string]int{"count": 1}},
 		{"PUT", entryPath + "/art", map[string]string{"imageUrl": "x"}},
+		{"PUT", deckPath + "/covers", map[string][]string{"entryIds": {entry.ID}}},
 		{"DELETE", entryPath, nil},
 		// Misty's own deck ID with Ash's entry ID must not reach the entry.
 		{"PUT", "/api/decks/" + mistyDeck.ID + "/entries/" + entry.ID, map[string]int{"count": 1}},
@@ -203,6 +203,81 @@ func TestAPI_DecksAreIsolatedPerUser(t *testing.T) {
 }
 
 // Nested client-side routes must serve the SPA, not redirect-loop.
+func TestAPI_DeckCovers(t *testing.T) {
+	srv := newTestServer(t, true)
+	ash := newClient(t, srv)
+	ash.signup("ash@example.com")
+
+	newDeck := func(name string) deck.Deck {
+		var d deck.Deck
+		if code := ash.do("POST", "/api/decks", map[string]string{"name": name}, &d); code != http.StatusCreated {
+			t.Fatalf("create deck %s: status %d", name, code)
+		}
+		return d
+	}
+	addEntry := func(deckID, name string, section deck.Section) deck.CardEntry {
+		var e deck.CardEntry
+		if code := ash.do("POST", "/api/decks/"+deckID+"/entries", deck.CardEntry{
+			Name: name, Count: 1, Section: section,
+		}, &e); code != http.StatusCreated {
+			t.Fatalf("add entry %s: status %d", name, code)
+		}
+		return e
+	}
+	setCovers := func(deckID string, ids ...string) int {
+		return ash.do("PUT", "/api/decks/"+deckID+"/covers", map[string][]string{"entryIds": ids}, nil)
+	}
+	coverIDs := func(covers []deck.CardEntry) []string {
+		ids := []string{}
+		for _, c := range covers {
+			ids = append(ids, c.ID)
+		}
+		return ids
+	}
+
+	d := newDeck("Charizard ex")
+	charizard := addEntry(d.ID, "Charizard ex", deck.SectionPokemon)
+	arven := addEntry(d.ID, "Arven", deck.SectionTrainer)
+	other := addEntry(newDeck("Other").ID, "Pidgeot ex", deck.SectionPokemon)
+
+	// Slot order is the order given.
+	if code := setCovers(d.ID, arven.ID, charizard.ID); code != http.StatusNoContent {
+		t.Fatalf("set covers: status %d", code)
+	}
+	var got deck.Deck
+	ash.do("GET", "/api/decks/"+d.ID, nil, &got)
+	if ids := coverIDs(got.Covers); len(ids) != 2 || ids[0] != arven.ID || ids[1] != charizard.ID {
+		t.Errorf("GET deck covers = %v, want [arven charizard]", ids)
+	}
+	var list []deck.Deck
+	ash.do("GET", "/api/decks", nil, &list)
+	for _, l := range list {
+		if l.ID == d.ID && len(l.Covers) != 2 {
+			t.Errorf("list covers = %v, want 2", coverIDs(l.Covers))
+		}
+	}
+
+	for _, ids := range [][]string{
+		{other.ID},                             // another deck's entry
+		{charizard.ID, charizard.ID},           // duplicate
+		{charizard.ID, arven.ID, charizard.ID}, // too many
+	} {
+		if code := setCovers(d.ID, ids...); code != http.StatusBadRequest {
+			t.Errorf("set covers %v: status %d, want 400", ids, code)
+		}
+	}
+
+	// Deleting a cover's entry frees its slot.
+	if code := ash.do("DELETE", "/api/decks/"+d.ID+"/entries/"+arven.ID, nil, nil); code != http.StatusNoContent {
+		t.Fatalf("delete entry: status %d", code)
+	}
+	got = deck.Deck{}
+	ash.do("GET", "/api/decks/"+d.ID, nil, &got)
+	if ids := coverIDs(got.Covers); len(ids) != 1 || ids[0] != charizard.ID {
+		t.Errorf("covers after deleting arven = %v, want [charizard]", ids)
+	}
+}
+
 func TestSPAFallback_NestedRoute(t *testing.T) {
 	srv := newTestServer(t, true)
 	resp, err := http.Get(srv.URL + "/decks/abc/practice")

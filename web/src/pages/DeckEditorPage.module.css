@@ -37,6 +37,12 @@
   flex-wrap: wrap;
 }
 
+.deckTitle {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
 .deckName {
   font-size: 1.2rem;
   font-weight: 700;
@@ -82,23 +88,25 @@
   color: var(--color-primary);
 }
 
-.actionBtn {
-  padding: 6px 12px;
-  background: rgba(99, 102, 241, 0.15);
-  border: 1px solid rgba(99, 102, 241, 0.3);
+.drawBtn {
+  padding: 7px 18px;
+  background: var(--color-primary);
+  border: none;
   border-radius: var(--radius);
-  color: var(--color-primary);
-  font-size: 0.8rem;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
   transition: background 0.15s;
 }
 
-.actionBtn:hover:not(:disabled) {
-  background: rgba(99, 102, 241, 0.25);
+.drawBtn:hover:not(:disabled) {
+  background: var(--color-primary-hover);
 }
 
-.actionBtn:disabled {
+.drawBtn:disabled {
   opacity: 0.5;
+  cursor: default;
 }
 
 .backBtn {
@@ -134,55 +142,4 @@
 
 .error {
   color: var(--color-danger);
-}
-
-.exportBox {
-  margin-top: 16px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-
-.exportHeader {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border-bottom: 1px solid var(--color-border);
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-}
-
-.exportHeader span {
-  flex: 1;
-}
-
-.copyBtn, .closeBtn {
-  background: none;
-  border: none;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  font-size: 0.8rem;
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.copyBtn:hover {
-  color: var(--color-text);
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.closeBtn:hover {
-  color: var(--color-danger);
-}
-
-.exportPre {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  padding: 12px;
-  white-space: pre-wrap;
-  word-break: break-all;
-  max-height: 300px;
-  overflow-y: auto;
 }

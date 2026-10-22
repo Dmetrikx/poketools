@@ -1,6 +1,9 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useDecks } from '@/hooks/useDecks'
+import { useDeckCovers } from '@/hooks/useDeckCovers'
+import DeckCover from '@/components/deck/DeckCover'
+import type { DeckSummary } from '@/types/deck'
 import styles from './HomePage.module.css'
 
 export default function HomePage() {
@@ -25,7 +28,10 @@ export default function HomePage() {
   return (
     <div>
       <div className={styles.header}>
-        <h1 className={styles.title}>My Decks</h1>
+        <div>
+          <h1 className={styles.title}>My Decks</h1>
+          <p className={styles.subtitle}>Pick a deck and test draw opening hands.</p>
+        </div>
         <form onSubmit={handleCreate} className={styles.createForm}>
           <input
             className={styles.input}
@@ -44,29 +50,51 @@ export default function HomePage() {
       {loading && <p className={styles.muted}>Loading…</p>}
 
       {!loading && decks.length === 0 && (
-        <p className={styles.muted}>No decks yet. Create one above or import a list.</p>
+        <p className={styles.muted}>
+          No decks yet. <Link to="/import">Import a decklist</Link> to start test drawing.
+        </p>
       )}
 
       <div className={styles.grid}>
         {decks.map(deck => (
-          <div key={deck.id} className={styles.card}>
-            <div className={styles.cardBody} onClick={() => navigate(`/decks/${deck.id}`)}>
-              <h2 className={styles.deckName}>{deck.name}</h2>
-              <p className={styles.deckMeta}>{deck.format}</p>
-              <p className={styles.deckDate}>
-                {new Date(deck.updated_at).toLocaleDateString()}
-              </p>
-            </div>
-            <div className={styles.cardFooter}>
-              <button
-                className={styles.deleteBtn}
-                onClick={() => confirm(`Delete "${deck.name}"?`) && deleteDeck(deck.id)}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
+          <DeckTile
+            key={deck.id}
+            deck={deck}
+            onOpen={() => navigate(`/decks/${deck.id}`)}
+            onTestDraw={() => navigate(`/decks/${deck.id}?draw=1`)}
+            onDelete={() => confirm(`Delete "${deck.name}"?`) && deleteDeck(deck.id)}
+          />
         ))}
+      </div>
+    </div>
+  )
+}
+
+interface TileProps {
+  deck: DeckSummary
+  onOpen: () => void
+  onTestDraw: () => void
+  onDelete: () => void
+}
+
+function DeckTile({ deck, onOpen, onTestDraw, onDelete }: TileProps) {
+  const { covers, loading } = useDeckCovers(deck.id, deck.covers)
+
+  return (
+    <div className={styles.card}>
+      <div className={styles.cardBody} onClick={onOpen}>
+        <DeckCover covers={covers} loading={loading} />
+        <h2 className={styles.deckName}>{deck.name}</h2>
+        <p className={styles.deckMeta}>
+          {deck.format} · {new Date(deck.updated_at).toLocaleDateString()}
+        </p>
+      </div>
+      <div className={styles.cardFooter}>
+        <button className={styles.drawBtn} onClick={onTestDraw}>Test draw</button>
+        <button className={styles.editBtn} onClick={onOpen}>Edit</button>
+        <button className={styles.deleteBtn} onClick={onDelete} aria-label={`Delete ${deck.name}`}>
+          Delete
+        </button>
       </div>
     </div>
   )

@@ -30,9 +30,8 @@ export const decksApi = {
     })
   },
 
-  // Export: get plain text
-  export: (id: string, formatter: 'ptcglive' | 'limitless' = 'ptcglive') =>
-    api.getText(`/decks/${id}/export?format=${formatter}`),
+  setCovers: (id: string, entryIds: string[]) =>
+    api.put<void>(`/decks/${id}/covers`, { entryIds }),
 
   // Entry management
   addEntry: (deckId: string, entry: Omit<CardEntry, 'id' | 'deckId'>) =>

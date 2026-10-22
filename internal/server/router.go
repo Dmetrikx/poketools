@@ -89,7 +89,7 @@ func registerAppRoutes(r chi.Router, deckHandler *api.DeckHandler, cardHandler *
 			r.Get("/", deckHandler.Get)
 			r.Put("/", deckHandler.Update)
 			r.Delete("/", deckHandler.Delete)
-			r.Get("/export", deckHandler.Export)
+			r.Put("/covers", deckHandler.SetCovers)
 
 			// Entry sub-routes
 			r.Post("/entries", deckHandler.AddEntry)

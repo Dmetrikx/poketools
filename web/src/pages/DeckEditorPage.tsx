@@ -1,10 +1,13 @@
-import { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useDeck } from '@/hooks/useDeck'
 import { useCardImages, imageKey } from '@/hooks/useCardImages'
+import { useDeckCovers } from '@/hooks/useDeckCovers'
 import CardSearch from '@/components/card/CardSearch'
 import SectionGroup from '@/components/deck/SectionGroup'
 import DeckGalleryView from '@/components/deck/DeckGalleryView'
+import DeckCover from '@/components/deck/DeckCover'
+import CoverPickerModal from '@/components/deck/CoverPickerModal'
 import PracticeHandModal from '@/components/practice/PracticeHandModal'
 import type { CardBrief } from '@/types/card'
 import type { CardEntry, Section } from '@/types/deck'
@@ -16,16 +19,23 @@ type ViewMode = 'list' | 'gallery'
 export default function DeckEditorPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { deck, loading, error, addEntry, updateEntry, updateEntryArt, deleteEntry, exportDeck } = useDeck(id!)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const { deck, loading, error, addEntry, updateEntry, updateEntryArt, deleteEntry } = useDeck(id!)
 
-  const [exportText, setExportText] = useState('')
-  const [exporting, setExporting] = useState(false)
   const [viewMode, setViewMode] = useState<ViewMode>('gallery')
-  const [showPractice, setShowPractice] = useState(false)
+  // ?draw=1 (from a deck tile's Test draw button) opens straight into a draw.
+  const [showPractice, setShowPractice] = useState(searchParams.get('draw') === '1')
+  const [coverSlot, setCoverSlot] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (searchParams.has('draw')) setSearchParams({}, { replace: true })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Always call hooks before early returns
   const entries = deck?.entries ?? []
   const [imageMap, overrideImage] = useCardImages(entries)
+  const { covers, loading: coversLoading, chooseCover } = useDeckCovers(id!, deck ? deck.covers : undefined, deck ? entries : undefined)
 
   if (loading) return <p className={styles.status}>Loading deck…</p>
   if (error) return <p className={styles.error}>{error}</p>
@@ -65,16 +75,6 @@ export default function DeckEditorPage() {
     }
   }
 
-  const handleExport = async (fmt: 'ptcglive' | 'limitless') => {
-    setExporting(true)
-    try {
-      const text = await exportDeck(fmt)
-      setExportText(text)
-    } finally {
-      setExporting(false)
-    }
-  }
-
   return (
     <div className={styles.layout}>
       {/* Left: Search panel */}
@@ -86,11 +86,27 @@ export default function DeckEditorPage() {
       {/* Right: Deck panel */}
       <div className={styles.deckPanel}>
         <div className={styles.deckHeader}>
-          <div>
-            <h1 className={styles.deckName}>{deck.name}</h1>
-            <span className={styles.deckCount}>{totalCards} / 60 cards</span>
+          <div className={styles.deckTitle}>
+            <DeckCover
+              covers={covers}
+              loading={coversLoading}
+              imageMap={imageMap}
+              size="small"
+              onSelect={entries.length > 0 ? setCoverSlot : undefined}
+            />
+            <div>
+              <h1 className={styles.deckName}>{deck.name}</h1>
+              <span className={styles.deckCount}>{totalCards} / 60 cards</span>
+            </div>
           </div>
           <div className={styles.actions}>
+            <button
+              className={styles.drawBtn}
+              onClick={() => setShowPractice(true)}
+              disabled={entries.length === 0}
+            >
+              Test draw
+            </button>
             <div className={styles.viewToggle}>
               <button
                 className={`${styles.toggleBtn} ${viewMode === 'list' ? styles.toggleActive : ''}`}
@@ -101,15 +117,6 @@ export default function DeckEditorPage() {
                 onClick={() => setViewMode('gallery')}
               >Gallery</button>
             </div>
-            <button className={styles.actionBtn} onClick={() => setShowPractice(true)}>
-              Practice Hands
-            </button>
-            <button className={styles.actionBtn} onClick={() => handleExport('ptcglive')} disabled={exporting}>
-              Export PTCG Live
-            </button>
-            <button className={styles.actionBtn} onClick={() => handleExport('limitless')} disabled={exporting}>
-              Export Limitless
-            </button>
             <button className={styles.backBtn} onClick={() => navigate('/')}>
               ← Back
             </button>
@@ -148,22 +155,23 @@ export default function DeckEditorPage() {
           )}
         </div>
 
-        {exportText && (
-          <div className={styles.exportBox}>
-            <div className={styles.exportHeader}>
-              <span>Export</span>
-              <button className={styles.copyBtn} onClick={() => navigator.clipboard.writeText(exportText)}>
-                Copy
-              </button>
-              <button className={styles.closeBtn} onClick={() => setExportText('')}>×</button>
-            </div>
-            <pre className={styles.exportPre}>{exportText}</pre>
-          </div>
-        )}
       </div>
 
-      {showPractice && (
+      {showPractice && entries.length > 0 && (
         <PracticeHandModal deck={deck} imageMap={imageMap} onClose={() => setShowPractice(false)} />
+      )}
+
+      {coverSlot !== null && (
+        <CoverPickerModal
+          entries={entries}
+          imageMap={imageMap}
+          currentId={covers[coverSlot]?.id}
+          onPick={entry => {
+            chooseCover(coverSlot, entry)
+            setCoverSlot(null)
+          }}
+          onClose={() => setCoverSlot(null)}
+        />
       )}
     </div>
   )

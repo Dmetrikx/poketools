@@ -18,6 +18,7 @@ export interface Deck {
   name: string
   format: string
   entries: CardEntry[]
+  covers: CardEntry[] | null
   created_at: string
   updated_at: string
 }
@@ -26,6 +27,7 @@ export interface DeckSummary {
   id: string
   name: string
   format: string
+  covers: CardEntry[] | null
   created_at: string
   updated_at: string
 }

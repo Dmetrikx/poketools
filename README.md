@@ -1,6 +1,6 @@
 # Poketools
 
-A multi-user Pokemon TCG deck builder. Import, edit, and export decklists — similar to [Limitless TCG](https://limitlesstcg.com) and RK9. Built to support simulation jobs and additional tooling in the future.
+A multi-user Pokemon TCG deck tool. Import a decklist (PTCG Live or Limitless) and test draw opening hands, with face-down prizes for prize checking. Decks can also be edited, given custom card art and two cover cards. Built to support simulation jobs and additional tooling in the future.
 
 ## Stack
 
@@ -91,7 +91,7 @@ poketools/
 │   └── src/
 │       ├── api/                # Typed API wrappers (client.ts, auth.ts, decks.ts, cards.ts)
 │       ├── types/              # Shared TypeScript types (auth.ts, deck.ts, card.ts)
-│       ├── pages/              # LoginPage, HomePage, DeckEditorPage, ImportPage, PracticeHandsPage
+│       ├── pages/              # LoginPage, HomePage, DeckEditorPage, ImportPage
 │       ├── components/         # UI components (layout/, deck/, card/)
 │       └── hooks/              # useAuth, useDecks, useDeck, useCardSearch, useCardImages, useDebounce
 │
@@ -158,6 +158,9 @@ All endpoints are under `/api`. Everything except `/api/auth/*` requires a sessi
 | `GET` | `/api/decks/:id` | Get deck with all entries |
 | `PUT` | `/api/decks/:id` | Update deck metadata `{ name, format }` |
 | `DELETE` | `/api/decks/:id` | Delete deck and all entries |
+| `PUT` | `/api/decks/:id/covers` | Set the deck's cover cards `{ entryIds }` (up to 2 of its entries, in slot order) |
+
+Decks include `covers`: the entries chosen as cover cards, or empty slots that the client fills with the two highest-HP Pokémon and then saves.
 
 ### Deck Entries
 
@@ -168,12 +171,11 @@ All endpoints are under `/api`. Everything except `/api/auth/*` requires a sessi
 | `PUT` | `/api/decks/:id/entries/:eid/art` | Update entry's custom art image URL `{ imageUrl }` |
 | `DELETE` | `/api/decks/:id/entries/:eid` | Remove entry |
 
-### Import / Export
+### Import
 
 | Method | Path | Description |
 |---|---|---|
 | `POST` | `/api/decks/import` | Parse decklist text → deck. Set `save: true` in body to persist. Query param `?format=ptcglive\|limitless` |
-| `GET` | `/api/decks/:id/export` | Export deck as text. Query param `?format=ptcglive\|limitless` |
 
 **Import request body:**
 ```json
@@ -209,6 +211,7 @@ users        (id, email, password_hash, created_at)
 sessions     (id = sha256(token), user_id, created_at, expires_at)
 decks        (id, user_id, name, format, created_at, updated_at)
 deck_entries (id, deck_id, card_id, name, set_code, number, count, section, position, image_url)
+deck_covers  (deck_id, slot 0|1, entry_id)
 ```
 
 Timestamps are epoch milliseconds. `section` is constrained to `pokemon | trainer | energy`. `image_url` stores per-entry custom art selections (default `''`).
@@ -229,7 +232,7 @@ type DeckFormatter interface {
 
 Steps:
 1. Create `internal/format/<yourformat>/parser.go` implementing `DeckFormatter`
-2. Add a `parser_test.go` with import/roundtrip tests
+2. Add a `parser_test.go` with import/roundtrip tests (`Export` isn't served over HTTP; it exists for the roundtrip)
 3. Add a case in `internal/api/deck_handler.go` → `formatterFor()`
 
 ---

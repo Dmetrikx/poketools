@@ -23,6 +23,7 @@ type Repository interface {
 	UpdateEntryImageURL(ctx context.Context, deckID, id string, imageURL string) error
 	DeleteEntry(ctx context.Context, deckID, id string) error
 	ReplaceEntries(ctx context.Context, deckID string, entries []CardEntry) error
+	SetCovers(ctx context.Context, deckID string, entryIDs []string) error
 }
 
 // Service handles deck business logic. Every method takes the ID of the user
@@ -128,6 +129,33 @@ func (s *Service) DeleteEntry(ctx context.Context, userID, deckID, id string) er
 		return fmt.Errorf("get deck: %w", err)
 	}
 	return s.repo.DeleteEntry(ctx, deckID, id)
+}
+
+// SetCovers replaces the deck's cover cards with the given entries, in slot
+// order. Every entry must belong to the deck.
+func (s *Service) SetCovers(ctx context.Context, userID, deckID string, entryIDs []string) error {
+	if len(entryIDs) > MaxCovers {
+		return fmt.Errorf("at most %d covers", MaxCovers)
+	}
+	d, err := s.repo.Get(ctx, userID, deckID)
+	if err != nil {
+		return fmt.Errorf("get deck: %w", err)
+	}
+	inDeck := make(map[string]bool, len(d.Entries))
+	for _, e := range d.Entries {
+		inDeck[e.ID] = true
+	}
+	seen := make(map[string]bool, len(entryIDs))
+	for _, id := range entryIDs {
+		if !inDeck[id] {
+			return fmt.Errorf("entry %q is not in this deck", id)
+		}
+		if seen[id] {
+			return fmt.Errorf("entry %q is a cover twice", id)
+		}
+		seen[id] = true
+	}
+	return s.repo.SetCovers(ctx, deckID, entryIDs)
 }
 
 // Import saves a fully-formed deck (e.g. parsed from text) for the given user

@@ -9,6 +9,9 @@ import (
 // another user — callers can't tell the two apart.
 var ErrNotFound = errors.New("not found")
 
+// MaxCovers is how many cards a deck shows as its cover.
+const MaxCovers = 2
+
 type Section string
 
 const (
@@ -44,6 +47,7 @@ type Deck struct {
 	Name      string      `json:"name"`
 	Format    string      `json:"format"` // "standard", "expanded"
 	Entries   []CardEntry `json:"entries"`
+	Covers    []CardEntry `json:"covers"` // up to MaxCovers entries shown for the deck, in slot order
 	CreatedAt time.Time   `json:"created_at"`
 	UpdatedAt time.Time   `json:"updated_at"`
 }
