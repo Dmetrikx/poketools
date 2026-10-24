@@ -152,6 +152,8 @@
   scroll-snap-type: x proximity;
   scrollbar-width: thin;
   outline: none;
+  /* Slots measure their offsets against the strip (see centerCard). */
+  position: relative;
   cursor: grab;
 }
 

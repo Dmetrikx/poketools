@@ -19,18 +19,21 @@ const DRAG_THRESHOLD = 5
  * The remaining deck spread face up in an overlapping fan that scrolls
  * sideways, top of the deck on the left and the bottom card at the far right.
  * It opens scrolled fully right, with the bottom card at the center, so
- * thumbing through means scrolling left toward the top. The hovered (or
- * arrow-key focused) card lifts out of the fan; clicking a card marks it as
- * seen.
+ * thumbing through means scrolling left toward the top. Whichever card sits
+ * at the center lifts out of the fan; clicking it marks it as seen, and
+ * clicking any other card scrolls that one to the center.
  */
 export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClearMarks }: Props) {
   const [sorted, setSorted] = useState(false)
   const [active, setActive] = useState<number | null>(null)
+  // The toolbar shows how to thumb through until the fan first moves.
+  const [moved, setMoved] = useState(false)
+  const startCard = useRef<number | null>(null)
   const stripRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const drag = useRef({ pressed: false, dragging: false, startX: 0, startScroll: 0 })
-  // Last pointer position over the strip; null once it leaves or the keyboard takes over.
-  const pointer = useRef<{ x: number; y: number } | null>(null)
+  // Card an arrow key is scrolling to, so repeated presses don't wait for the scroll.
+  const keyTarget = useRef<number | null>(null)
   const scrollFrame = useRef(0)
 
   const ordered = useMemo(() => (sorted ? sortCards(cards) : cards), [cards, sorted])
@@ -51,40 +54,55 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
 
   useEffect(() => () => cancelAnimationFrame(scrollFrame.current), [])
 
+  // The card whose center is nearest the strip's center. Slot offsets are
+  // layout positions (the strip is their offsetParent), so the lifted card's
+  // transform doesn't skew them.
+  const centerCard = () => {
+    const strip = stripRef.current
+    if (!strip) return null
+    const mid = strip.scrollLeft + strip.clientWidth / 2
+    let best: number | null = null
+    let bestDist = Infinity
+    cardRefs.current.forEach((el, i) => {
+      if (!el || i >= ordered.length) return
+      const dist = Math.abs(el.offsetLeft + el.offsetWidth / 2 - mid)
+      if (dist < bestDist) { best = i; bestDist = dist }
+    })
+    return best
+  }
+
   // Pick the deck up at its bottom card, before the first paint so it doesn't jump.
   useLayoutEffect(() => {
     const strip = stripRef.current
     if (strip) strip.scrollLeft = strip.scrollWidth - strip.clientWidth
+    startCard.current = centerCard()
+    setActive(startCard.current)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Browsers don't refresh hover while content scrolls under a still pointer
-  // (mouseenter only fires once the mouse moves), so on scroll, lift
-  // whichever card is now under the pointer.
   const handleScroll = () => {
     cancelAnimationFrame(scrollFrame.current)
     scrollFrame.current = requestAnimationFrame(() => {
-      const p = pointer.current
-      if (!p || drag.current.dragging) return
-      const slot = document.elementFromPoint(p.x, p.y)?.closest<HTMLElement>('[data-index]')
-      if (slot && stripRef.current?.contains(slot)) setActive(Number(slot.dataset.index))
+      const center = centerCard()
+      setActive(center)
+      if (center !== startCard.current) setMoved(true)
+      if (center === keyTarget.current) keyTarget.current = null
     })
   }
 
-  const focusCard = (index: number) => {
-    // Keyboard navigation scrolls too; don't let the idle pointer steal focus back.
-    pointer.current = null
+  const scrollToCard = (index: number) => {
     const clamped = Math.max(0, Math.min(ordered.length - 1, index))
-    setActive(clamped)
+    keyTarget.current = clamped
     cardRefs.current[clamped]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
       e.preventDefault()
-      focusCard((active ?? -1) + (e.key === 'ArrowRight' ? 1 : -1))
+      scrollToCard((keyTarget.current ?? active ?? 0) + (e.key === 'ArrowRight' ? 1 : -1))
     } else if (e.key === 'Home' || e.key === 'End') {
       e.preventDefault()
-      focusCard(e.key === 'Home' ? 0 : ordered.length - 1)
+      scrollToCard(e.key === 'Home' ? 0 : ordered.length - 1)
     } else if ((e.key === ' ' || e.key === 'Enter') && active !== null) {
       e.preventDefault()
       onToggleMark(ordered[active].uid)
@@ -97,7 +115,6 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
   }
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    pointer.current = { x: e.clientX, y: e.clientY }
     const d = drag.current
     if (!d.pressed) return
     const dx = e.clientX - d.startX
@@ -114,9 +131,10 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
     setTimeout(() => { drag.current.dragging = false }, 0)
   }
 
-  const handleCardClick = (uid: number) => {
+  const handleCardClick = (index: number) => {
     if (drag.current.dragging) return
-    onToggleMark(uid)
+    if (index === active) onToggleMark(ordered[index].uid)
+    else scrollToCard(index)
   }
 
   const activeCard = active !== null ? ordered[active] : undefined
@@ -125,7 +143,7 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
     <div className={styles.panel}>
       <div className={styles.toolbar}>
         <div className={styles.counter}>
-          {activeCard ? (
+          {activeCard && moved ? (
             <>
               <strong>Card {active! + 1}</strong> / {ordered.length}
               <span className={styles.activeName}>{activeCard.entry.name}</span>
@@ -167,7 +185,6 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-          onPointerLeave={() => { pointer.current = null }}
           onScroll={handleScroll}
           aria-label="Remaining deck"
         >
@@ -183,13 +200,12 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
                 data-index={i}
                 className={`${styles.slot} ${position} ${marked.has(card.uid) ? styles.marked : ''}`}
                 style={{ zIndex: i === active ? ordered.length + 1 : i }}
-                onMouseEnter={() => { if (!drag.current.dragging) setActive(i) }}
               >
                 <PlayingCard
                   entry={card.entry}
                   image={imageMap.get(imageKey(card.entry))}
                   faceUp
-                  onClick={() => handleCardClick(card.uid)}
+                  onClick={() => handleCardClick(i)}
                   className={styles.fanCard}
                 />
                 {marked.has(card.uid) && <span className={styles.check}>✓</span>}
