@@ -162,10 +162,27 @@
   cursor: grabbing;
 }
 
+/* Each slot's --lift (0–1, how close it is to the center) and --part (0–1,
+   how far past the center it is) are set by DeckFan every frame, straight
+   from the scroll position, so there's no transition to lag behind it. The
+   centered card rises by --rise and grows by --grow; cards past it slide
+   right by --shift so the fan parts around it. */
+.strip {
+  --rise: -48px;
+  --grow: 0.35;
+  --shift: 64px;
+}
+
 .slot {
+  --lift: 0;
+  --part: 0;
   position: relative;
   flex-shrink: 0;
-  transition: transform 0.22s cubic-bezier(0.3, 0.7, 0.3, 1), filter 0.2s;
+  transform:
+    translateX(calc(var(--part) * var(--shift)))
+    translateY(calc(var(--lift) * var(--rise)))
+    scale(calc(1 + var(--lift) * var(--grow)));
+  will-change: transform;
 }
 
 .slot + .slot {
@@ -174,15 +191,7 @@
 
 .fanCard {
   width: 118px;
-}
-
-.active {
-  transform: translateY(-48px) scale(1.35);
-}
-
-/* Cards past the lifted one slide right so the fan parts around it. */
-.afterActive {
-  transform: translateX(64px);
+  transition: filter 0.2s;
 }
 
 .marked .fanCard {
@@ -232,6 +241,9 @@
   }
 
   .strip {
+    --rise: -14%;
+    --grow: 0.06;
+    --shift: calc(var(--card) * 0.5);
     width: 100%;
     padding: calc(var(--card) * 0.22) calc(50% - var(--card) / 2) 16px;
   }
@@ -242,14 +254,6 @@
 
   .fanCard {
     width: var(--card);
-  }
-
-  .active {
-    transform: translateY(-14%) scale(1.06);
-  }
-
-  .afterActive {
-    transform: translateX(calc(var(--card) * 0.5));
   }
 }
 

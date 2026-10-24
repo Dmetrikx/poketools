@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback, memo } from 'react'
 import { imageKey } from '@/hooks/useCardImages'
 import { sortCards, type DealtCard } from '@/practice/deal'
 import PlayingCard from './PlayingCard'
@@ -22,26 +22,68 @@ const WHEEL_RATIO = 0.6
 // runs through the deck. Capped at MAX_FLING.
 const FLING_GAIN = 0.3
 const MAX_FLING = 8
-// A fling keeps this share of its speed per 16ms frame, and settles on the
-// center card once it drops below MIN_SPEED (px/ms).
+// A fling glides as far as it would coasting with this share of its speed
+// kept per 16ms frame, then lands on the card nearest that point.
 const FRICTION = 0.95
-const MIN_SPEED = 0.05
+const GLIDE = 16 / (1 - FRICTION)
+// Bounds on a fling's length (ms), and the length of short moves: settling
+// after a drag, arrow keys, clicks and wheel steps.
+const MIN_GLIDE_TIME = 200
+const MAX_GLIDE_TIME = 1400
+const GLIDE_TIME_PER_PX = 0.6
+const SNAP_TIME = 240
+const WHEEL_TIME = 180
 // Pointer samples older than this don't count toward a fling's speed.
 const VELOCITY_WINDOW = 100
-// Wheel quiet time before the fan settles on the center card.
-const SETTLE_DELAY = 120
+// Wheel quiet time after which the next wheel event starts from the fan's
+// position rather than adding to the previous ones.
+const WHEEL_IDLE = 200
 
 interface Sample { t: number; x: number }
+
+const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n))
+const easeOutCubic = (t: number) => 1 - (1 - t) ** 3
+
+interface SlotProps {
+  card: DealtCard
+  index: number
+  image: string | undefined
+  marked: boolean
+  active: boolean
+  onClick: (index: number) => void
+  setRef: (index: number, el: HTMLDivElement | null) => void
+}
+
+// Memoized so moving the center only re-renders the two cards whose `active` flips.
+const FanSlot = memo(function FanSlot({ card, index, image, marked, active, onClick, setRef }: SlotProps) {
+  return (
+    <div
+      ref={el => setRef(index, el)}
+      data-index={index}
+      className={`${styles.slot} ${active ? styles.active : ''} ${marked ? styles.marked : ''}`}
+    >
+      <PlayingCard
+        entry={card.entry}
+        image={image}
+        faceUp
+        onClick={() => onClick(index)}
+        className={styles.fanCard}
+      />
+      {marked && <span className={styles.check}>✓</span>}
+    </div>
+  )
+})
 
 /**
  * The remaining deck spread face up in an overlapping fan that scrolls
  * sideways, top of the deck on the left and the bottom card at the far right.
  * It opens scrolled fully right, with the bottom card at the center, so
  * thumbing through means scrolling left toward the top. Drags, swipes and the
- * wheel are damped and flings take effort (see DRAG_RATIO, FLING_GAIN), and
- * every move settles with a card at the center, rather than native scrolling
- * that flings past half the deck. Whichever card sits at the center lifts out
- * of the fan; clicking it marks it as seen, and clicking any other card
+ * wheel are damped and flings take effort (see DRAG_RATIO, FLING_GAIN); every
+ * move is one eased animation that lands with a card at the center, rather
+ * than native scrolling that flings past half the deck. The card at the
+ * center lifts out of the fan, eased in and out with the scroll position
+ * (see paint); clicking it marks it as seen, and clicking any other card
  * scrolls that one to the center.
  */
 export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClearMarks }: Props) {
@@ -53,104 +95,147 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
   const stripRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const drag = useRef({ pressed: false, dragging: false, startX: 0, startScroll: 0, samples: [] as Sample[] })
-  const fling = useRef(0)
-  const settleTimer = useRef(0)
-  // Card an arrow key is scrolling to, so repeated presses don't wait for the scroll.
-  const keyTarget = useRef<number | null>(null)
-  const scrollFrame = useRef(0)
+  // The running animation, and the card it lands on (so repeated arrow keys
+  // and wheel steps build on it instead of waiting for it).
+  const anim = useRef<{ frame: number; card: number } | null>(null)
+  const wheel = useRef({ pos: 0, last: -Infinity })
+  // Last --lift/--part/z-index written to each slot, to skip unchanged writes.
+  const painted = useRef(new WeakMap<HTMLElement, string>())
 
   const ordered = useMemo(() => (sorted ? sortCards(cards) : cards), [cards, sorted])
+  const count = ordered.length
 
-  useEffect(() => () => {
-    cancelAnimationFrame(scrollFrame.current)
-    cancelAnimationFrame(fling.current)
-    clearTimeout(settleTimer.current)
-  }, [])
-
-  // The card whose center is nearest the strip's center. Slot offsets are
-  // layout positions (the strip is their offsetParent), so the lifted card's
-  // transform doesn't skew them.
-  const centerCard = () => {
+  // Layout measurements. Slots are evenly spaced, and their offsets are
+  // layout positions (the strip is their offsetParent), so transforms don't
+  // skew them. offsetLeft is rounded to whole pixels, so the spacing is
+  // measured across the whole fan rather than between two neighbors.
+  const metrics = () => {
     const strip = stripRef.current
-    if (!strip) return null
-    const mid = strip.scrollLeft + strip.clientWidth / 2
-    let best: number | null = null
-    let bestDist = Infinity
+    const first = cardRefs.current[0]
+    if (!strip || !first) return null
+    const last = cardRefs.current[count - 1]
+    return {
+      strip,
+      firstCenter: first.offsetLeft + first.offsetWidth / 2,
+      step: last && count > 1 ? (last.offsetLeft - first.offsetLeft) / (count - 1) : 1,
+      half: strip.clientWidth / 2,
+      max: strip.scrollWidth - strip.clientWidth,
+    }
+  }
+  type Metrics = NonNullable<ReturnType<typeof metrics>>
+
+  // The scroll position that centers card `i`, and the card nearest the center at `pos`.
+  const cardPos = (m: Metrics, i: number) => clamp(m.firstCenter + i * m.step - m.half, 0, m.max)
+  const cardAt = (m: Metrics, pos: number) => clamp(Math.round((pos + m.half - m.firstCenter) / m.step), 0, count - 1)
+
+  // Lift and part each card by its exact distance from the center, so the
+  // fan moves in step with the scroll instead of jumping card to card.
+  const paint = () => {
+    const m = metrics()
+    if (!m) return
+    const center = (m.strip.scrollLeft + m.half - m.firstCenter) / m.step
+    const nearest = clamp(Math.round(center), 0, count - 1)
     cardRefs.current.forEach((el, i) => {
-      if (!el || i >= ordered.length) return
-      const dist = Math.abs(el.offsetLeft + el.offsetWidth / 2 - mid)
-      if (dist < bestDist) { best = i; bestDist = dist }
+      if (!el || i >= count) return
+      const offset = i - center
+      const lift = Math.max(0, 1 - Math.abs(offset)).toFixed(3)
+      const part = clamp(offset, 0, 1).toFixed(3)
+      const z = i === nearest ? count + 1 : i
+      const key = `${lift}|${part}|${z}`
+      if (painted.current.get(el) === key) return
+      painted.current.set(el, key)
+      el.style.setProperty('--lift', lift)
+      el.style.setProperty('--part', part)
+      el.style.zIndex = String(z)
     })
-    return best
-  }
-
-  // Pick the deck up at its bottom card, before the first paint so it doesn't jump.
-  useLayoutEffect(() => {
-    const strip = stripRef.current
-    if (strip) strip.scrollLeft = strip.scrollWidth - strip.clientWidth
-    startCard.current = centerCard()
-    setActive(startCard.current)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const handleScroll = () => {
-    cancelAnimationFrame(scrollFrame.current)
-    scrollFrame.current = requestAnimationFrame(() => {
-      const center = centerCard()
-      setActive(center)
-      if (center !== startCard.current) setMoved(true)
-      if (center === keyTarget.current) keyTarget.current = null
-    })
-  }
-
-  const scrollToCard = (index: number) => {
-    stopMotion()
-    const clamped = Math.max(0, Math.min(ordered.length - 1, index))
-    keyTarget.current = clamped
-    cardRefs.current[clamped]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+    setActive(nearest)
+    if (nearest !== startCard.current) setMoved(true)
   }
 
   const stopMotion = () => {
-    cancelAnimationFrame(fling.current)
-    clearTimeout(settleTimer.current)
+    if (anim.current) cancelAnimationFrame(anim.current.frame)
+    anim.current = null
   }
 
-  const settle = () => {
-    const center = centerCard()
-    if (center !== null) scrollToCard(center)
-  }
-
-  // Coast at `speed` (scroll px/ms), slowing by FRICTION, then settle.
-  const startFling = (speed: number) => {
-    const strip = stripRef.current!
-    let last = performance.now()
-    const step = (now: number) => {
-      const dt = now - last
-      last = now
-      const max = strip.scrollWidth - strip.clientWidth
-      const next = Math.max(0, Math.min(max, strip.scrollLeft + speed * dt))
-      strip.scrollLeft = next
-      speed *= FRICTION ** (dt / 16)
-      // Stop when slow enough or pinned against either end of the fan.
-      if (Math.abs(speed) < MIN_SPEED || next === 0 || next === max) settle()
-      else fling.current = requestAnimationFrame(step)
+  // Ease to card `index` over `duration` ms.
+  const scrollToCard = (index: number, duration = SNAP_TIME) => {
+    const m = metrics()
+    if (!m) return
+    stopMotion()
+    const card = clamp(index, 0, count - 1)
+    const from = m.strip.scrollLeft
+    const to = cardPos(m, card)
+    if (Math.abs(to - from) < 0.5) {
+      m.strip.scrollLeft = to
+      paint()
+      return
     }
-    fling.current = requestAnimationFrame(step)
+    const start = performance.now()
+    const a = { frame: 0, card }
+    const step = (now: number) => {
+      const t = clamp((now - start) / duration, 0, 1)
+      m.strip.scrollLeft = from + (to - from) * easeOutCubic(t)
+      paint()
+      if (t < 1) a.frame = requestAnimationFrame(step)
+      else if (anim.current === a) anim.current = null
+    }
+    a.frame = requestAnimationFrame(step)
+    anim.current = a
   }
 
-  // The wheel (either axis) scrolls the fan sideways, damped. React's onWheel
-  // is passive, so preventDefault needs a native listener; it's re-bound each
-  // render so it sees the current cards.
+  // Glide at `speed` (scroll px/ms) and land on the card nearest where it
+  // would coast to, in one animation that starts at the release speed.
+  const fling = (speed: number) => {
+    const m = metrics()
+    if (!m) return
+    const from = m.strip.scrollLeft
+    const card = cardAt(m, from + speed * GLIDE)
+    const dist = cardPos(m, card) - from
+    // easeOutCubic starts at 3× its average speed. A slow release would
+    // stretch a short settle into a crawl, so the length is also capped by
+    // distance.
+    const sameWay = speed !== 0 && Math.sign(dist) === Math.sign(speed)
+    const cap = Math.min(MAX_GLIDE_TIME, SNAP_TIME + Math.abs(dist) * GLIDE_TIME_PER_PX)
+    const duration = sameWay ? clamp((3 * Math.abs(dist)) / Math.abs(speed), MIN_GLIDE_TIME, cap) : SNAP_TIME
+    scrollToCard(card, duration)
+  }
+
+  useEffect(() => () => stopMotion(), [])
+
+  // Pick the deck up at its bottom card, before the first paint so it doesn't jump.
+  useLayoutEffect(() => {
+    const m = metrics()
+    if (!m) return
+    m.strip.scrollLeft = m.max
+    startCard.current = cardAt(m, m.max)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Re-paint when the order changes (slots move to new indexes) or the layout does.
+  useLayoutEffect(paint)
+  useEffect(() => {
+    window.addEventListener('resize', paint)
+    return () => window.removeEventListener('resize', paint)
+  })
+
+  // The wheel (either axis) scrolls the fan sideways, damped, a card at a
+  // time. React's onWheel is passive, so preventDefault needs a native
+  // listener; it's re-bound each render so it sees the current cards.
   useEffect(() => {
     const strip = stripRef.current
     if (!strip) return
     const onWheel = (e: WheelEvent) => {
       e.preventDefault()
-      stopMotion()
+      const m = metrics()
+      if (!m) return
+      const w = wheel.current
+      if (e.timeStamp - w.last > WHEEL_IDLE) w.pos = m.strip.scrollLeft
+      w.last = e.timeStamp
       const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX
       // Firefox can report lines instead of pixels.
-      strip.scrollLeft += delta * (e.deltaMode === WheelEvent.DOM_DELTA_LINE ? 16 : 1) * WHEEL_RATIO
-      settleTimer.current = window.setTimeout(settle, SETTLE_DELAY)
+      w.pos = clamp(w.pos + delta * (e.deltaMode === WheelEvent.DOM_DELTA_LINE ? 16 : 1) * WHEEL_RATIO, 0, m.max)
+      const card = cardAt(m, w.pos)
+      if (anim.current?.card !== card) scrollToCard(card, WHEEL_TIME)
     }
     strip.addEventListener('wheel', onWheel, { passive: false })
     return () => strip.removeEventListener('wheel', onWheel)
@@ -159,10 +244,10 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
       e.preventDefault()
-      scrollToCard((keyTarget.current ?? active ?? 0) + (e.key === 'ArrowRight' ? 1 : -1))
+      scrollToCard((anim.current?.card ?? active ?? 0) + (e.key === 'ArrowRight' ? 1 : -1))
     } else if (e.key === 'Home' || e.key === 'End') {
       e.preventDefault()
-      scrollToCard(e.key === 'Home' ? 0 : ordered.length - 1)
+      scrollToCard(e.key === 'Home' ? 0 : count - 1)
     } else if ((e.key === ' ' || e.key === 'Enter') && active !== null) {
       e.preventDefault()
       onToggleMark(ordered[active].uid)
@@ -190,6 +275,7 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
     }
     if (!d.dragging) return
     stripRef.current!.scrollLeft = d.startScroll - dx * DRAG_RATIO
+    paint()
     d.samples.push({ t: e.timeStamp, x: e.clientX })
     while (d.samples.length > 2 && e.timeStamp - d.samples[0].t > VELOCITY_WINDOW) d.samples.shift()
   }
@@ -199,12 +285,9 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
     if (d.pressed && d.dragging) {
       const first = d.samples[0]
       const dt = e.timeStamp - first.t
-      // Coast only if the pointer was still moving when it let go.
-      if (dt > 0 && dt < VELOCITY_WINDOW * 2) {
-        const v = (e.clientX - first.x) / dt
-        startFling(-Math.sign(v) * Math.min(MAX_FLING, FLING_GAIN * v * v))
-      }
-      else settle()
+      // Glide only if the pointer was still moving when it let go.
+      const v = dt > 0 && dt < VELOCITY_WINDOW * 2 ? (e.clientX - first.x) / dt : 0
+      fling(-Math.sign(v) * Math.min(MAX_FLING, FLING_GAIN * v * v))
     }
     d.pressed = false
     // `dragging` stays set until the click that follows the drag is swallowed.
@@ -217,6 +300,12 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
     else scrollToCard(index)
   }
 
+  // Stable callbacks keep FanSlot's memo effective.
+  const clickRef = useRef(handleCardClick)
+  clickRef.current = handleCardClick
+  const onSlotClick = useCallback((index: number) => clickRef.current(index), [])
+  const setSlotRef = useCallback((index: number, el: HTMLDivElement | null) => { cardRefs.current[index] = el }, [])
+
   const activeCard = active !== null ? ordered[active] : undefined
 
   return (
@@ -225,12 +314,12 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
         <div className={styles.counter}>
           {activeCard && moved ? (
             <>
-              <strong>Card {active! + 1}</strong> / {ordered.length}
+              <strong>Card {active! + 1}</strong> / {count}
               <span className={styles.activeName}>{activeCard.entry.name}</span>
             </>
           ) : (
             <span>
-              {ordered.length} cards ·{' '}
+              {count} cards ·{' '}
               <span className={styles.pointerHint}>scroll, swipe or use ← → to thumb through</span>
               <span className={styles.touchHint}>swipe to thumb through</span>
             </span>
@@ -265,33 +354,21 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-          onScroll={handleScroll}
+          onScroll={paint}
           aria-label="Remaining deck"
         >
-          {ordered.map((card, i) => {
-            const position =
-              active === null ? '' :
-              i === active ? styles.active :
-              i > active ? styles.afterActive : ''
-            return (
-              <div
-                key={card.uid}
-                ref={el => { cardRefs.current[i] = el }}
-                data-index={i}
-                className={`${styles.slot} ${position} ${marked.has(card.uid) ? styles.marked : ''}`}
-                style={{ zIndex: i === active ? ordered.length + 1 : i }}
-              >
-                <PlayingCard
-                  entry={card.entry}
-                  image={imageMap.get(imageKey(card.entry))}
-                  faceUp
-                  onClick={() => handleCardClick(i)}
-                  className={styles.fanCard}
-                />
-                {marked.has(card.uid) && <span className={styles.check}>✓</span>}
-              </div>
-            )
-          })}
+          {ordered.map((card, i) => (
+            <FanSlot
+              key={card.uid}
+              card={card}
+              index={i}
+              image={imageMap.get(imageKey(card.entry))}
+              marked={marked.has(card.uid)}
+              active={i === active}
+              onClick={onSlotClick}
+              setRef={setSlotRef}
+            />
+          ))}
         </div>
       </div>
     </div>
