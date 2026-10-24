@@ -15,11 +15,16 @@ interface Props {
 // Pointer travel before a press on the strip becomes a drag instead of a click.
 const DRAG_THRESHOLD = 6
 // Resistance: how far the fan moves per pixel of drag or wheel.
-const DRAG_RATIO = 0.5
-const WHEEL_RATIO = 0.35
+const DRAG_RATIO = 0.75
+const WHEEL_RATIO = 0.6
+// A fling's speed (scroll px/ms) grows with the square of the release speed
+// (pointer px/ms), so a gentle flick moves a card or two and only a hard one
+// runs through the deck. Capped at MAX_FLING.
+const FLING_GAIN = 0.3
+const MAX_FLING = 8
 // A fling keeps this share of its speed per 16ms frame, and settles on the
 // center card once it drops below MIN_SPEED (px/ms).
-const FRICTION = 0.92
+const FRICTION = 0.95
 const MIN_SPEED = 0.05
 // Pointer samples older than this don't count toward a fling's speed.
 const VELOCITY_WINDOW = 100
@@ -33,11 +38,11 @@ interface Sample { t: number; x: number }
  * sideways, top of the deck on the left and the bottom card at the far right.
  * It opens scrolled fully right, with the bottom card at the center, so
  * thumbing through means scrolling left toward the top. Drags, swipes and the
- * wheel are damped (see DRAG_RATIO) and every move settles with a card at
- * the center, rather than native scrolling that flings past half the deck.
- * Whichever card sits
- * at the center lifts out of the fan; clicking it marks it as seen, and
- * clicking any other card scrolls that one to the center.
+ * wheel are damped and flings take effort (see DRAG_RATIO, FLING_GAIN), and
+ * every move settles with a card at the center, rather than native scrolling
+ * that flings past half the deck. Whichever card sits at the center lifts out
+ * of the fan; clicking it marks it as seen, and clicking any other card
+ * scrolls that one to the center.
  */
 export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClearMarks }: Props) {
   const [sorted, setSorted] = useState(false)
@@ -195,7 +200,10 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
       const first = d.samples[0]
       const dt = e.timeStamp - first.t
       // Coast only if the pointer was still moving when it let go.
-      if (dt > 0 && dt < VELOCITY_WINDOW * 2) startFling(-((e.clientX - first.x) / dt) * DRAG_RATIO)
+      if (dt > 0 && dt < VELOCITY_WINDOW * 2) {
+        const v = (e.clientX - first.x) / dt
+        startFling(-Math.sign(v) * Math.min(MAX_FLING, FLING_GAIN * v * v))
+      }
       else settle()
     }
     d.pressed = false
