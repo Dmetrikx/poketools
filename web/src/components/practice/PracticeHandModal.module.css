@@ -312,3 +312,100 @@
   font-weight: 600;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
+
+/* Phones: the draw takes the whole screen, the hand sits in two even rows and
+   the board shrinks so prizes, next card and deck share one line. */
+@media (max-width: 600px) {
+  .overlay {
+    padding: 0;
+  }
+
+  .modal {
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    border: none;
+    border-radius: 0;
+    padding:
+      max(12px, env(safe-area-inset-top))
+      max(12px, env(safe-area-inset-right))
+      max(16px, env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
+    gap: 14px;
+  }
+
+  .header {
+    position: relative;
+    padding-right: 40px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .headerActions {
+    flex-wrap: wrap;
+  }
+
+  .closeBtn {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .handRow {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .handCard {
+    width: auto;
+  }
+
+  .board {
+    gap: 12px;
+    justify-content: space-between;
+  }
+
+  .label {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+  }
+
+  .prizeGrid {
+    gap: 6px;
+  }
+
+  .boardCard {
+    width: 52px;
+  }
+}
+
+@media (pointer: coarse) {
+  .primaryBtn,
+  .secondaryBtn {
+    min-height: 40px;
+  }
+
+  .linkBtn {
+    padding: 6px 0;
+  }
+}
+
+/* A tap leaves :hover stuck on touch screens; skip the lift effects there. */
+@media (hover: none) {
+  .handCard:hover {
+    transform: none;
+  }
+
+  .prizeGrid .boardCard:hover {
+    transform: none;
+  }
+
+  .pile:hover:not(.pileLifted) {
+    transform: none;
+  }
+}

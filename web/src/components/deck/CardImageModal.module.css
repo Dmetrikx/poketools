@@ -148,3 +148,23 @@
   opacity: 1;
   border-color: var(--color-primary);
 }
+
+@media (max-width: 600px) {
+  /* Inside the frame: at 90vw the corner offset would sit off-screen. */
+  .closeBtn {
+    top: 8px;
+    right: 8px;
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .modal {
+    max-height: 100dvh;
+    overflow-y: auto;
+  }
+
+  .altThumb {
+    width: 72px;
+  }
+}

@@ -13,6 +13,7 @@
 .modal {
   width: min(760px, 100%);
   max-height: 85vh;
+  max-height: 85dvh;
   display: flex;
   flex-direction: column;
   background: var(--color-surface);
@@ -96,4 +97,22 @@
   color: var(--color-text-muted);
   font-size: 0.7rem;
   text-align: center;
+}
+
+@media (max-width: 600px) {
+  .overlay {
+    padding: 0;
+  }
+
+  .modal {
+    height: 100dvh;
+    max-height: none;
+    border: none;
+    border-radius: 0;
+  }
+
+  .closeBtn {
+    width: 36px;
+    height: 36px;
+  }
 }

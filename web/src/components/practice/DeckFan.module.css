@@ -193,3 +193,34 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
   pointer-events: none;
 }
+
+/* Phones: smaller cards, with the strip padding and overlap scaled to match. */
+@media (max-width: 600px) {
+  .strip {
+    padding: 56px calc(50% - 48px) 14px;
+  }
+
+  .slot + .slot {
+    margin-left: -58px;
+  }
+
+  .fanCard {
+    width: 96px;
+  }
+
+  .active {
+    transform: translateY(-40px) scale(1.3);
+  }
+
+  .afterActive {
+    transform: translateX(52px);
+  }
+}
+
+@media (pointer: coarse) {
+  .toolBtn,
+  .toggleBtn {
+    min-height: 32px;
+    padding: 4px 12px;
+  }
+}

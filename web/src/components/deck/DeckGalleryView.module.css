@@ -189,3 +189,37 @@
   text-overflow: ellipsis;
   color: var(--color-text-muted);
 }
+/* Touch has no hover: keep the controls up, and don't leave a tapped tile lifted. */
+@media (hover: none) {
+  .tile:hover {
+    transform: none;
+  }
+
+  .controls {
+    display: flex;
+    pointer-events: none;
+  }
+
+  .ctrlBtn {
+    width: 28px;
+    height: 28px;
+    pointer-events: all;
+  }
+
+  .artBadge {
+    opacity: 1;
+  }
+
+  /* The controls cover the top corner; the count moves to the bottom. */
+  .badge {
+    top: auto;
+    bottom: 4px;
+  }
+}
+
+/* Three tiles per row, filling the panel. */
+@media (max-width: 600px) {
+  .tile {
+    width: calc((100% - 2 * 8px) / 3);
+  }
+}

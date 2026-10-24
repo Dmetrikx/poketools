@@ -81,6 +81,15 @@
 }
 
 @media (max-width: 480px) {
+  .nav {
+    gap: 12px;
+    padding: 0 max(12px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left));
+  }
+
+  .link {
+    padding: 6px 8px;
+  }
+
   .email {
     display: none;
   }

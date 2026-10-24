@@ -90,3 +90,14 @@
   color: var(--color-danger);
   background: rgba(239, 68, 68, 0.1);
 }
+
+@media (pointer: coarse) {
+  .countBtn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .removeBtn {
+    padding: 8px;
+  }
+}
