@@ -149,7 +149,8 @@
   overflow-x: auto;
   overflow-y: hidden;
   padding: 64px calc(50% - 59px) 18px;
-  scroll-snap-type: x proximity;
+  /* Horizontal swipes are handled in DeckFan; vertical ones still scroll the page. */
+  touch-action: pan-y;
   scrollbar-width: thin;
   outline: none;
   /* Slots measure their offsets against the strip (see centerCard). */
@@ -164,7 +165,6 @@
 .slot {
   position: relative;
   flex-shrink: 0;
-  scroll-snap-align: center;
   transition: transform 0.22s cubic-bezier(0.3, 0.7, 0.3, 1), filter 0.2s;
 }
 
