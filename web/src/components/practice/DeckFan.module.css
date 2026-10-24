@@ -40,6 +40,21 @@
   text-overflow: ellipsis;
 }
 
+/* Touch screens have no arrow keys or wheel to mention. */
+.touchHint {
+  display: none;
+}
+
+@media (hover: none) {
+  .pointerHint {
+    display: none;
+  }
+
+  .touchHint {
+    display: inline;
+  }
+}
+
 .toolbarActions {
   display: flex;
   align-items: center;
@@ -137,6 +152,8 @@
   scroll-snap-type: x proximity;
   scrollbar-width: thin;
   outline: none;
+  /* Slots measure their offsets against the strip (see centerCard). */
+  position: relative;
   cursor: grab;
 }
 
@@ -194,26 +211,45 @@
   pointer-events: none;
 }
 
-/* Phones: smaller cards, with the strip padding and overlap scaled to match. */
+/* Phones: the fan fills the deck sheet with big cards, sized by --card to
+   whichever of the screen's width or height runs out first. Each card shows
+   its left edge (name and HP) under the next one. */
 @media (max-width: 600px) {
+  .panel {
+    --card: min(72vw, 40dvh);
+    flex: 1;
+    min-height: 0;
+    border-top: none;
+    padding-top: 0;
+    animation: none;
+  }
+
+  .viewport {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    --focus: min(var(--card), 70%);
+  }
+
   .strip {
-    padding: 56px calc(50% - 48px) 14px;
+    width: 100%;
+    padding: calc(var(--card) * 0.22) calc(50% - var(--card) / 2) 16px;
   }
 
   .slot + .slot {
-    margin-left: -58px;
+    margin-left: calc(var(--card) * -0.66);
   }
 
   .fanCard {
-    width: 96px;
+    width: var(--card);
   }
 
   .active {
-    transform: translateY(-40px) scale(1.3);
+    transform: translateY(-14%) scale(1.06);
   }
 
   .afterActive {
-    transform: translateX(52px);
+    transform: translateX(calc(var(--card) * 0.5));
   }
 }
 

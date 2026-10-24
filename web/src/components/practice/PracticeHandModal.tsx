@@ -5,6 +5,7 @@ import { dealHand, deckSignature, type Hand } from '@/practice/deal'
 import type { CardEntry, Deck } from '@/types/deck'
 import PlayingCard from './PlayingCard'
 import DeckFan from './DeckFan'
+import DeckSheet from './DeckSheet'
 import styles from './PracticeHandModal.module.css'
 
 interface Props {
@@ -231,13 +232,15 @@ export default function PracticeHandModal({ deck, imageMap, onClose }: Props) {
             </div>
 
             {deckOpen && (
-              <DeckFan
-                cards={hand.deck}
-                imageMap={imageMap}
-                marked={new Set(session!.marked)}
-                onToggleMark={toggleMark}
-                onClearMarks={() => update({ ...session!, marked: [] })}
-              />
+              <DeckSheet onClose={() => setDeckOpen(false)}>
+                <DeckFan
+                  cards={hand.deck}
+                  imageMap={imageMap}
+                  marked={new Set(session!.marked)}
+                  onToggleMark={toggleMark}
+                  onClearMarks={() => update({ ...session!, marked: [] })}
+                />
+              </DeckSheet>
             )}
           </>
         )}
