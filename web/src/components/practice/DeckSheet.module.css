@@ -1,0 +1,84 @@
+/* Wide screens: the sheet is just the fan's place in the modal. */
+.backdrop,
+.handle {
+  display: none;
+}
+
+/* Phones: the picked-up deck slides up over most of the screen, leaving the
+   top of the board showing (dimmed) above it. */
+@media (max-width: 600px) {
+  .backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.55);
+    animation: fadeIn 0.25s ease-out;
+    transition: opacity 0.25s;
+  }
+
+  .backdropClosing {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 11;
+    height: 88vh;
+    height: 88dvh;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg);
+    border-top: 1px solid var(--color-border);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.5);
+    padding:
+      0
+      max(12px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
+    animation: slideUp 0.3s cubic-bezier(0.3, 0.7, 0.3, 1);
+    transition: transform 0.25s cubic-bezier(0.3, 0.7, 0.3, 1);
+  }
+
+  .closing {
+    transform: translateY(100%);
+  }
+
+  .handle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    width: 100%;
+    padding: 8px 0 10px;
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    cursor: pointer;
+    touch-action: none;
+  }
+
+  .grip {
+    width: 40px;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--color-border);
+  }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

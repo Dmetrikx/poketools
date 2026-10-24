@@ -131,7 +131,11 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
               <span className={styles.activeName}>{activeCard.entry.name}</span>
             </>
           ) : (
-            <span>{ordered.length} cards · scroll, swipe or use ← → to thumb through</span>
+            <span>
+              {ordered.length} cards ·{' '}
+              <span className={styles.pointerHint}>scroll, swipe or use ← → to thumb through</span>
+              <span className={styles.touchHint}>swipe to thumb through</span>
+            </span>
           )}
         </div>
         <div className={styles.toolbarActions}>
