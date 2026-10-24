@@ -13,13 +13,29 @@ interface Props {
 }
 
 // Pointer travel before a press on the strip becomes a drag instead of a click.
-const DRAG_THRESHOLD = 5
+const DRAG_THRESHOLD = 6
+// Resistance: how far the fan moves per pixel of drag or wheel.
+const DRAG_RATIO = 0.5
+const WHEEL_RATIO = 0.35
+// A fling keeps this share of its speed per 16ms frame, and settles on the
+// center card once it drops below MIN_SPEED (px/ms).
+const FRICTION = 0.92
+const MIN_SPEED = 0.05
+// Pointer samples older than this don't count toward a fling's speed.
+const VELOCITY_WINDOW = 100
+// Wheel quiet time before the fan settles on the center card.
+const SETTLE_DELAY = 120
+
+interface Sample { t: number; x: number }
 
 /**
  * The remaining deck spread face up in an overlapping fan that scrolls
  * sideways, top of the deck on the left and the bottom card at the far right.
  * It opens scrolled fully right, with the bottom card at the center, so
- * thumbing through means scrolling left toward the top. Whichever card sits
+ * thumbing through means scrolling left toward the top. Drags, swipes and the
+ * wheel are damped (see DRAG_RATIO) and every move settles with a card at
+ * the center, rather than native scrolling that flings past half the deck.
+ * Whichever card sits
  * at the center lifts out of the fan; clicking it marks it as seen, and
  * clicking any other card scrolls that one to the center.
  */
@@ -31,28 +47,20 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
   const startCard = useRef<number | null>(null)
   const stripRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
-  const drag = useRef({ pressed: false, dragging: false, startX: 0, startScroll: 0 })
+  const drag = useRef({ pressed: false, dragging: false, startX: 0, startScroll: 0, samples: [] as Sample[] })
+  const fling = useRef(0)
+  const settleTimer = useRef(0)
   // Card an arrow key is scrolling to, so repeated presses don't wait for the scroll.
   const keyTarget = useRef<number | null>(null)
   const scrollFrame = useRef(0)
 
   const ordered = useMemo(() => (sorted ? sortCards(cards) : cards), [cards, sorted])
 
-  // Vertical wheel scrolls the fan sideways. React's onWheel is passive, so
-  // preventDefault needs a native listener.
-  useEffect(() => {
-    const strip = stripRef.current
-    if (!strip) return
-    const onWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return
-      e.preventDefault()
-      strip.scrollLeft += e.deltaY
-    }
-    strip.addEventListener('wheel', onWheel, { passive: false })
-    return () => strip.removeEventListener('wheel', onWheel)
+  useEffect(() => () => {
+    cancelAnimationFrame(scrollFrame.current)
+    cancelAnimationFrame(fling.current)
+    clearTimeout(settleTimer.current)
   }, [])
-
-  useEffect(() => () => cancelAnimationFrame(scrollFrame.current), [])
 
   // The card whose center is nearest the strip's center. Slot offsets are
   // layout positions (the strip is their offsetParent), so the lifted card's
@@ -91,10 +99,57 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
   }
 
   const scrollToCard = (index: number) => {
+    stopMotion()
     const clamped = Math.max(0, Math.min(ordered.length - 1, index))
     keyTarget.current = clamped
     cardRefs.current[clamped]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
   }
+
+  const stopMotion = () => {
+    cancelAnimationFrame(fling.current)
+    clearTimeout(settleTimer.current)
+  }
+
+  const settle = () => {
+    const center = centerCard()
+    if (center !== null) scrollToCard(center)
+  }
+
+  // Coast at `speed` (scroll px/ms), slowing by FRICTION, then settle.
+  const startFling = (speed: number) => {
+    const strip = stripRef.current!
+    let last = performance.now()
+    const step = (now: number) => {
+      const dt = now - last
+      last = now
+      const max = strip.scrollWidth - strip.clientWidth
+      const next = Math.max(0, Math.min(max, strip.scrollLeft + speed * dt))
+      strip.scrollLeft = next
+      speed *= FRICTION ** (dt / 16)
+      // Stop when slow enough or pinned against either end of the fan.
+      if (Math.abs(speed) < MIN_SPEED || next === 0 || next === max) settle()
+      else fling.current = requestAnimationFrame(step)
+    }
+    fling.current = requestAnimationFrame(step)
+  }
+
+  // The wheel (either axis) scrolls the fan sideways, damped. React's onWheel
+  // is passive, so preventDefault needs a native listener; it's re-bound each
+  // render so it sees the current cards.
+  useEffect(() => {
+    const strip = stripRef.current
+    if (!strip) return
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault()
+      stopMotion()
+      const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX
+      // Firefox can report lines instead of pixels.
+      strip.scrollLeft += delta * (e.deltaMode === WheelEvent.DOM_DELTA_LINE ? 16 : 1) * WHEEL_RATIO
+      settleTimer.current = window.setTimeout(settle, SETTLE_DELAY)
+    }
+    strip.addEventListener('wheel', onWheel, { passive: false })
+    return () => strip.removeEventListener('wheel', onWheel)
+  })
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
@@ -109,9 +164,15 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
     }
   }
 
+  // Mouse drags and touch swipes both land here: the strip's touch-action
+  // leaves horizontal touch movement to us instead of native scrolling.
   const handlePointerDown = (e: React.PointerEvent) => {
-    if (e.pointerType !== 'mouse' || e.button !== 0) return
-    drag.current = { pressed: true, dragging: false, startX: e.clientX, startScroll: stripRef.current!.scrollLeft }
+    if (e.pointerType === 'mouse' && e.button !== 0) return
+    stopMotion()
+    drag.current = {
+      pressed: true, dragging: false, startX: e.clientX, startScroll: stripRef.current!.scrollLeft,
+      samples: [{ t: e.timeStamp, x: e.clientX }],
+    }
   }
 
   const handlePointerMove = (e: React.PointerEvent) => {
@@ -122,13 +183,24 @@ export default function DeckFan({ cards, imageMap, marked, onToggleMark, onClear
       d.dragging = true
       stripRef.current!.setPointerCapture(e.pointerId)
     }
-    if (d.dragging) stripRef.current!.scrollLeft = d.startScroll - dx
+    if (!d.dragging) return
+    stripRef.current!.scrollLeft = d.startScroll - dx * DRAG_RATIO
+    d.samples.push({ t: e.timeStamp, x: e.clientX })
+    while (d.samples.length > 2 && e.timeStamp - d.samples[0].t > VELOCITY_WINDOW) d.samples.shift()
   }
 
-  const handlePointerUp = () => {
-    drag.current.pressed = false
+  const handlePointerUp = (e: React.PointerEvent) => {
+    const d = drag.current
+    if (d.pressed && d.dragging) {
+      const first = d.samples[0]
+      const dt = e.timeStamp - first.t
+      // Coast only if the pointer was still moving when it let go.
+      if (dt > 0 && dt < VELOCITY_WINDOW * 2) startFling(-((e.clientX - first.x) / dt) * DRAG_RATIO)
+      else settle()
+    }
+    d.pressed = false
     // `dragging` stays set until the click that follows the drag is swallowed.
-    setTimeout(() => { drag.current.dragging = false }, 0)
+    setTimeout(() => { d.dragging = false }, 0)
   }
 
   const handleCardClick = (index: number) => {
