@@ -81,3 +81,13 @@
 .linkButton:hover {
   text-decoration: underline;
 }
+
+@media (max-width: 600px) {
+  .wrap {
+    padding: 6vh 12px 0;
+  }
+
+  .card {
+    padding: 24px 20px;
+  }
+}

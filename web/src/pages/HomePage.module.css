@@ -168,3 +168,56 @@
   color: var(--color-danger);
   background: rgba(239, 68, 68, 0.1);
 }
+
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .createForm {
+    flex-wrap: wrap;
+  }
+
+  .input {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .btn {
+    flex: 1;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+
+  .cardBody {
+    padding: 14px 8px 10px;
+  }
+
+  /* Test draw gets its own row; Edit and Delete share the one below. */
+  .cardFooter {
+    flex-wrap: wrap;
+    padding: 8px;
+  }
+
+  .drawBtn {
+    flex: 1 1 100%;
+  }
+
+  .editBtn,
+  .deleteBtn {
+    flex: 1;
+  }
+}
+
+@media (pointer: coarse) {
+  .btn,
+  .drawBtn,
+  .editBtn,
+  .deleteBtn {
+    min-height: 40px;
+  }
+}

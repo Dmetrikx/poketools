@@ -26,6 +26,8 @@ export default function DeckEditorPage() {
   // ?draw=1 (from a deck tile's Test draw button) opens straight into a draw.
   const [showPractice, setShowPractice] = useState(searchParams.get('draw') === '1')
   const [coverSlot, setCoverSlot] = useState<number | null>(null)
+  // On phones the search collapses behind a toggle; desktop always shows it.
+  const [searchOpen, setSearchOpen] = useState(false)
 
   useEffect(() => {
     if (searchParams.has('draw')) setSearchParams({}, { replace: true })
@@ -91,9 +93,18 @@ export default function DeckEditorPage() {
   return (
     <div className={styles.layout}>
       {/* Left: Search panel */}
-      <div className={styles.searchPanel}>
+      <div className={`${styles.searchPanel} ${searchOpen ? styles.searchOpen : ''}`}>
         <h2 className={styles.panelTitle}>Add Cards</h2>
-        <CardSearch onSelect={card => handleCardSelect(card)} />
+        <button
+          className={styles.searchToggle}
+          onClick={() => setSearchOpen(o => !o)}
+          aria-expanded={searchOpen}
+        >
+          {searchOpen ? 'Done adding cards' : '+ Add cards'}
+        </button>
+        <div className={styles.searchBody}>
+          <CardSearch onSelect={card => handleCardSelect(card)} />
+        </div>
       </div>
 
       {/* Right: Deck panel */}
@@ -138,7 +149,7 @@ export default function DeckEditorPage() {
 
         <div className={styles.entries}>
           {entries.length === 0 && (
-            <p className={styles.empty}>Search for cards on the left to build your deck.</p>
+            <p className={styles.empty}>Search for cards to build your deck.</p>
           )}
 
           {viewMode === 'list' && entries.length > 0 && SECTIONS.map(section => (

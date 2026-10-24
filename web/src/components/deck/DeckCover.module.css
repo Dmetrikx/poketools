@@ -11,6 +11,14 @@
   --overlap: -28px;
 }
 
+@media (max-width: 600px) {
+  .large {
+    height: 150px;
+    --card-width: 88px;
+    --overlap: -22px;
+  }
+}
+
 .small {
   height: 92px;
   --card-width: 56px;
@@ -90,4 +98,14 @@
 .selectable:focus-visible .blank {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+@media (hover: none) {
+  .cover:hover .slot0 {
+    transform: rotate(-7deg) translateY(4px);
+  }
+
+  .cover:hover .slot1 {
+    transform: rotate(7deg) translateY(4px);
+  }
 }
