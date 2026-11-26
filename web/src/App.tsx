@@ -1,9 +1,13 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import AppShell from '@/components/layout/AppShell'
 import HomePage from '@/pages/HomePage'
 import DeckEditorPage from '@/pages/DeckEditorPage'
 import LoginPage from '@/pages/LoginPage'
 import { useAuth } from '@/hooks/useAuth'
+
+// The simulator (engine, catalog, card definitions) loads as its own chunk.
+const PlayPage = lazy(() => import('@/pages/PlayPage'))
 
 export default function App() {
   const { user, allowSignup, checking, login, signup, logout } = useAuth()
@@ -20,6 +24,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/decks/:id" element={<DeckEditorPage />} />
+        <Route path="/play" element={<Suspense fallback={null}><PlayPage /></Suspense>} />
         {/* Import is a modal on the home page now; keep old links working. */}
         <Route path="/import" element={<Navigate to="/?import=1" replace />} />
       </Routes>

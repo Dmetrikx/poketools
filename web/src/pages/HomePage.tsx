@@ -57,6 +57,9 @@ export default function HomePage() {
           <button className={styles.btn} type="button" onClick={() => setShowImport(true)}>
             Import
           </button>
+          <button className={styles.btn} type="button" onClick={() => navigate('/play')}>
+            Play matchup
+          </button>
         </form>
       </div>
 
@@ -78,6 +81,7 @@ export default function HomePage() {
             deck={deck}
             onOpen={() => navigate(`/decks/${deck.id}`)}
             onTestDraw={() => navigate(`/decks/${deck.id}?draw=1`)}
+            onPlay={() => navigate(`/play?a=${deck.id}`)}
             onDelete={() => confirm(`Delete "${deck.name}"?`) && deleteDeck(deck.id)}
           />
         ))}
@@ -97,10 +101,11 @@ interface TileProps {
   deck: DeckSummary
   onOpen: () => void
   onTestDraw: () => void
+  onPlay: () => void
   onDelete: () => void
 }
 
-function DeckTile({ deck, onOpen, onTestDraw, onDelete }: TileProps) {
+function DeckTile({ deck, onOpen, onTestDraw, onPlay, onDelete }: TileProps) {
   const { covers, loading } = useDeckCovers(deck.id, deck.covers)
 
   return (
@@ -114,6 +119,7 @@ function DeckTile({ deck, onOpen, onTestDraw, onDelete }: TileProps) {
       </div>
       <div className={styles.cardFooter}>
         <button className={styles.drawBtn} onClick={onTestDraw}>Test draw</button>
+        <button className={styles.editBtn} onClick={onPlay}>Play</button>
         <button className={styles.editBtn} onClick={onOpen}>Edit</button>
         <button className={styles.deleteBtn} onClick={onDelete} aria-label={`Delete ${deck.name}`}>
           Delete

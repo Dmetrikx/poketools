@@ -2,30 +2,15 @@
 // builds a mid-game state directly so a rule or card can be tested without
 // playing up to it.
 
-import cardsJson from '../catalog/cards.json'
-import aliasesJson from '../catalog/aliases.json'
-import { createCatalog, resolveEntry } from '../catalog/resolve'
-import type { Aliases, CatalogAttack, CatalogCard, EnergyType, FixtureDeck } from '../catalog/types'
-import { registryImpls } from '../cards'
+import { resolveEntry } from '../catalog/resolve'
+import type { CatalogAttack, CatalogCard, EnergyType, FixtureDeck } from '../catalog/types'
+import { catalog, dbFrom, gameDb } from '../db'
 import { initialState } from './game'
 import type { CardImpl, Effectful, Impls, MarkerImpl } from './impl'
 import { newSlot } from './rules'
-import type { Db, GameState, PlayerId, Rotation, Slot } from './types'
+import type { GameState, PlayerId, Rotation, Slot } from './types'
 
-export const catalog = createCatalog(cardsJson as CatalogCard[], aliasesJson as Aliases)
-
-export function dbFrom(cards: Iterable<CatalogCard>, impls?: Impls): Db {
-  const byId = new Map<string, CatalogCard>()
-  for (const c of cards) byId.set(c.id, c)
-  return {
-    card(id) {
-      const c = byId.get(id)
-      if (!c) throw new Error(`unknown card ${id}`)
-      return c
-    },
-    impls,
-  }
-}
+export { catalog, dbFrom }
 
 /** Impls from plain maps, for tests with synthetic cards. */
 export function implsFrom(cards: Record<string, CardImpl>, markers: Record<string, MarkerImpl> = {}, rules: Effectful[] = []): Impls {
@@ -33,7 +18,7 @@ export function implsFrom(cards: Record<string, CardImpl>, markers: Record<strin
 }
 
 /** The real catalog with every registered card definition. */
-export const catalogDb = dbFrom(catalog.cards.values(), registryImpls)
+export const catalogDb = gameDb
 
 /** A fixture deck as 60 catalog ids. */
 export function fixtureDeck(deck: FixtureDeck): string[] {
