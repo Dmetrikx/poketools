@@ -6,13 +6,15 @@ import cardsJson from '../catalog/cards.json'
 import aliasesJson from '../catalog/aliases.json'
 import { createCatalog, resolveEntry } from '../catalog/resolve'
 import type { Aliases, CatalogAttack, CatalogCard, EnergyType, FixtureDeck } from '../catalog/types'
+import { registryImpls } from '../cards'
 import { initialState } from './game'
+import type { CardImpl, Effectful, Impls, MarkerImpl } from './impl'
 import { newSlot } from './rules'
 import type { Db, GameState, PlayerId, Rotation, Slot } from './types'
 
 export const catalog = createCatalog(cardsJson as CatalogCard[], aliasesJson as Aliases)
 
-export function dbFrom(cards: Iterable<CatalogCard>): Db {
+export function dbFrom(cards: Iterable<CatalogCard>, impls?: Impls): Db {
   const byId = new Map<string, CatalogCard>()
   for (const c of cards) byId.set(c.id, c)
   return {
@@ -21,10 +23,17 @@ export function dbFrom(cards: Iterable<CatalogCard>): Db {
       if (!c) throw new Error(`unknown card ${id}`)
       return c
     },
+    impls,
   }
 }
 
-export const catalogDb = dbFrom(catalog.cards.values())
+/** Impls from plain maps, for tests with synthetic cards. */
+export function implsFrom(cards: Record<string, CardImpl>, markers: Record<string, MarkerImpl> = {}, rules: Effectful[] = []): Impls {
+  return { card: id => cards[id], marker: k => markers[k], rules: () => rules }
+}
+
+/** The real catalog with every registered card definition. */
+export const catalogDb = dbFrom(catalog.cards.values(), registryImpls)
 
 /** A fixture deck as 60 catalog ids. */
 export function fixtureDeck(deck: FixtureDeck): string[] {

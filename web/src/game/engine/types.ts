@@ -1,4 +1,5 @@
 import type { CatalogCard, EnergyType } from '../catalog/types'
+import type { Impls } from './impl'
 
 export type PlayerId = 0 | 1
 
@@ -28,6 +29,8 @@ export interface Slot {
   enteredTurn: number
   /** Turn it last evolved, -1 if never. */
   evolvedTurn: number
+  /** Last time an opponent's attack damaged it. */
+  hitBy?: { turn: number; player: PlayerId }
 }
 
 export interface TurnFlags {
@@ -47,6 +50,40 @@ export interface PlayerState {
   bench: Slot[]
   mulligans: number
   flags: TurnFlags
+}
+
+/**
+ * An effect that lasts for a while ("during your opponent's next turn").
+ * Behaviour comes from the marker kind's registered implementation; the
+ * marker itself is plain data.
+ */
+export interface Marker {
+  id: number
+  kind: string
+  /** Who created it. */
+  player: PlayerId
+  /** The Pokémon it is on, if any. */
+  slot?: number
+  /** Stays on when its Pokémon moves to the Bench or evolves. */
+  sticky?: boolean
+  /** Ends at the end of this turn number. */
+  until: number
+  data?: Record<string, string | number | boolean>
+}
+
+/** What happened during one turn, for "during your last turn" effects. */
+export interface TurnRecord {
+  turn: number
+  player: PlayerId
+  knockOuts: { slot: number; owner: PlayerId; cardId: string; byAttack: boolean }[]
+  attacks: { slot: number; name: string }[]
+  /** Slot ids moved from the Bench to the Active Spot. */
+  movedToActive: number[]
+  /** Names of Supporters played. */
+  supporters: string[]
+  /** Activated abilities used: slot id + ability name, and its group. */
+  abilities: { slot: number; name: string; group?: string }[]
+  stadiumUsed: boolean
 }
 
 export interface LogEntry {
@@ -72,6 +109,14 @@ export interface GameState {
   /** The question the current step is waiting on. */
   pendingPrompt: Prompt | null
   log: LogEntry[]
+  markers: Marker[]
+  nextMarkerId: number
+  /** The last few turns, newest last. */
+  history: TurnRecord[]
+  /** Trainers being played: out of the hand, not yet in the discard pile. */
+  resolving: number[]
+  /** Once-per-game effects already used, e.g. "legacy:0". */
+  usedOnce: string[]
 }
 
 // ── prompts ──────────────────────────────────────────────────────────────
@@ -113,18 +158,22 @@ export type Action =
   | { type: 'evolve'; card: number; target: number }
   | { type: 'attachEnergy'; card: number; target: number }
   | { type: 'playTrainer'; card: number; target?: number }
+  /** source: the Pokémon's slot id, or the card's uid for an ability used from the hand. */
   | { type: 'useAbility'; source: number; ability: string }
+  | { type: 'stadiumAction' }
   | { type: 'retreat'; to: number; discard: number[] }
-  | { type: 'attack'; attack: string }
+  /** source: the card id the attack is printed on when it isn't the Pokémon's own (Mew ex). */
+  | { type: 'attack'; attack: string; source?: string }
   | { type: 'endTurn' }
   | { type: 'concede'; player: PlayerId }
   | { type: 'judge'; judge: JudgeOp }
 
 // ── card data ────────────────────────────────────────────────────────────
 
-/** Card lookup the engine runs against. */
+/** Card data and behaviour the engine runs against. */
 export interface Db {
   card(cardId: string): CatalogCard
+  impls?: Impls
 }
 
 export interface Ctx {

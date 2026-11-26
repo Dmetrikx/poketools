@@ -26,7 +26,7 @@ function rng(seed: number): () => number {
 
 const WEIGHT: Record<Action['type'], number> = {
   attack: 6, playBasic: 3, evolve: 4, attachEnergy: 4, playTrainer: 2, useAbility: 2, retreat: 0.5,
-  endTurn: 1, start: 1, concede: 0, judge: 0,
+  endTurn: 1, start: 1, concede: 0, judge: 0, stadiumAction: 1,
 }
 
 function pick(actions: Action[], rand: () => number): Action {
