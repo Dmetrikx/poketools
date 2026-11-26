@@ -3,11 +3,11 @@ export * from '../effects/ops'
 export * as sel from '../effects/select'
 export { matching } from '../effects/select'
 export {
-  cardOf, energyAlternatives, findSlot, inPlay, isFirstTurn, lastTurnOf, log, maxHp, nameOf, other,
+  cardOf, energyAlternatives, findSlot, inPlay, isFirstTurn, lastTurnOf, log, maxHp, nameOf, other, switchActive,
   retreatCost, shuffleDeck, slotName, thisTurn, topCard,
 } from '../engine/rules'
 export { isOver } from '../engine/turn'
-export { shuffleInPlace } from '../engine/rng'
+export { coin, shuffleInPlace } from '../engine/rng'
 export type {
   AbilityImpl, AttackImpl, AttackX, CardImpl, DamageEvent, EffectReach, EnergyImpl, KnockOutEvent, Modifier,
   Source, TrainerImpl, X,
