@@ -67,6 +67,10 @@ export interface KnockOutEvent {
   byAttack: boolean
   /** The attacking Pokémon's owner when knocked out by an attack. */
   attackerOwner: PlayerId | null
+  /** The attacking Pokémon, if knocked out by an attack and still in play. */
+  attacker: Slot | null
+  /** Was it the Active Pokémon? */
+  wasActive: boolean
 }
 
 /** How a non-damage effect reaches a Pokémon, for prevention checks. */

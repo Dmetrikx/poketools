@@ -4,7 +4,7 @@
 import type { CatalogCard, EnergyType, TrainerSubtype } from '../catalog/types'
 import type { X } from '../engine/impl'
 import { abilityOff } from '../engine/modifiers'
-import { cardOf, energyAlternatives, inPlay, lastTurnOf, other, topCard, PRIZES } from '../engine/rules'
+import { benchLimit, cardOf, energyAlternatives, inPlay, lastTurnOf, other, topCard, PRIZES } from '../engine/rules'
 import type { Ctx, PlayerId, Slot } from '../engine/types'
 
 // ── card filters ─────────────────────────────────────────────────────────
@@ -63,6 +63,11 @@ export function inPlayOf(ctx: Ctx, p: PlayerId, f: CardFilter = any): Slot[] {
 
 export function bothInPlay(ctx: Ctx, f: CardFilter = any): Slot[] {
   return [...inPlayOf(ctx, 0, f), ...inPlayOf(ctx, 1, f)]
+}
+
+/** How many Pokémon this player's Bench can hold. */
+export function benchRoom(ctx: Ctx, p: PlayerId): number {
+  return benchLimit(ctx, p)
 }
 
 export function isActive(ctx: Ctx, slot: Slot): boolean {

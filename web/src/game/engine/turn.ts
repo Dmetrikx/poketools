@@ -169,7 +169,8 @@ export function* resolveKnockOuts(ctx: Ctx, afterAttack = false): Proc {
   const events: KnockOutEvent[] = knocked.map(slot => {
     const owner = slotOwner(ctx, slot)
     const byAttack = afterAttack && slot.hitBy?.turn === s.turn && slot.hitBy.player !== owner
-    return { slot, owner, byAttack, attackerOwner: byAttack ? slot.hitBy!.player : null }
+    const attacker = byAttack ? inPlay(s.players[slot.hitBy!.player]).find(x => x.id === slot.hitBy!.attacker) ?? null : null
+    return { slot, owner, byAttack, attackerOwner: byAttack ? slot.hitBy!.player : null, attacker, wasActive: s.players[owner].active?.id === slot.id }
   })
   for (const ko of events) {
     let n = prizeValue(ctx, ko.slot)

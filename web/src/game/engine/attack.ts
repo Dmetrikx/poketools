@@ -58,7 +58,7 @@ export function hit(a: AttackX, target: Slot, amount: number, opts: DamageOption
     log(ctx, slotOwner(ctx, target), `${slotName(ctx, target)} takes ${dmg} damage.`)
   }
   if (slotOwner(ctx, target) !== a.me) {
-    target.hitBy = { turn: ctx.s.turn, player: a.me }
+    target.hitBy = { turn: ctx.s.turn, player: a.me, attacker: a.attacker.id }
     a.hits.push({ target, damage: dmg })
   }
   return dmg

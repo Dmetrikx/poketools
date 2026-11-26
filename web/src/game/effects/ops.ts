@@ -323,12 +323,15 @@ export function* attachEnergy(x: X, uid: number, to: Slot): Proc {
   yield* emit(x, { type: 'attached', slot: to, card: uid, player: p, fromHand })
 }
 
-/** Discards attached cards. From an attack, emits discardedByAttack (Boomerang Energy). */
+/**
+ * Discards attached cards. From an attack, emits discardedByAttack first,
+ * while the cards are still attached (Boomerang Energy remembers itself).
+ */
 export function* discardAttached(x: X, uids: number[]): Proc {
   if (!uids.length) return
+  if (x.effect === 'attack') yield* emit(x, { type: 'discardedByAttack', cards: uids, attacker: (x as AttackX).attacker })
   moveCards(x, uids, 'discard')
   log(x, null, `Discards ${uids.map(u => nameOf(x, u)).join(', ')}.`)
-  if (x.effect === 'attack') yield* emit(x, { type: 'discardedByAttack', cards: uids, attacker: (x as AttackX).attacker })
 }
 
 /** Choose n Energy attached to a Pokémon and discard them. */
