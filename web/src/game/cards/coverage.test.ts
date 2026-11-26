@@ -11,6 +11,11 @@ const registered = registeredEffects()
 const pendingKeys = Object.keys(pending)
 
 describe('card coverage', () => {
+  it('every catalog effect is implemented', () => {
+    expect(effects.filter(k => !registered.has(k))).toEqual([])
+    expect(pendingKeys).toEqual([])
+  })
+
   it('every catalog effect is implemented or pending', () => {
     const missing = effects.filter(k => !registered.has(k) && !(k in pending))
     expect(missing).toEqual([])

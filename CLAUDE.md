@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-**Poketools** is a multi-user Pokémon TCG deck builder: import decklists (PTCG Live, Limitless) and **test draw** opening hands, which is the core feature. Decks can also be edited and given custom card art and two cover cards. There's deliberately no export. It's a Go REST API with a React + TypeScript SPA embedded in the binary, SQLite on a Fly.io volume.
+**Poketools** is a multi-user Pokémon TCG deck builder: import decklists (PTCG Live, Limitless) and **test draw** opening hands, which is the core feature. Decks can also be edited and given custom card art and two cover cards, and any two decks can be played against each other in the **matchup simulator** (`/play`), a full-rules engine for the LAIC 2026-27 card pool. There's deliberately no export. It's a Go REST API with a React + TypeScript SPA embedded in the binary, SQLite on a Fly.io volume.
 
 It follows the same layout and conventions as the user's other projects started from go-fly-template (calendario, necroLog, palTracker). When in doubt, match necroLog.
 
@@ -15,10 +15,12 @@ make dev              # Run backend + frontend concurrently (port 8080 + 5173)
 make dev-backend      # Build + exec the Go API server (refuses if :8080 is taken)
 make dev-frontend     # Vite dev server only (port 5173)
 make kill-stale       # Kill a leftover dev server holding :8080
-make test             # All Go tests, with -race
+make test             # All Go tests (with -race), then the frontend (vitest) tests
+make test-frontend    # Frontend tests only: catalog, engine, effects, every card, fuzz
+make catalog          # Rebuild the simulator's card catalog (ARGS=--refresh refetches)
 make sqlc             # Regenerate sqlc query code after modifying SQL
 make build            # Production build (frontend compiled into binary, version via ldflags)
-make deploy-check     # Tests + vet + frontend build + clean tree: ready to push to main
+make deploy-check     # Go tests + vet + frontend tests and build + clean tree: ready to push to main
 make deploy-status    # fly status
 make deploy-logs      # fly logs
 ```
@@ -108,8 +110,15 @@ pkg/tcgdex/                          # TCGdex client + 15-minute cache
 web/src/
   api/                               # client.ts (fetch wrapper, 401 event), auth.ts, decks.ts, cards.ts
   hooks/                             # useAuth, useDecks, useDeck, useCardSearch, useCardImages, useBasicPokemon, useDeckCovers, useDebounce
-  pages/                             # LoginPage, HomePage, DeckEditorPage
+  pages/                             # LoginPage, HomePage, DeckEditorPage, PlayPage (lazy)
   components/practice/               # PracticeHandModal, DeckFan, PlayingCard (flip)
+  components/game/                   # Matchup simulator board: Board, PromptPanel, JudgePanel, ZoneViewer, MatchupSetup
+  game/                              # Matchup simulator (pure TS, no React): see "Matchup Simulator"
+    catalog/                         # Generated card data (cards.json, aliases.json, fixtures/) + resolve.ts
+    engine/                          # Rules: state, steps, actions, legalActions, attack, turn, modifiers, events
+    effects/                         # Authoring API: ops, selectors
+    cards/                           # One definition per card: trainers/, energy.ts, pokemon/, pending.ts
+    db.ts                            # Catalog + registered definitions (the game's Db)
   practice/deal.ts                   # Shuffle + mulligan dealing, deck sort
   deck/covers.ts                     # Default cover pick (highest HP) + slot swap
   components/layout/                 # AppShell, Navbar (user email + logout)
@@ -163,6 +172,7 @@ Standard library `testing` only, with fakes over mocks. `make test` runs with `-
 - `internal/card/service_test.go`: `Resolve` ID candidates and Pocket filtering against a fake TCGdex; `pkg/tcgdex/client_test.go`: the client against `httptest`
 - `internal/repository/db_test.go`: migration runner, pragma-per-connection, pre-runner schema replacement
 - `internal/format/*/parser_test.go`: import + roundtrip per format
+- `web/src/game/**/*.test.ts` (vitest, `make test-frontend`): catalog totals and resolution of all 36 fixture decks; engine rules on synthetic cards; one test per effect hook; scenario tests for every non-trivial card on the real catalog; `coverage.test.ts` (every catalog effect has a definition, `pending.ts` empty); `fuzz.test.ts` (each fixture deck vs 2 others with seeded random legal play: card conservation, answerable prompts, replay equals live state)
 
 `internal/server` tests need `web/dist` to exist (it's embedded). CI creates a placeholder; locally, run `make build-frontend` once.
 
@@ -192,11 +202,25 @@ Standard library `testing` only, with fakes over mocks. `make test` runs with `-
 
 App `poketools-k5-rwq`, region `lax`, volume `poketools_data` at `/data`, scale-to-zero.
 
-**There is exactly one path to production: push to main.** `ci.yml` runs vet, build, race tests and the frontend build; `fly-deploy.yml` triggers on CI's `workflow_run`, deploys only if CI succeeded, checks out exactly the tested SHA, and passes it as `VERSION`. Deliberately no `make deploy`. Run `make deploy-check` before pushing.
+**There is exactly one path to production: push to main.** `ci.yml` runs vet, build, race tests, the frontend tests and the frontend build; `fly-deploy.yml` triggers on CI's `workflow_run`, deploys only if CI succeeded, checks out exactly the tested SHA, and passes it as `VERSION`. Deliberately no `make deploy`. Run `make deploy-check` before pushing.
 
-## Removed: Game Board
+## Matchup Simulator
 
-The drag-and-drop game board (`HandDetailPage`, reached from the practice/Test Draw modal) was removed to be redesigned later. It was frontend-only (no backend state). Recover it from git history: PRs #3 and #5–#10, last version at `8aa2b34`.
+`/play?a={deckId}&b={deckId}` plays two of the user's decks against each other, both sides on one screen (hot seat), with every rule and card effect automated. It is frontend-only: no backend state, no migration. It loads as its own chunk.
+
+**Card pool.** The 342 distinct cards played at LAIC 2026-27 São Paulo (Limitless tournament 574). `make catalog` (web/scripts/build-catalog.ts) rebuilds `game/catalog/` from the tournament lists, Limitless card pages (Pokémon text, prints, Tera rule; Ancient / Future / ACE SPEC tags from Limitless search) and TCGdex (trainer and energy text of the exact print). It fails if totals drift from 342 = 201/46/43/12/19/8/13. Output is committed; `web/scripts/catalog-report.md` lists source differences. `resolveEntry` matches a deck entry by print, then TCGdex id, then (trainers and energy only) name; a deck with cards outside the pool can't start.
+
+**Engine (`game/engine/`).** A game is `{seed, decks, steps}`; a step is an action plus the answers to the prompts it raised. Procedures are generators that yield prompts; answering re-runs the step from its checkpoint with one more answer, so state is plain data and undo works per answer. The seeded RNG lives in the state. `legalActions` enumerates every legal action and `perform` rejects anything else. Judge overrides are steps too. `useGame` saves the record under `matchup-{a}-{b}` and replays it on reload; it's dropped when either deck's contents change.
+
+**Card behaviour.** `cards/` registers one `CardImpl` per catalog id (`defineCard`), written from the catalog text quoted above it:
+- attacks: generators using the ops in `effects/` (`damageActive`, `damage`, `placeCounters`, searches, …); no definition means printed damage only
+- abilities: activated (`use`, `canUse`, `limit`, `group`, `fromHand`), passive `modifiers`, or event handlers (`on.evolved`, `on.playedToBench`, `on.checkup`, …)
+- trainers: `play` / `canPlay` / `firstTurn`, Stadium `action`, Tool `canAttach`; Special Energy: `provides`, `canAttach`
+- timed effects are markers (`defineMarker` + `addMarker`); shared ones live in `cards/pokemon/common.ts`
+
+The engine collects modifiers (`engine/modifiers.ts`) from rules, the Stadium, markers and each Pokémon's abilities, Tools and Special Energy, and queries them at fixed points (HP, costs, Energy provided, the damage pipeline, prevention, locks, Prize count, evolution rules). Ability locks resolve in two stages: rules / Stadium / markers first, then locking abilities not switched off by stage 1.
+
+**Adding a card.** Write its definition in the matching `cards/` file, run `npx vite-node scripts/prune-pending.ts` (from `web/`) if it was pending, and add a scenario test with `cards/testkit.ts` (`setup`, `drive`, `answers`). `coverage.test.ts` fails on a catalog effect without a definition or a card defined twice. If the pool changes, rerun `make catalog` and expect new entries to show up as missing coverage.
 
 ## Adding a New Decklist Format
 
