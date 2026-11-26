@@ -1,6 +1,8 @@
 import type { CatalogAttack, CatalogCard, EnergyType } from '../catalog/types'
+import type { WeaknessResistance } from '../catalog/types'
+import { allowed, each, implOf } from './modifiers'
 import { shuffleInPlace } from './rng'
-import type { Ctx, PlayerId, PlayerState, Slot } from './types'
+import type { Ctx, PlayerId, PlayerState, Slot, TurnRecord } from './types'
 
 // Queries and small state changes shared by every procedure. The effect
 // package (milestone 4) hooks its modifiers into the queries here, so the
@@ -78,8 +80,10 @@ export function newSlot(uid: number, turn: number): Slot {
   }
 }
 
-export function benchLimit(_ctx: Ctx, _p: PlayerId): number {
-  return MAX_BENCH
+export function benchLimit(ctx: Ctx, p: PlayerId): number {
+  let n = MAX_BENCH
+  for (const [src, f] of each(ctx, 'benchSize')) n = Math.max(n, f(src, ctx, p) ?? 0)
+  return n
 }
 
 /** Is it this player's first turn of the game? */
@@ -90,7 +94,9 @@ export function isFirstTurn(ctx: Ctx, p: PlayerId): boolean {
 // ── stats ────────────────────────────────────────────────────────────────
 
 export function maxHp(ctx: Ctx, slot: Slot): number {
-  return topCard(ctx, slot).hp ?? 0
+  let hp = topCard(ctx, slot).hp ?? 0
+  for (const [src, f] of each(ctx, 'hp')) hp += f(src, ctx, slot)
+  return Math.max(0, hp)
 }
 
 export function remainingHp(ctx: Ctx, slot: Slot): number {
@@ -98,15 +104,43 @@ export function remainingHp(ctx: Ctx, slot: Slot): number {
 }
 
 export function retreatCost(ctx: Ctx, slot: Slot): number {
-  return topCard(ctx, slot).retreat ?? 0
+  let cost = topCard(ctx, slot).retreat ?? 0
+  let none = false
+  for (const [src, f] of each(ctx, 'retreatCost')) {
+    const r = f(src, ctx, slot)
+    if (r === 'none') none = true
+    else cost += r
+  }
+  return none ? 0 : Math.max(0, cost)
 }
 
 export function attacksOf(ctx: Ctx, slot: Slot): CatalogAttack[] {
   return topCard(ctx, slot).attacks ?? []
 }
 
-export function attackCost(_ctx: Ctx, _slot: Slot, attack: CatalogAttack): EnergyType[] {
-  return attack.cost
+/** The Pokémon's own attacks plus any it can borrow (Mew ex), with the card each is printed on. */
+export function usableAttacks(ctx: Ctx, slot: Slot): { cardId: string; attack: CatalogAttack; own: boolean }[] {
+  const top = topCard(ctx, slot)
+  const out = attacksOf(ctx, slot).map(attack => ({ cardId: top.id, attack, own: true }))
+  for (const [src, f] of each(ctx, 'extraAttacks')) {
+    for (const e of f(src, ctx, slot)) {
+      const attack = ctx.db.card(e.cardId).attacks?.find(a => a.name === e.attack)
+      if (attack && !out.some(o => o.cardId === e.cardId && o.attack.name === attack.name)) out.push({ cardId: e.cardId, attack, own: false })
+    }
+  }
+  return out
+}
+
+export function attackCost(ctx: Ctx, slot: Slot, attack: CatalogAttack): EnergyType[] {
+  let cost = attack.cost
+  for (const [src, f] of each(ctx, 'attackCost')) cost = f(src, ctx, slot, attack, cost)
+  return cost
+}
+
+export function weaknessOf(ctx: Ctx, slot: Slot): WeaknessResistance | null {
+  let w = topCard(ctx, slot).weakness ?? null
+  for (const [src, f] of each(ctx, 'weakness')) w = f(src, ctx, slot, w)
+  return w
 }
 
 /** Prize cards the opponent takes when this Pokémon is Knocked Out. */
@@ -132,10 +166,13 @@ export type EnergyUnit = EnergyType | 'Any'
  * list of units. Basic Energy provides its type. Special Energy provides
  * {C} until its definition says otherwise (milestone 6).
  */
-export function energyAlternatives(ctx: Ctx, _slot: Slot, uid: number): EnergyUnit[][] {
+export function energyAlternatives(ctx: Ctx, slot: Slot, uid: number): EnergyUnit[][] {
   const c = cardOf(ctx, uid)
-  if (c.subtype === 'Basic' && c.energyType) return [[c.energyType]]
-  return [['Colorless']]
+  let alts: EnergyUnit[][]
+  if (c.subtype === 'Basic' && c.energyType) alts = [[c.energyType]]
+  else alts = implOf(ctx, uid)?.energy?.provides?.(ctx, slot, uid) ?? [['Colorless']]
+  for (const [src, f] of each(ctx, 'energy')) alts = f(src, ctx, slot, uid, alts)
+  return alts
 }
 
 /** Units an Energy card counts for when paying a Retreat Cost. */
@@ -171,6 +208,41 @@ export function canPay(ctx: Ctx, slot: Slot, cost: EnergyType[]): boolean {
 }
 
 // ── state changes ────────────────────────────────────────────────────────
+
+// ── turn history ─────────────────────────────────────────────────────────
+
+const HISTORY = 4
+
+export function newTurnRecord(turn: number, player: PlayerId): TurnRecord {
+  return { turn, player, knockOuts: [], attacks: [], movedToActive: [], supporters: [], abilities: [], stadiumUsed: false }
+}
+
+/** This turn's record. */
+export function thisTurn(ctx: Ctx): TurnRecord {
+  const h = ctx.s.history
+  if (!h.length || h[h.length - 1].turn !== ctx.s.turn) {
+    h.push(newTurnRecord(ctx.s.turn, ctx.s.turnPlayer))
+    if (h.length > HISTORY) h.shift()
+  }
+  return h[h.length - 1]
+}
+
+/** The record of a turn `ago` turns back (1 = the previous turn), if kept. */
+export function turnAgo(ctx: Ctx, ago: number): TurnRecord | undefined {
+  return ctx.s.history.find(r => r.turn === ctx.s.turn - ago)
+}
+
+/** The given player's last turn before this one. */
+export function lastTurnOf(ctx: Ctx, p: PlayerId): TurnRecord | undefined {
+  return [...ctx.s.history].reverse().find(r => r.player === p && r.turn < ctx.s.turn)
+}
+
+// ── permissions ──────────────────────────────────────────────────────────
+
+export const canHeal = (ctx: Ctx, slot: Slot) => allowed(ctx, 'canHeal', slot)
+export const canRetreatNow = (ctx: Ctx, slot: Slot) => allowed(ctx, 'canRetreat', slot)
+export const canMoveCounters = (ctx: Ctx) => allowed(ctx, 'canMoveCounters')
+export const canPlayCard = (ctx: Ctx, p: PlayerId, uid: number) => allowed(ctx, 'canPlay', p, uid)
 
 export function log(ctx: Ctx, player: PlayerId | null, text: string): void {
   ctx.s.log.push({ turn: ctx.s.turn, player, text })
@@ -210,12 +282,20 @@ export function switchActive(ctx: Ctx, p: PlayerId, benchId: number): void {
   pl.active = pl.bench[i]
   clearConditions(old)
   pl.bench[i] = old
+  leftActive(ctx, old)
+  thisTurn(ctx).movedToActive.push(pl.active.id)
+}
+
+/** Effects on a Pokémon end when it moves to the Bench or evolves, unless sticky. */
+export function leftActive(ctx: Ctx, slot: Slot): void {
+  ctx.s.markers = ctx.s.markers.filter(m => m.slot !== slot.id || m.sticky)
 }
 
 /** Moves a Pokémon and everything attached to its owner's discard pile. */
 export function discardSlot(ctx: Ctx, slot: Slot): void {
   const p = slotOwner(ctx, slot)
   const pl = ctx.s.players[p]
+  ctx.s.markers = ctx.s.markers.filter(m => m.slot !== slot.id)
   if (pl.active?.id === slot.id) pl.active = null
   else pl.bench = pl.bench.filter(s => s.id !== slot.id)
   for (const uid of slotCards(slot)) pl.discard.push(uid)
@@ -236,5 +316,6 @@ export function allZoneCards(ctx: Ctx): number[] {
     for (const slot of inPlay(pl)) out.push(...slotCards(slot))
   }
   if (ctx.s.stadium !== null) out.push(ctx.s.stadium)
+  out.push(...ctx.s.resolving)
   return out
 }

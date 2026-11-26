@@ -1,10 +1,13 @@
+import { emit } from './events'
+import type { KnockOutEvent } from './impl'
+import { each } from './modifiers'
 import { ask } from './prompt'
 import { coin } from './rng'
 import {
   HAND_SIZE, PRIZES, benchLimit, cardOf, clearConditions, discardSlot, draw, inPlay, isBasicPokemon,
-  log, maxHp, newSlot, other, prizeValue, shuffleDeck, slotName, slotOwner, takeFromZone,
+  log, maxHp, newSlot, other, prizeValue, shuffleDeck, slotName, slotOwner, takeFromZone, thisTurn, topCard,
 } from './rules'
-import type { Ctx, PlayerId, Proc, Slot } from './types'
+import type { Ctx, GameState, PlayerId, Proc, Slot } from './types'
 
 const MAX_MULLIGANS = 100
 
@@ -80,6 +83,7 @@ export function resetFlags(ctx: Ctx, p: PlayerId): void {
 export function startTurn(ctx: Ctx): void {
   const p = ctx.s.turnPlayer
   resetFlags(ctx, p)
+  thisTurn(ctx)
   log(ctx, p, `Turn ${ctx.s.turn}.`)
   if (!draw(ctx, p, 1)) {
     log(ctx, p, 'Can\'t draw: deck is empty.')
@@ -88,8 +92,12 @@ export function startTurn(ctx: Ctx): void {
 }
 
 export function* endTurn(ctx: Ctx): Proc {
+  yield* emit(ctx, { type: 'turnEnd', player: ctx.s.turnPlayer })
+  yield* resolveKnockOuts(ctx)
+  if (isOver(ctx.s)) return
   yield* checkup(ctx)
-  if (ctx.s.phase === 'over') return
+  if (isOver(ctx.s)) return
+  ctx.s.markers = ctx.s.markers.filter(m => m.until > ctx.s.turn)
   ctx.s.turn++
   ctx.s.turnPlayer = other(ctx.s.turnPlayer)
   startTurn(ctx)
@@ -104,8 +112,10 @@ export function* checkup(ctx: Ctx): Proc {
     if (!slot) continue
     const name = slotName(ctx, slot)
     if (slot.poisoned) {
-      slot.damage += 10
-      log(ctx, p, `${name} takes 1 damage counter from Poison.`)
+      let counters = 1
+      for (const [src, f] of each(ctx, 'poisonCounters')) counters += f(src, ctx, slot)
+      slot.damage += 10 * counters
+      log(ctx, p, `${name} takes ${counters} damage counter${counters === 1 ? '' : 's'} from Poison.`)
     }
     if (slot.burned) {
       slot.damage += 20
@@ -123,10 +133,16 @@ export function* checkup(ctx: Ctx): Proc {
       log(ctx, p, `${name} recovers from Paralysis.`)
     }
   }
+  yield* emit(ctx, { type: 'checkup' })
   yield* resolveKnockOuts(ctx)
 }
 
 // ── knock outs and winning ───────────────────────────────────────────────
+
+/** A function, not an inline check, so TypeScript doesn't narrow `phase` across yields. */
+export function isOver(s: GameState): boolean {
+  return s.phase === 'over'
+}
 
 export function endGame(ctx: Ctx, winner: PlayerId | 'draw'): void {
   ctx.s.phase = 'over'
@@ -138,9 +154,10 @@ export function endGame(ctx: Ctx, winner: PlayerId | 'draw'): void {
 /**
  * Knocks Out every Pokémon whose damage reaches its HP, gives out Prize
  * cards, checks the win conditions, and has each player promote a new
- * Active if theirs was Knocked Out.
+ * Active if theirs was Knocked Out. `afterAttack`: Pokémon an opponent's
+ * attack damaged this turn count as Knocked Out by that attack.
  */
-export function* resolveKnockOuts(ctx: Ctx): Proc {
+export function* resolveKnockOuts(ctx: Ctx, afterAttack = false): Proc {
   const s = ctx.s
   const knocked: Slot[] = []
   for (const p of [0, 1] as PlayerId[]) {
@@ -149,11 +166,20 @@ export function* resolveKnockOuts(ctx: Ctx): Proc {
   if (!knocked.length && s.players.every(pl => pl.active)) return
 
   const prizesFor: [number, number] = [0, 0]
-  for (const slot of knocked) {
+  const events: KnockOutEvent[] = knocked.map(slot => {
     const owner = slotOwner(ctx, slot)
-    prizesFor[other(owner)] += prizeValue(ctx, slot)
-    log(ctx, owner, `${slotName(ctx, slot)} is Knocked Out.`)
-    discardSlot(ctx, slot)
+    const byAttack = afterAttack && slot.hitBy?.turn === s.turn && slot.hitBy.player !== owner
+    return { slot, owner, byAttack, attackerOwner: byAttack ? slot.hitBy!.player : null }
+  })
+  for (const ko of events) {
+    let n = prizeValue(ctx, ko.slot)
+    for (const [src, f] of each(ctx, 'prizes')) n += f(src, ctx, ko)
+    prizesFor[other(ko.owner)] += Math.max(0, n)
+  }
+  for (const ko of events) {
+    thisTurn(ctx).knockOuts.push({ slot: ko.slot.id, owner: ko.owner, cardId: topCard(ctx, ko.slot).id, byAttack: ko.byAttack })
+    log(ctx, ko.owner, `${slotName(ctx, ko.slot)} is Knocked Out.`)
+    discardSlot(ctx, ko.slot)
   }
   for (const p of [0, 1] as PlayerId[]) if (prizesFor[p]) takePrizes(ctx, p, prizesFor[p])
 
@@ -172,6 +198,7 @@ export function promote(ctx: Ctx, p: PlayerId, benchId: number): void {
   const i = pl.bench.findIndex(b => b.id === benchId)
   pl.active = pl.bench.splice(i, 1)[0]
   clearConditions(pl.active)
+  thisTurn(ctx).movedToActive.push(pl.active.id)
   log(ctx, p, `${slotName(ctx, pl.active)} is now Active.`)
 }
 
