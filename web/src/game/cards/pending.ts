@@ -1,0 +1,700 @@
+// Every catalog effect not yet implemented, with the primitives it needs
+// (see taxonomy.ts). Classified from the catalog texts in milestone 2.
+// coverage.test.ts fails if an effect is neither registered nor listed
+// here. Each milestone that implements cards removes their entries; at the
+// end this is empty.
+
+import type { EffectKey } from './effectKeys'
+import type { Primitive } from './taxonomy'
+
+export const pending: Record<EffectKey, Primitive[]> = {
+  // Abra
+  "MEG-54#attack:Teleportation Attack": ["switchSelf"],
+  "TWM-80#ability:Teleporter": ["shuffleIntoDeck", "oncePerTurn", "activeOnly"],
+  // Alakazam
+  "MEG-56#ability:Psychic Draw": ["draw", "onEvolve", "oncePerTurn"],
+  "MEG-56#attack:Powerful Hand": ["placeCounters", "scaleDamage"],
+  "TWM-82#attack:Strange Hacking": ["moveCounters", "applyCondition"],
+  "TWM-82#attack:Psychic": ["scaleDamage"],
+  // Annihilape
+  "PBL-41#ability:Durable Body": ["flip", "surviveKnockOut"],
+  "PBL-41#attack:Ghostly Blow": ["placeCounters"],
+  "SSP-100#attack:Tantrum": ["applyCondition"],
+  "SSP-100#attack:Destined Fight": ["knockOut"],
+  // Applin
+  "TWM-126#attack:Find a Friend": ["searchDeck", "shuffleDeck"],
+  "TWM-17#attack:Tumbling Attack": ["flip", "conditionalDamage"],
+  // Arboliva ex
+  "DRI-23#attack:Oil Salvo": ["damage", "ignoreWeaknessResistance"],
+  "DRI-23#attack:Aroma Shot": ["removeConditions"],
+  // Azurill
+  "DLR-80#attack:Bouncy-Bounce Charge": ["searchAttach", "shuffleDeck"],
+  // Banette
+  "PBL-34#ability:Hide 'n' Sneak": ["preventEffects"],
+  "PBL-34#attack:Puppet Pull": ["searchDeck", "shuffleDeck"],
+  // Bayleef
+  "MEG-9#attack:Push Down": ["pushOut"],
+  // Beedrill ex
+  "CRI-3#attack:Rumbling Bees": ["scaleDamage"],
+  // Beldum
+  "TEF-113#attack:Iron Tackle": ["selfDamage"],
+  // Blaziken ex
+  "JTG-24#ability:Seething Spirit": ["attachFromDiscard", "oncePerTurn"],
+  "JTG-24#attack:Smolder-sault": ["attackLock", "timedMarker"],
+  // Bloodmoon Ursaluna ex
+  "TWM-141#ability:Seasoned Skill": ["attackCost"],
+  "TWM-141#attack:Blood Moon": ["attackLock", "timedMarker"],
+  // Budew
+  "ASC-16#attack:Itchy Pollen": ["playLock", "timedMarker"],
+  // Bulbasaur
+  "MEG-1#attack:Bind Down": ["retreatLock", "timedMarker"],
+  // Buneary
+  "MEG-107#attack:Charm": ["damageReduction", "timedMarker"],
+  "PFL-83#attack:Run Around": ["switchSelf"],
+  // Cacnea
+  "DLR-4#attack:Knock Away": ["flip", "conditionalDamage"],
+  // Cacturne
+  "DLR-5#attack:Linear Attack": ["damage", "ignoreWeaknessResistance"],
+  "DLR-5#attack:Punishing Needles": ["scaleDamage"],
+  // Carvanha
+  "PFL-60#attack:Reckless Charge": ["selfDamage"],
+  // Celebi
+  "MEG-12#attack:Traverse Time": ["searchDeck", "shuffleDeck"],
+  // Charmander
+  "PFL-11#ability:Agile": ["retreatCost"],
+  // Chi-Yu
+  "PBL-59#attack:Whirling Envy": ["conditionalDamage", "ignoreWeaknessResistance"],
+  "TWM-39#attack:Allure": ["draw"],
+  "TWM-39#attack:Ground Melter": ["discardStadium", "conditionalDamage"],
+  // Chien-Pao
+  "SSP-56#ability:Snow Sink": ["discardStadium", "onPlayToBench"],
+  "SSP-56#attack:Icicle Loop": ["energyToHand"],
+  // Chikorita
+  "ASC-8#attack:Growl": ["damageReduction", "timedMarker"],
+  // Cofagrigus
+  "SSP-83#attack:Law of the Underworld": ["placeCounters"],
+  // Combusken
+  "DRI-41#attack:Double Kick": ["flip", "scaleDamage"],
+  // Cornerstone Mask Ogerpon ex
+  "TWM-112#ability:Cornerstone Stance": ["preventDamage"],
+  "TWM-112#attack:Demolish": ["ignoreWeaknessResistance"],
+  // Crustle
+  "DRI-12#ability:Mysterious Rock Inn": ["preventDamage"],
+  "DRI-12#attack:Superb Scissors": ["ignoreDefenderEffects"],
+  // Cynthia's Gabite
+  "DRI-103#ability:Champion's Call": ["searchDeck", "shuffleDeck", "oncePerTurn"],
+  // Cynthia's Garchomp ex
+  "DRI-104#attack:Corkscrew Dive": ["drawUntil"],
+  "DRI-104#attack:Draconic Buster": ["discardEnergy"],
+  // Cynthia's Gible
+  "DRI-102#attack:Rock Hurl": ["ignoreWeaknessResistance"],
+  // Cynthia's Roserade
+  "DRI-8#ability:Cheer On to Glory": ["damageBonus"],
+  // Cynthia's Spiritomb
+  "DRI-129#attack:Raging Curse": ["scaleDamage", "ignoreWeaknessResistance"],
+  // Dedenne
+  "SSP-87#attack:Electromagnetic Sonar": ["recoverFromDiscard"],
+  // Dhelmise
+  "PBL-39#attack:Vengeful Anchor": ["conditionalDamage"],
+  // Dipplin
+  "TWM-18#ability:Festival Lead": ["attackTwice"],
+  "TWM-18#attack:Do the Wave": ["scaleDamage"],
+  // Dolliv
+  "DRI-22#attack:Nutrients": ["heal"],
+  // Dragapult ex
+  "TWM-130#attack:Phantom Dive": ["placeCounters", "distributeCounters"],
+  // Drakloak
+  "TWM-129#ability:Recon Directive": ["lookAtTop", "oncePerTurn"],
+  // Drapion
+  "POR-52#attack:Hazardous Tail": ["selfDamage", "applyCondition"],
+  // Drilbur
+  "PBL-46#attack:Call for Family": ["searchToBench", "shuffleDeck"],
+  // Dudunsparce
+  "TEF-129#ability:Run Away Draw": ["draw", "shuffleIntoDeck", "oncePerTurn"],
+  // Dudunsparce ex
+  "JTG-121#attack:Tenacious Tail": ["scaleDamage"],
+  "JTG-121#attack:Destructive Drill": ["ignoreDefenderEffects"],
+  // Dunsparce
+  "JTG-120#attack:Trading Places": ["switchSelf"],
+  "TEF-128#attack:Dig": ["flip", "preventDamage", "preventEffects", "timedMarker"],
+  // Dusclops
+  "PRE-36#ability:Cursed Blast": ["placeCounters", "knockOut", "oncePerTurn"],
+  // Dusknoir
+  "PRE-37#ability:Cursed Blast": ["placeCounters", "knockOut", "oncePerTurn"],
+  "PRE-37#attack:Shadow Bind": ["retreatLock", "timedMarker"],
+  // Duskull
+  "PRE-35#attack:Come and Get You": ["discardToBench"],
+  // Dwebble
+  "DRI-11#attack:Ascension": ["searchEvolve", "shuffleDeck"],
+  // Eevee ex
+  "PRE-75#ability:Rainbow DNA": ["evolutionRule", "firstTurnRule"],
+  // Empoleon ex
+  "PFL-70#ability:Emperor's Stance": ["preventEffects"],
+  "PFL-70#attack:Iron Feathers": ["damageReduction", "timedMarker"],
+  // Enamorus
+  "TWM-93#attack:Love Resonance": ["conditionalDamage"],
+  // Ethan's Cyndaquil
+  "DRI-32#attack:Ember": ["discardEnergy"],
+  // Ethan's Ho-Oh ex
+  "DRI-39#ability:Golden Flame": ["attachFromHand", "oncePerTurn"],
+  "DRI-39#attack:Shining Feathers": ["heal"],
+  // Ethan's Quilava
+  "DRI-33#ability:Bonded by the Journey": ["searchDeck", "shuffleDeck", "oncePerTurn"],
+  // Ethan's Typhlosion
+  "DRI-34#attack:Buddy Blast": ["scaleDamage"],
+  // Fan Rotom
+  "SCR-118#ability:Fan Call": ["searchDeck", "shuffleDeck", "oncePerTurn", "firstTurnRule"],
+  "SCR-118#attack:Assault Landing": ["conditionalDamage"],
+  // Fezandipiti ex
+  "ASC-142#ability:Flip the Script": ["draw", "oncePerTurn", "turnHistory"],
+  "ASC-142#attack:Cruel Arrow": ["damage", "ignoreWeaknessResistance"],
+  // Flutter Mane
+  "TEF-78#ability:Midnight Fluttering": ["activeOnly", "abilityLock"],
+  "TEF-78#attack:Hex Hurl": ["placeCounters", "distributeCounters"],
+  // Frillish
+  "WHT-44#attack:Oceanic Gloom": ["playLock", "timedMarker"],
+  // Froakie
+  "CRI-20#attack:Collect": ["draw"],
+  // Frogadier
+  "CRI-21#attack:Summoning Jutsu": ["searchDeck", "shuffleDeck"],
+  // Froslass
+  "TWM-53#ability:Freezing Shroud": ["placeCounters", "onCheckup"],
+  // Genesect
+  "SFA-40#ability:ACE Nullifier": ["playLock"],
+  // Genesect ex
+  "BLK-67#ability:Metallic Signal": ["searchDeck", "shuffleDeck", "oncePerTurn"],
+  "BLK-67#attack:Protect Charge": ["damageReduction", "timedMarker"],
+  // Giratina
+  "DLR-45#attack:Chaos Crawler": ["preventDamage", "attackLock", "timedMarker", "turnHistory"],
+  // Goldeen
+  "TWM-44#ability:Festival Lead": ["attackTwice"],
+  "TWM-44#attack:Whirlpool": ["discardEnergy", "flip"],
+  // Greninja ex
+  "30C-21#attack:Stealthy Slash": ["damage", "scaleDamage", "ignoreWeaknessResistance"],
+  "TWM-106#attack:Shinobi Blade": ["searchDeck", "shuffleDeck"],
+  "TWM-106#attack:Mirage Barrage": ["discardEnergy", "damage", "ignoreWeaknessResistance"],
+  // Hariyama
+  "MEG-73#ability:Heave-Ho Catcher": ["gust", "onEvolve", "oncePerTurn"],
+  "MEG-73#attack:Wild Press": ["selfDamage"],
+  // Haxorus
+  "BLK-70#attack:Cross-Cut": ["conditionalDamage"],
+  "BLK-70#attack:Axe Blast": ["knockOut"],
+  // Hoothoot
+  "SCR-114#attack:Triple Stab": ["flip", "scaleDamage"],
+  // Hydrapple ex
+  "SCR-14#ability:Ripening Charge": ["attachFromHand", "heal", "oncePerTurn"],
+  "SCR-14#attack:Syrup Storm": ["scaleDamage"],
+  // Iron Crown ex
+  "TEF-81#ability:Cobalt Command": ["damageBonus"],
+  "TEF-81#attack:Twin Shotels": ["damage", "ignoreWeaknessResistance"],
+  // Iron Leaves ex
+  "TEF-25#ability:Rapid Vernier": ["moveEnergy", "switchSelf", "onPlayToBench"],
+  "TEF-25#attack:Prism Edge": ["attackLock", "timedMarker"],
+  // Iron Thorns ex
+  "TWM-77#ability:Initialization": ["abilityLock", "activeOnly"],
+  "TWM-77#attack:Volt Cyclone": ["moveEnergy"],
+  // Jirachi ex
+  "30C-102#attack:Wish Granter": ["drawUntil"],
+  "30C-102#attack:Swift": ["ignoreWeaknessResistance"],
+  // Jolteon ex
+  "PRE-30#attack:Flashing Spear": ["discardEnergy", "scaleDamage"],
+  "PRE-30#attack:Dravite": ["attackLock", "timedMarker"],
+  // Kadabra
+  "MEG-55#ability:Psychic Draw": ["draw", "onEvolve", "oncePerTurn"],
+  // Kakuna
+  "CRI-2#ability:Exoskeleton": ["damageReduction"],
+  // Koraidon ex
+  "ASC-121#attack:Orichalcum Fang": ["conditionalDamage", "turnHistory"],
+  "ASC-121#attack:Impact Blow": ["attackLock", "timedMarker"],
+  // Kyurem
+  "SFA-47#ability:Plasma Bane": ["attackCost"],
+  "SFA-47#attack:Trifrost": ["discardEnergy", "damage", "ignoreWeaknessResistance"],
+  // Latias ex
+  "SSP-76#ability:Skyliner": ["retreatCost"],
+  "SSP-76#attack:Eon Blade": ["attackLock", "timedMarker"],
+  // Lillie's Clefairy ex
+  "JTG-56#ability:Fairy Zone": ["weaknessChange"],
+  "JTG-56#attack:Full Moon Rondo": ["scaleDamage"],
+  // Lucario
+  "30C-83#attack:Aura Sphere": ["damage", "ignoreWeaknessResistance"],
+  // Lugia
+  "30C-121#attack:Elemental Blast": ["discardEnergy"],
+  // Lunatone
+  "MEG-74#ability:Lunar Cycle": ["draw", "discardFromHand", "oncePerTurn", "playCondition"],
+  // Marnie's Grimmsnarl ex
+  "DRI-136#ability:Punk Up": ["searchAttach", "shuffleDeck", "onEvolve"],
+  "DRI-136#attack:Shadow Bullet": ["damage", "ignoreWeaknessResistance"],
+  // Marnie's Impidimp
+  "DRI-134#attack:Filch": ["draw"],
+  // Mega Charizard X ex
+  "PFL-13#attack:Inferno X": ["discardEnergy", "scaleDamage"],
+  // Mega Charizard Y ex
+  "ASC-22#attack:Explosion Y": ["discardEnergy", "damage", "ignoreWeaknessResistance"],
+  // Mega Excadrill ex
+  "PBL-65#attack:Undermine": ["discardDeckTop"],
+  "PBL-65#attack:Maximum Drilling": ["conditionalDamage"],
+  // Mega Froslass ex
+  "ASC-47#attack:Resentful Refrain": ["scaleDamage"],
+  "ASC-47#attack:Absolute Snow": ["applyCondition"],
+  // Mega Greninja ex
+  "CRI-22#ability:Mortal Shuriken": ["discardFromHand", "placeCounters", "oncePerTurn", "activeOnly", "playCondition"],
+  "CRI-22#attack:Ninja Spinner": ["energyToHand", "conditionalDamage"],
+  // Mega Kangaskhan ex
+  "MEG-104#ability:Run Errand": ["draw", "oncePerTurn", "activeOnly"],
+  "MEG-104#attack:Rapid-Fire Combo": ["flip", "scaleDamage"],
+  // Mega Latias ex
+  "MEG-100#attack:Strafe": ["switchSelf"],
+  "MEG-100#attack:Illusory Impulse": ["discardEnergy"],
+  // Mega Lopunny ex
+  "PFL-84#attack:Gale Thrust": ["conditionalDamage", "turnHistory"],
+  "PFL-84#attack:Spiky Hopper": ["ignoreDefenderEffects"],
+  // Mega Lucario ex
+  "MEG-77#attack:Aura Jab": ["attachFromDiscard"],
+  "MEG-77#attack:Mega Brave": ["attackLock", "timedMarker"],
+  // Mega Rayquaza ex
+  "DLR-84#ability:Ruler's Roar": ["lookAtTop", "shuffleDeck", "onPlayToBench", "oncePerTurn"],
+  "DLR-84#attack:Storm Emerald": ["scaleDamage"],
+  // Mega Sharpedo ex
+  "PFL-61#attack:Greedy Fang": ["draw"],
+  "PFL-61#attack:Hungry Jaws": ["conditionalDamage"],
+  // Mega Skarmory ex
+  "POR-55#attack:Sonic Ripper": ["energyToDeck", "damage", "ignoreWeaknessResistance"],
+  // Mega Starmie ex
+  "POR-21#attack:Jetting Blow": ["damage", "ignoreWeaknessResistance"],
+  "POR-21#attack:Nebula Beam": ["ignoreWeaknessResistance"],
+  // Mega Venusaur ex
+  "MEG-3#ability:Solar Transfer": ["moveEnergy", "repeatable"],
+  "MEG-3#attack:Jungle Dump": ["heal"],
+  // Meganium
+  "MEG-10#ability:Wild Growth": ["energyProvided"],
+  // Meowth ex
+  "POR-62#ability:Last-Ditch Catch": ["searchDeck", "shuffleDeck", "onPlayToBench", "oncePerTurn"],
+  "POR-62#attack:Tuck Tail": ["scoop"],
+  // Metagross
+  "CRI-61#attack:Bounce Back": ["pushOut"],
+  "CRI-61#attack:Metallic Hammer": ["discardEnergy", "conditionalDamage"],
+  // Metang
+  "TEF-114#ability:Metal Maker": ["lookAtTop", "shuffleDeck", "oncePerTurn"],
+  // Mew ex
+  "30C-66#ability:Memory Helix": ["copyAttack"],
+  "30C-66#attack:Teleportation Burst": ["switchSelf"],
+  // Moltres
+  "PFL-14#attack:Fighting Wings": ["conditionalDamage"],
+  // Munkidori
+  "TWM-95#ability:Adrena-Brain": ["moveCounters", "oncePerTurn"],
+  "TWM-95#attack:Mind Bend": ["applyCondition"],
+  // N's Darmanitan
+  "JTG-27#attack:Back Draft": ["scaleDamage"],
+  "JTG-27#attack:Flamebody Cannon": ["discardEnergy", "damage", "ignoreWeaknessResistance"],
+  // N's Purrloin
+  "JTG-96#attack:Thieving Swipe": ["revealHand"],
+  // N's Reshiram
+  "JTG-116#attack:Powerful Rage": ["scaleDamage"],
+  // N's Zekrom
+  "ASC-155#attack:Shred": ["ignoreDefenderEffects"],
+  "ASC-155#attack:Rampaging Thunder": ["attackLock", "timedMarker"],
+  // N's Zoroark ex
+  "JTG-98#ability:Trade": ["draw", "discardFromHand", "oncePerTurn", "playCondition"],
+  "JTG-98#attack:Night Joker": ["copyAttack"],
+  // Noctowl
+  "SCR-115#ability:Jewel Seeker": ["searchDeck", "shuffleDeck", "onEvolve", "oncePerTurn"],
+  // Okidogi
+  "TWM-111#ability:Adrena-Power": ["damageBonus", "hpBonus"],
+  // Oricorio ex
+  "PFL-18#ability:Excited Turbo": ["repeatable", "attachFromHand"],
+  // Paldean Tauros
+  "SSP-18#attack:Spirited Tackle": ["conditionalDamage"],
+  // Passimian
+  "SSP-111#attack:Coordinated Throwing": ["scaleDamage"],
+  // Patrat
+  "CRI-70#ability:Watchful Eye": ["counterMoveLock"],
+  // Pawmot
+  "PFL-34#attack:Voltaic Fist": ["applyCondition", "selfDamage"],
+  // Pecharunt
+  "SVP-149#ability:Toxic Subjugation": ["placeCounters", "onCheckup", "activeOnly"],
+  "SVP-149#attack:Poison Chain": ["applyCondition", "retreatLock", "timedMarker"],
+  // Pecharunt ex
+  "SFA-39#ability:Subjugating Chains": ["switchSelf", "applyCondition", "oncePerTurn"],
+  "SFA-39#attack:Irritated Outburst": ["scaleDamage"],
+  // Pikipek
+  "PBL-66#attack:Double Stab": ["flip", "scaleDamage"],
+  // Piplup
+  "PFL-27#attack:Call for Support": ["searchDeck", "shuffleDeck"],
+  // Poltchageist
+  "PBL-5#ability:Hide 'n' Sneak": ["preventEffects"],
+  "PBL-5#attack:Furtive Drop": ["placeCounters"],
+  // Psyduck
+  "ASC-39#ability:Damp": ["abilityLock"],
+  // Rabsca
+  "TEF-24#ability:Spherical Shield": ["preventDamage"],
+  "TEF-24#attack:Psychic": ["scaleDamage"],
+  // Raging Bolt ex
+  "TEF-123#attack:Burst Roar": ["draw", "discardHand"],
+  "TEF-123#attack:Bellowing Thunder": ["discardEnergy", "scaleDamage"],
+  // Regigigas
+  "PRE-86#attack:Jewel Breaker": ["conditionalDamage"],
+  // Rellor
+  "DRI-24#attack:Collect": ["draw"],
+  "TEF-23#attack:Slight Intrusion": ["selfDamage"],
+  // Reshiram
+  "30C-14#attack:Laser Flame": ["conditionalDamage"],
+  // Reshiram ex
+  "WHT-20#attack:Blazing Burst": ["discardEnergy", "scaleDamage"],
+  // Riolu
+  "MEG-76#attack:Accelerating Stab": ["attackLock", "timedMarker"],
+  "PRE-50#attack:Quick Attack": ["flip", "conditionalDamage"],
+  // Seaking
+  "PRE-21#ability:Festival Lead": ["attackTwice"],
+  "PRE-21#attack:Rapid Draw": ["draw"],
+  // Shaymin
+  "DRI-10#ability:Flower Curtain": ["preventDamage"],
+  // Shuppet
+  "PBL-33#ability:Hide 'n' Sneak": ["preventEffects"],
+  // Sinistcha
+  "PBL-6#ability:Hide 'n' Sneak": ["preventEffects"],
+  "PBL-6#attack:Matcha Spin": ["placeCounters"],
+  // Slowking
+  "SCR-58#attack:Seek Inspiration": ["discardDeckTop", "copyAttack"],
+  // Slowpoke
+  "MEP-86#ability:Dopey Face": ["conditionImmunity"],
+  "SCR-57#attack:Dangle Tail": ["recoverFromDiscard"],
+  // Solrock
+  "MEG-75#attack:Cosmic Beam": ["conditionalDamage", "ignoreWeaknessResistance"],
+  // Spiritomb
+  "PBL-35#attack:Spiritual End": ["multiplyCounters"],
+  // Talonflame ex
+  "DLR-88#ability:Excited Dive": ["benchFromHand", "oncePerTurn", "fromHand"],
+  "DLR-88#attack:Talon Hunt": ["searchDeck", "shuffleDeck"],
+  // Tapu Bulu
+  "SFA-6#attack:Wood Hammer": ["selfDamage"],
+  // Tapu Koko ex
+  "JTG-51#attack:Linked Lightning": ["scaleDamage"],
+  // Tatsugiri
+  "TWM-131#ability:Attract Customers": ["lookAtTop", "shuffleDeck", "oncePerTurn", "activeOnly"],
+  // Teal Mask Ogerpon ex
+  "TWM-25#ability:Teal Dance": ["draw", "attachFromHand", "oncePerTurn"],
+  "TWM-25#attack:Myriad Leaf Shower": ["scaleDamage"],
+  // Team Rocket's Articuno
+  "DRI-51#ability:Repelling Veil": ["preventEffects"],
+  "DRI-51#attack:Dark Frost": ["conditionalDamage"],
+  // Team Rocket's Honchkrow
+  "ASC-127#attack:Rocket Feathers": ["discardFromHand", "scaleDamage"],
+  // Team Rocket's Mewtwo ex
+  "DRI-81#ability:Power Saver": ["attackRequirement"],
+  "DRI-81#attack:Erasure Ball": ["discardEnergy", "scaleDamage"],
+  // Team Rocket's Mimikyu
+  "DRI-87#attack:Gemstone Mimicry": ["copyAttack"],
+  // Team Rocket's Murkrow
+  "DRI-127#attack:Deceit": ["searchDeck", "shuffleDeck"],
+  "DRI-127#attack:Torment": ["attackLock", "timedMarker"],
+  // Team Rocket's Porygon
+  "DRI-153#attack:Hacking": ["discardFromHand"],
+  // Team Rocket's Porygon2
+  "DRI-154#attack:R Command": ["scaleDamage"],
+  // Team Rocket's Sneasel
+  "DRI-128#attack:Strike the Sleeper": ["damage", "scaleDamage", "ignoreWeaknessResistance"],
+  // Team Rocket's Spidops
+  "DRI-20#ability:Charging Up": ["attachFromDiscard", "oncePerTurn"],
+  "DRI-20#attack:Rocket Rush": ["scaleDamage"],
+  // Team Rocket's Tarountula
+  "DRI-19#attack:Take Down": ["selfDamage"],
+  // Team Rocket's Wobbuffet
+  "DRI-82#attack:Rocket Mirror": ["moveCounters"],
+  // Terapagos ex
+  "SCR-128#attack:Unified Beatdown": ["scaleDamage", "firstTurnRule"],
+  "SCR-128#attack:Crown Opal": ["preventDamage", "timedMarker"],
+  // Thwackey
+  "TWM-15#ability:Boom Boom Groove": ["searchDeck", "shuffleDeck", "oncePerTurn"],
+  // Torchic
+  "DRI-40#attack:Collect": ["draw"],
+  // Toucannon
+  "PBL-68#ability:Aerial Draw": ["draw", "oncePerTurn"],
+  "PBL-68#attack:Feather Rondo": ["scaleDamage"],
+  // Toxel
+  "PFL-67#attack:Call for Family": ["searchToBench", "shuffleDeck"],
+  // Toxtricity
+  "PFL-68#ability:Sinister Surge": ["searchAttach", "shuffleDeck", "placeCounters", "oncePerTurn"],
+  // Unown
+  "30C-72#attack:Mysterious Signal": ["prizeCount"],
+  // Victini
+  "SSP-21#ability:Victory Cheer": ["damageBonus"],
+  // Volcanion ex
+  "JTG-31#ability:Scalding Steam": ["applyCondition", "oncePerTurn", "activeOnly"],
+  "JTG-31#attack:Scorching Cyclone": ["moveEnergy"],
+  // Weedle
+  "CRI-1#attack:Surprise Attack": ["flip", "conditionalDamage"],
+  // Wellspring Mask Ogerpon ex
+  "TWM-64#attack:Sob": ["retreatLock", "timedMarker"],
+  "TWM-64#attack:Torrential Pump": ["energyToDeck", "damage", "ignoreWeaknessResistance"],
+  // Yveltal
+  "30C-100#ability:Life-Locked": ["healLock"],
+  "MEG-88#attack:Clutch": ["retreatLock", "timedMarker"],
+  // Zeraora
+  "DRI-78#attack:Thunder Raid": ["discardEnergy", "damage", "ignoreWeaknessResistance"],
+  // Aarune
+  "DLR-89#text": ["searchDeck", "shuffleDeck"],
+  // Academy at Night
+  "SFA-54#text": ["putOnTop", "stadiumAction"],
+  // Acerola's Mischief
+  "MEG-113#text": ["preventDamage", "preventEffects", "timedMarker", "playCondition"],
+  // Adventure Lantern
+  "DLR-90#text": ["searchDeck", "shuffleDeck"],
+  // Air Balloon
+  "ASC-181#text": ["retreatCost"],
+  // Area Zero Underdepths
+  "SCR-131#text": ["benchSize", "onLeavePlay"],
+  // AZ's Tranquility
+  "CRI-76#text": ["heal", "switchSelf"],
+  // Battle Cage
+  "PFL-85#text": ["preventCounters"],
+  // Bianca's Devotion
+  "TEF-142#text": ["heal"],
+  // Binding Mochi
+  "PRE-95#text": ["damageBonus"],
+  // Black Belt's Training
+  "JTG-143#text": ["damageBonus", "timedMarker"],
+  // Blowtorch
+  "PFL-86#text": ["discardFromHand", "discardEnergy", "discardTool", "discardStadium", "playCondition"],
+  // Boss's Orders
+  "MEG-114#text": ["gust"],
+  // Brave Bangle
+  "WHT-80#text": ["damageBonus"],
+  // Briar
+  "SCR-132#text": ["prizeCount", "timedMarker", "playCondition"],
+  // Brilliant Blender
+  "SSP-164#text": ["shuffleDeck", "searchDeck"],
+  // Brock's Scouting
+  "JTG-146#text": ["searchDeck", "shuffleDeck"],
+  // Buddy-Buddy Poffin
+  "TEF-144#text": ["searchToBench", "shuffleDeck"],
+  // Bug Catching Set
+  "TWM-143#text": ["lookAtTop", "shuffleDeck"],
+  // Carmine
+  "TWM-145#text": ["draw", "discardHand", "firstTurnRule"],
+  // Ciphermaniac's Codebreaking
+  "TEF-145#text": ["searchToTop", "shuffleDeck"],
+  // Colress's Tenacity
+  "SFA-57#text": ["searchDeck", "shuffleDeck"],
+  // Community Center
+  "TWM-146#text": ["heal", "stadiumAction", "supporterPlayedThisTurn"],
+  // Crispin
+  "SCR-133#text": ["searchDeck", "shuffleDeck", "searchAttach"],
+  // Crushing Hammer
+  "POR-71#text": ["discardEnergy", "flip"],
+  // Cynthia's Power Weight
+  "DRI-162#text": ["hpBonus"],
+  // Cyrano
+  "SSP-170#text": ["searchDeck", "shuffleDeck"],
+  // Dawn
+  "PFL-87#text": ["searchDeck", "shuffleDeck"],
+  // Dusk Ball
+  "SSP-175#text": ["lookAtBottom", "shuffleDeck"],
+  // Energy Recycler
+  "DRI-164#text": ["discardToDeck"],
+  // Energy Retrieval
+  "SVI-171#text": ["recoverFromDiscard"],
+  // Energy Search
+  "POR-72#text": ["searchDeck", "shuffleDeck"],
+  // Energy Switch
+  "MEG-115#text": ["moveEnergy"],
+  // Enhanced Hammer
+  "TWM-148#text": ["discardEnergy"],
+  // Eri
+  "TEF-146#text": ["discardFromHand", "revealHand"],
+  // Ethan's Adventure
+  "DRI-165#text": ["searchDeck", "shuffleDeck"],
+  // Explorer's Guidance
+  "TEF-147#text": ["lookAtTop", "discardDeckTop"],
+  // Festival Grounds
+  "TWM-149#text": ["removeConditions", "conditionImmunity"],
+  // Fighting Gong
+  "MEG-116#text": ["searchDeck", "shuffleDeck"],
+  // Firebreather
+  "PFL-89#text": ["searchDeck", "shuffleDeck"],
+  // Forest of Vitality
+  "MEG-117#text": ["evolutionRule"],
+  // Gladion's Final Battle
+  "PBL-77#text": ["damageBonus", "timedMarker", "playCondition"],
+  // Glass Trumpet
+  "SCR-135#text": ["attachFromDiscard", "playCondition"],
+  // Grand Tree
+  "SCR-136#text": ["searchEvolve", "shuffleDeck", "stadiumAction"],
+  // Gravity Gemstone
+  "SCR-137#text": ["retreatCost"],
+  // Gravity Mountain
+  "SSP-177#text": ["hpBonus"],
+  // Grisham
+  "DLR-93#text": ["heal"],
+  // Gwynn
+  "PBL-78#text": ["draw", "discardFromHand"],
+  // Hand Trimmer
+  "TEF-150#text": ["discardFromHand"],
+  // Handheld Fan
+  "TWM-150#text": ["moveEnergy", "onDamagedByAttack"],
+  // Harlequin
+  "WHT-83#text": ["draw", "shuffleHandIntoDeck", "flip"],
+  // Hero's Cape
+  "TEF-152#text": ["hpBonus"],
+  // Hilda
+  "WHT-84#text": ["searchDeck", "shuffleDeck"],
+  // Iris's Fighting Spirit
+  "JTG-149#text": ["drawUntil", "discardFromHand", "playCondition"],
+  // Iron Defender
+  "MEG-118#text": ["damageReduction", "timedMarker"],
+  // Jamming Tower
+  "TWM-153#text": ["toolLock"],
+  // Janine's Secret Art
+  "PRE-112#text": ["searchAttach", "shuffleDeck", "applyCondition"],
+  // Judge
+  "POR-76#text": ["shuffleHandIntoDeck"],
+  // Jumbo Ice Cream
+  "PFL-91#text": ["heal"],
+  // Kieran
+  "TWM-154#text": ["switchSelf", "chooseMode", "damageBonus", "timedMarker"],
+  // Lana's Aid
+  "TWM-155#text": ["recoverFromDiscard"],
+  // Legendary Pyroduct
+  "DLR-94#text": ["abilityLock"],
+  // Lillie's Determination
+  "MEG-119#text": ["draw", "shuffleHandIntoDeck"],
+  // Lillie's Pearl
+  "JTG-151#text": ["prizeCount", "onKnockedOut"],
+  // Lisia's Appeal
+  "SSP-179#text": ["gust", "applyCondition"],
+  // Lucian
+  "TWM-157#text": ["draw", "handToDeckBottom", "flip"],
+  // Lucky Helmet
+  "TWM-158#text": ["draw", "onDamagedByAttack"],
+  // Lumiose City
+  "POR-77#text": ["searchToBench", "shuffleDeck", "endTurn", "stadiumAction"],
+  // Max Rod
+  "PRE-116#text": ["recoverFromDiscard"],
+  // Mega Signal
+  "MEG-121#text": ["searchDeck", "shuffleDeck"],
+  // Miracle Headset
+  "SSP-183#text": ["recoverFromDiscard"],
+  // N's Castle
+  "JTG-152#text": ["retreatCost"],
+  // N's Plan
+  "BLK-83#text": ["moveEnergy"],
+  // N's PP Up
+  "JTG-153#text": ["attachFromDiscard"],
+  // Naveen
+  "POR-79#text": ["drawUntil", "discardFromHand", "playCondition"],
+  // Night Stretcher
+  "ASC-196#text": ["recoverFromDiscard"],
+  // Nighttime Mine
+  "ASC-197#text": ["attackCost"],
+  // Poké Pad
+  "POR-81#text": ["searchDeck", "shuffleDeck"],
+  // Pokégear 3.0
+  "SVI-186#text": ["lookAtTop", "shuffleDeck"],
+  // Pokémon Catcher
+  "POR-82#text": ["gust", "flip"],
+  // Pokémon Center Lady
+  "MEG-123#text": ["heal", "removeConditions"],
+  // Powerglass
+  "SFA-63#text": ["attachFromDiscard", "onTurnEnd"],
+  // Precious Trolley
+  "SSP-185#text": ["searchToBench", "shuffleDeck"],
+  // Premium Power Pro
+  "MEG-124#text": ["damageBonus", "timedMarker"],
+  // Prime Catcher
+  "TEF-157#text": ["switchSelf", "gust"],
+  // Prism Tower
+  "CRI-80#text": ["draw", "stadiumAction", "discardFromHand"],
+  // Punk Helmet
+  "PFL-92#text": ["placeCounters", "onDamagedByAttack"],
+  // Rare Candy
+  "MEG-125#text": ["evolutionRule", "firstTurnRule"],
+  // Redeemable Ticket
+  "JTG-156#text": ["prizesToDeck"],
+  // Risky Ruins
+  "MEG-127#text": ["placeCounters", "onBenchPlaced"],
+  // Rosa's Encouragement
+  "POR-84#text": ["attachFromDiscard", "playCondition"],
+  // Roto-Stick
+  "PRE-127#text": ["lookAtTop", "shuffleDeck"],
+  // Ruffian
+  "JTG-157#text": ["discardEnergy", "discardTool"],
+  // Sacred Ash
+  "DRI-168#text": ["discardToDeck"],
+  // Salvatore
+  "TEF-160#text": ["searchEvolve", "shuffleDeck", "evolutionRule"],
+  // Scoop Up Cyclone
+  "TWM-162#text": ["scoop"],
+  // Secret Box
+  "TWM-163#text": ["searchDeck", "shuffleDeck", "discardFromHand", "playCondition"],
+  // Special Red Card
+  "CRI-82#text": ["draw", "handToDeckBottom", "playCondition"],
+  // Spikemuth Gym
+  "DRI-169#text": ["searchDeck", "shuffleDeck", "stadiumAction"],
+  // Strange Timepiece
+  "MEG-128#text": ["devolve"],
+  // Surfer
+  "SSP-187#text": ["drawUntil", "switchSelf"],
+  // Surfing Beach
+  "MEG-129#text": ["switchSelf", "stadiumAction"],
+  // Survival Brace
+  "TWM-164#text": ["surviveKnockOut"],
+  // Switch
+  "MEG-130#text": ["switchSelf"],
+  // Tasty Rice Ball
+  "DLR-101#text": ["heal"],
+  // Team Rocket's Archer
+  "DRI-170#text": ["draw", "shuffleHandIntoDeck", "playCondition", "turnHistory"],
+  // Team Rocket's Ariana
+  "DRI-171#text": ["drawUntil"],
+  // Team Rocket's Factory
+  "DRI-173#text": ["draw", "stadiumAction", "supporterPlayedThisTurn"],
+  // Team Rocket's Giovanni
+  "DRI-174#text": ["switchSelf", "gust"],
+  // Team Rocket's Petrel
+  "DRI-176#text": ["searchDeck", "shuffleDeck"],
+  // Team Rocket's Proton
+  "DRI-177#text": ["searchDeck", "shuffleDeck", "firstTurnRule"],
+  // Team Rocket's Transceiver
+  "DRI-178#text": ["searchDeck", "shuffleDeck"],
+  // Team Rocket's Watchtower
+  "DRI-180#text": ["abilityLock"],
+  // Tool Scrapper
+  "ASC-212#text": ["discardTool"],
+  // Ultra Ball
+  "MEG-131#text": ["searchDeck", "shuffleDeck", "discardFromHand", "playCondition"],
+  // Unfair Stamp
+  "TWM-165#text": ["draw", "shuffleHandIntoDeck", "playCondition", "turnHistory"],
+  // Wally's Compassion
+  "MEG-132#text": ["energyToHand", "heal"],
+  // Wondrous Patch
+  "PFL-94#text": ["attachFromDiscard"],
+  // Xerosic's Machinations
+  "SFA-64#text": ["discardFromHand"],
+  // Zinnia's Trust
+  "DLR-103#text": ["moveEnergy", "switchSelf"],
+  // Boomerang Energy
+  "TWM-166#text": ["attachFromDiscard", "energyProvided", "onDiscardedByOwnAttack"],
+  // Bubbly Water Energy
+  "CRI-84#text": ["removeConditions", "energyProvided", "conditionImmunity"],
+  // Enriching Energy
+  "SSP-191#text": ["draw", "energyProvided", "onAttach"],
+  // Growing Grass Energy
+  "POR-86#text": ["hpBonus", "energyProvided"],
+  // Ignition Energy
+  "WHT-86#text": ["energyProvided", "onTurnEnd"],
+  // Legacy Energy
+  "TWM-167#text": ["energyProvided", "prizeCount", "onKnockedOut"],
+  // Mist Energy
+  "TEF-161#text": ["preventEffects", "energyProvided"],
+  // Neo Upper Energy
+  "TEF-162#text": ["energyProvided"],
+  // Prism Energy
+  "ASC-216#text": ["energyProvided"],
+  // Rocky Fighting Energy
+  "POR-87#text": ["preventEffects", "energyProvided"],
+  // Spiky Energy
+  "JTG-159#text": ["placeCounters", "energyProvided", "onDamagedByAttack"],
+  // Team Rocket's Energy
+  "DRI-182#text": ["energyProvided", "attachRestriction"],
+  // Telepathic Psychic Energy
+  "POR-88#text": ["searchToBench", "shuffleDeck", "energyProvided", "onAttach"],
+}
