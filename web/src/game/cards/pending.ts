@@ -6,10 +6,7 @@ import type { Primitive } from './taxonomy'
 export const pending: Record<EffectKey, Primitive[]> = {
   // Abra
   "MEG-54#attack:Teleportation Attack": ["switchSelf"],
-  "TWM-80#ability:Teleporter": ["shuffleIntoDeck", "oncePerTurn", "activeOnly"],
   // Alakazam
-  "MEG-56#ability:Psychic Draw": ["draw", "onEvolve", "oncePerTurn"],
-  "MEG-56#attack:Powerful Hand": ["placeCounters", "scaleDamage"],
   "TWM-82#attack:Strange Hacking": ["moveCounters", "applyCondition"],
   "TWM-82#attack:Psychic": ["scaleDamage"],
   // Annihilape
@@ -19,29 +16,20 @@ export const pending: Record<EffectKey, Primitive[]> = {
   "SSP-100#attack:Destined Fight": ["knockOut"],
   // Applin
   "TWM-126#attack:Find a Friend": ["searchDeck", "shuffleDeck"],
-  "TWM-17#attack:Tumbling Attack": ["flip", "conditionalDamage"],
   // Arboliva ex
   "DRI-23#attack:Oil Salvo": ["damage", "ignoreWeaknessResistance"],
   "DRI-23#attack:Aroma Shot": ["removeConditions"],
-  // Azurill
-  "DLR-80#attack:Bouncy-Bounce Charge": ["searchAttach", "shuffleDeck"],
   // Banette
   "PBL-34#ability:Hide 'n' Sneak": ["preventEffects"],
   "PBL-34#attack:Puppet Pull": ["searchDeck", "shuffleDeck"],
-  // Bayleef
-  "MEG-9#attack:Push Down": ["pushOut"],
   // Beedrill ex
   "CRI-3#attack:Rumbling Bees": ["scaleDamage"],
-  // Beldum
-  "TEF-113#attack:Iron Tackle": ["selfDamage"],
   // Blaziken ex
   "JTG-24#ability:Seething Spirit": ["attachFromDiscard", "oncePerTurn"],
   "JTG-24#attack:Smolder-sault": ["attackLock", "timedMarker"],
   // Bloodmoon Ursaluna ex
   "TWM-141#ability:Seasoned Skill": ["attackCost"],
   "TWM-141#attack:Blood Moon": ["attackLock", "timedMarker"],
-  // Budew
-  "ASC-16#attack:Itchy Pollen": ["playLock", "timedMarker"],
   // Bulbasaur
   "MEG-1#attack:Bind Down": ["retreatLock", "timedMarker"],
   // Buneary
@@ -54,29 +42,18 @@ export const pending: Record<EffectKey, Primitive[]> = {
   "DLR-5#attack:Punishing Needles": ["scaleDamage"],
   // Carvanha
   "PFL-60#attack:Reckless Charge": ["selfDamage"],
-  // Celebi
-  "MEG-12#attack:Traverse Time": ["searchDeck", "shuffleDeck"],
   // Charmander
   "PFL-11#ability:Agile": ["retreatCost"],
   // Chi-Yu
   "PBL-59#attack:Whirling Envy": ["conditionalDamage", "ignoreWeaknessResistance"],
   "TWM-39#attack:Allure": ["draw"],
   "TWM-39#attack:Ground Melter": ["discardStadium", "conditionalDamage"],
-  // Chien-Pao
-  "SSP-56#ability:Snow Sink": ["discardStadium", "onPlayToBench"],
-  "SSP-56#attack:Icicle Loop": ["energyToHand"],
   // Chikorita
   "ASC-8#attack:Growl": ["damageReduction", "timedMarker"],
   // Cofagrigus
   "SSP-83#attack:Law of the Underworld": ["placeCounters"],
   // Combusken
   "DRI-41#attack:Double Kick": ["flip", "scaleDamage"],
-  // Cornerstone Mask Ogerpon ex
-  "TWM-112#ability:Cornerstone Stance": ["preventDamage"],
-  "TWM-112#attack:Demolish": ["ignoreWeaknessResistance"],
-  // Crustle
-  "DRI-12#ability:Mysterious Rock Inn": ["preventDamage"],
-  "DRI-12#attack:Superb Scissors": ["ignoreDefenderEffects"],
   // Cynthia's Gabite
   "DRI-103#ability:Champion's Call": ["searchDeck", "shuffleDeck", "oncePerTurn"],
   // Cynthia's Garchomp ex
@@ -92,27 +69,10 @@ export const pending: Record<EffectKey, Primitive[]> = {
   "SSP-87#attack:Electromagnetic Sonar": ["recoverFromDiscard"],
   // Dhelmise
   "PBL-39#attack:Vengeful Anchor": ["conditionalDamage"],
-  // Dipplin
-  "TWM-18#ability:Festival Lead": ["attackTwice"],
-  "TWM-18#attack:Do the Wave": ["scaleDamage"],
   // Dolliv
   "DRI-22#attack:Nutrients": ["heal"],
-  // Dragapult ex
-  "TWM-130#attack:Phantom Dive": ["placeCounters", "distributeCounters"],
-  // Drakloak
-  "TWM-129#ability:Recon Directive": ["lookAtTop", "oncePerTurn"],
   // Drapion
   "POR-52#attack:Hazardous Tail": ["selfDamage", "applyCondition"],
-  // Drilbur
-  "PBL-46#attack:Call for Family": ["searchToBench", "shuffleDeck"],
-  // Dudunsparce
-  "TEF-129#ability:Run Away Draw": ["draw", "shuffleIntoDeck", "oncePerTurn"],
-  // Dudunsparce ex
-  "JTG-121#attack:Tenacious Tail": ["scaleDamage"],
-  "JTG-121#attack:Destructive Drill": ["ignoreDefenderEffects"],
-  // Dunsparce
-  "JTG-120#attack:Trading Places": ["switchSelf"],
-  "TEF-128#attack:Dig": ["flip", "preventDamage", "preventEffects", "timedMarker"],
   // Dusclops
   "PRE-36#ability:Cursed Blast": ["placeCounters", "knockOut", "oncePerTurn"],
   // Dusknoir
@@ -120,8 +80,6 @@ export const pending: Record<EffectKey, Primitive[]> = {
   "PRE-37#attack:Shadow Bind": ["retreatLock", "timedMarker"],
   // Duskull
   "PRE-35#attack:Come and Get You": ["discardToBench"],
-  // Dwebble
-  "DRI-11#attack:Ascension": ["searchEvolve", "shuffleDeck"],
   // Eevee ex
   "PRE-75#ability:Rainbow DNA": ["evolutionRule", "firstTurnRule"],
   // Empoleon ex
@@ -131,9 +89,6 @@ export const pending: Record<EffectKey, Primitive[]> = {
   "TWM-93#attack:Love Resonance": ["conditionalDamage"],
   // Ethan's Cyndaquil
   "DRI-32#attack:Ember": ["discardEnergy"],
-  // Ethan's Ho-Oh ex
-  "DRI-39#ability:Golden Flame": ["attachFromHand", "oncePerTurn"],
-  "DRI-39#attack:Shining Feathers": ["heal"],
   // Ethan's Quilava
   "DRI-33#ability:Bonded by the Journey": ["searchDeck", "shuffleDeck", "oncePerTurn"],
   // Ethan's Typhlosion
@@ -141,9 +96,6 @@ export const pending: Record<EffectKey, Primitive[]> = {
   // Fan Rotom
   "SCR-118#ability:Fan Call": ["searchDeck", "shuffleDeck", "oncePerTurn", "firstTurnRule"],
   "SCR-118#attack:Assault Landing": ["conditionalDamage"],
-  // Fezandipiti ex
-  "ASC-142#ability:Flip the Script": ["draw", "oncePerTurn", "turnHistory"],
-  "ASC-142#attack:Cruel Arrow": ["damage", "ignoreWeaknessResistance"],
   // Flutter Mane
   "TEF-78#ability:Midnight Fluttering": ["activeOnly", "abilityLock"],
   "TEF-78#attack:Hex Hurl": ["placeCounters", "distributeCounters"],
@@ -155,11 +107,6 @@ export const pending: Record<EffectKey, Primitive[]> = {
   "CRI-21#attack:Summoning Jutsu": ["searchDeck", "shuffleDeck"],
   // Froslass
   "TWM-53#ability:Freezing Shroud": ["placeCounters", "onCheckup"],
-  // Genesect
-  "SFA-40#ability:ACE Nullifier": ["playLock"],
-  // Genesect ex
-  "BLK-67#ability:Metallic Signal": ["searchDeck", "shuffleDeck", "oncePerTurn"],
-  "BLK-67#attack:Protect Charge": ["damageReduction", "timedMarker"],
   // Giratina
   "DLR-45#attack:Chaos Crawler": ["preventDamage", "attackLock", "timedMarker", "turnHistory"],
   // Goldeen
@@ -177,40 +124,20 @@ export const pending: Record<EffectKey, Primitive[]> = {
   "BLK-70#attack:Axe Blast": ["knockOut"],
   // Hoothoot
   "SCR-114#attack:Triple Stab": ["flip", "scaleDamage"],
-  // Hydrapple ex
-  "SCR-14#ability:Ripening Charge": ["attachFromHand", "heal", "oncePerTurn"],
-  "SCR-14#attack:Syrup Storm": ["scaleDamage"],
   // Iron Crown ex
   "TEF-81#ability:Cobalt Command": ["damageBonus"],
   "TEF-81#attack:Twin Shotels": ["damage", "ignoreWeaknessResistance"],
   // Iron Leaves ex
   "TEF-25#ability:Rapid Vernier": ["moveEnergy", "switchSelf", "onPlayToBench"],
   "TEF-25#attack:Prism Edge": ["attackLock", "timedMarker"],
-  // Iron Thorns ex
-  "TWM-77#ability:Initialization": ["abilityLock", "activeOnly"],
-  "TWM-77#attack:Volt Cyclone": ["moveEnergy"],
   // Jirachi ex
   "30C-102#attack:Wish Granter": ["drawUntil"],
   "30C-102#attack:Swift": ["ignoreWeaknessResistance"],
   // Jolteon ex
   "PRE-30#attack:Flashing Spear": ["discardEnergy", "scaleDamage"],
   "PRE-30#attack:Dravite": ["attackLock", "timedMarker"],
-  // Kadabra
-  "MEG-55#ability:Psychic Draw": ["draw", "onEvolve", "oncePerTurn"],
   // Kakuna
   "CRI-2#ability:Exoskeleton": ["damageReduction"],
-  // Koraidon ex
-  "ASC-121#attack:Orichalcum Fang": ["conditionalDamage", "turnHistory"],
-  "ASC-121#attack:Impact Blow": ["attackLock", "timedMarker"],
-  // Kyurem
-  "SFA-47#ability:Plasma Bane": ["attackCost"],
-  "SFA-47#attack:Trifrost": ["discardEnergy", "damage", "ignoreWeaknessResistance"],
-  // Latias ex
-  "SSP-76#ability:Skyliner": ["retreatCost"],
-  "SSP-76#attack:Eon Blade": ["attackLock", "timedMarker"],
-  // Lillie's Clefairy ex
-  "JTG-56#ability:Fairy Zone": ["weaknessChange"],
-  "JTG-56#attack:Full Moon Rondo": ["scaleDamage"],
   // Lucario
   "30C-83#attack:Aura Sphere": ["damage", "ignoreWeaknessResistance"],
   // Lugia
@@ -226,18 +153,12 @@ export const pending: Record<EffectKey, Primitive[]> = {
   "PFL-13#attack:Inferno X": ["discardEnergy", "scaleDamage"],
   // Mega Charizard Y ex
   "ASC-22#attack:Explosion Y": ["discardEnergy", "damage", "ignoreWeaknessResistance"],
-  // Mega Excadrill ex
-  "PBL-65#attack:Undermine": ["discardDeckTop"],
-  "PBL-65#attack:Maximum Drilling": ["conditionalDamage"],
   // Mega Froslass ex
   "ASC-47#attack:Resentful Refrain": ["scaleDamage"],
   "ASC-47#attack:Absolute Snow": ["applyCondition"],
   // Mega Greninja ex
   "CRI-22#ability:Mortal Shuriken": ["discardFromHand", "placeCounters", "oncePerTurn", "activeOnly", "playCondition"],
   "CRI-22#attack:Ninja Spinner": ["energyToHand", "conditionalDamage"],
-  // Mega Kangaskhan ex
-  "MEG-104#ability:Run Errand": ["draw", "oncePerTurn", "activeOnly"],
-  "MEG-104#attack:Rapid-Fire Combo": ["flip", "scaleDamage"],
   // Mega Latias ex
   "MEG-100#attack:Strafe": ["switchSelf"],
   "MEG-100#attack:Illusory Impulse": ["discardEnergy"],
@@ -247,38 +168,17 @@ export const pending: Record<EffectKey, Primitive[]> = {
   // Mega Lucario ex
   "MEG-77#attack:Aura Jab": ["attachFromDiscard"],
   "MEG-77#attack:Mega Brave": ["attackLock", "timedMarker"],
-  // Mega Rayquaza ex
-  "DLR-84#ability:Ruler's Roar": ["lookAtTop", "shuffleDeck", "onPlayToBench", "oncePerTurn"],
-  "DLR-84#attack:Storm Emerald": ["scaleDamage"],
   // Mega Sharpedo ex
   "PFL-61#attack:Greedy Fang": ["draw"],
   "PFL-61#attack:Hungry Jaws": ["conditionalDamage"],
-  // Mega Skarmory ex
-  "POR-55#attack:Sonic Ripper": ["energyToDeck", "damage", "ignoreWeaknessResistance"],
   // Mega Starmie ex
   "POR-21#attack:Jetting Blow": ["damage", "ignoreWeaknessResistance"],
   "POR-21#attack:Nebula Beam": ["ignoreWeaknessResistance"],
   // Mega Venusaur ex
   "MEG-3#ability:Solar Transfer": ["moveEnergy", "repeatable"],
   "MEG-3#attack:Jungle Dump": ["heal"],
-  // Meganium
-  "MEG-10#ability:Wild Growth": ["energyProvided"],
-  // Meowth ex
-  "POR-62#ability:Last-Ditch Catch": ["searchDeck", "shuffleDeck", "onPlayToBench", "oncePerTurn"],
-  "POR-62#attack:Tuck Tail": ["scoop"],
-  // Metagross
-  "CRI-61#attack:Bounce Back": ["pushOut"],
-  "CRI-61#attack:Metallic Hammer": ["discardEnergy", "conditionalDamage"],
-  // Metang
-  "TEF-114#ability:Metal Maker": ["lookAtTop", "shuffleDeck", "oncePerTurn"],
-  // Mew ex
-  "30C-66#ability:Memory Helix": ["copyAttack"],
-  "30C-66#attack:Teleportation Burst": ["switchSelf"],
   // Moltres
   "PFL-14#attack:Fighting Wings": ["conditionalDamage"],
-  // Munkidori
-  "TWM-95#ability:Adrena-Brain": ["moveCounters", "oncePerTurn"],
-  "TWM-95#attack:Mind Bend": ["applyCondition"],
   // N's Darmanitan
   "JTG-27#attack:Back Draft": ["scaleDamage"],
   "JTG-27#attack:Flamebody Cannon": ["discardEnergy", "damage", "ignoreWeaknessResistance"],
@@ -286,12 +186,6 @@ export const pending: Record<EffectKey, Primitive[]> = {
   "JTG-96#attack:Thieving Swipe": ["revealHand"],
   // N's Reshiram
   "JTG-116#attack:Powerful Rage": ["scaleDamage"],
-  // N's Zekrom
-  "ASC-155#attack:Shred": ["ignoreDefenderEffects"],
-  "ASC-155#attack:Rampaging Thunder": ["attackLock", "timedMarker"],
-  // N's Zoroark ex
-  "JTG-98#ability:Trade": ["draw", "discardFromHand", "oncePerTurn", "playCondition"],
-  "JTG-98#attack:Night Joker": ["copyAttack"],
   // Noctowl
   "SCR-115#ability:Jewel Seeker": ["searchDeck", "shuffleDeck", "onEvolve", "oncePerTurn"],
   // Okidogi
@@ -300,8 +194,6 @@ export const pending: Record<EffectKey, Primitive[]> = {
   "PFL-18#ability:Excited Turbo": ["repeatable", "attachFromHand"],
   // Paldean Tauros
   "SSP-18#attack:Spirited Tackle": ["conditionalDamage"],
-  // Passimian
-  "SSP-111#attack:Coordinated Throwing": ["scaleDamage"],
   // Patrat
   "CRI-70#ability:Watchful Eye": ["counterMoveLock"],
   // Pawmot
@@ -309,9 +201,6 @@ export const pending: Record<EffectKey, Primitive[]> = {
   // Pecharunt
   "SVP-149#ability:Toxic Subjugation": ["placeCounters", "onCheckup", "activeOnly"],
   "SVP-149#attack:Poison Chain": ["applyCondition", "retreatLock", "timedMarker"],
-  // Pecharunt ex
-  "SFA-39#ability:Subjugating Chains": ["switchSelf", "applyCondition", "oncePerTurn"],
-  "SFA-39#attack:Irritated Outburst": ["scaleDamage"],
   // Pikipek
   "PBL-66#attack:Double Stab": ["flip", "scaleDamage"],
   // Piplup
@@ -324,9 +213,6 @@ export const pending: Record<EffectKey, Primitive[]> = {
   // Rabsca
   "TEF-24#ability:Spherical Shield": ["preventDamage"],
   "TEF-24#attack:Psychic": ["scaleDamage"],
-  // Raging Bolt ex
-  "TEF-123#attack:Burst Roar": ["draw", "discardHand"],
-  "TEF-123#attack:Bellowing Thunder": ["discardEnergy", "scaleDamage"],
   // Regigigas
   "PRE-86#attack:Jewel Breaker": ["conditionalDamage"],
   // Rellor
@@ -342,34 +228,23 @@ export const pending: Record<EffectKey, Primitive[]> = {
   // Seaking
   "PRE-21#ability:Festival Lead": ["attackTwice"],
   "PRE-21#attack:Rapid Draw": ["draw"],
-  // Shaymin
-  "DRI-10#ability:Flower Curtain": ["preventDamage"],
   // Shuppet
   "PBL-33#ability:Hide 'n' Sneak": ["preventEffects"],
   // Sinistcha
   "PBL-6#ability:Hide 'n' Sneak": ["preventEffects"],
   "PBL-6#attack:Matcha Spin": ["placeCounters"],
-  // Slowking
-  "SCR-58#attack:Seek Inspiration": ["discardDeckTop", "copyAttack"],
   // Slowpoke
   "MEP-86#ability:Dopey Face": ["conditionImmunity"],
-  "SCR-57#attack:Dangle Tail": ["recoverFromDiscard"],
   // Solrock
   "MEG-75#attack:Cosmic Beam": ["conditionalDamage", "ignoreWeaknessResistance"],
   // Spiritomb
   "PBL-35#attack:Spiritual End": ["multiplyCounters"],
-  // Talonflame ex
-  "DLR-88#ability:Excited Dive": ["benchFromHand", "oncePerTurn", "fromHand"],
-  "DLR-88#attack:Talon Hunt": ["searchDeck", "shuffleDeck"],
   // Tapu Bulu
   "SFA-6#attack:Wood Hammer": ["selfDamage"],
   // Tapu Koko ex
   "JTG-51#attack:Linked Lightning": ["scaleDamage"],
   // Tatsugiri
   "TWM-131#ability:Attract Customers": ["lookAtTop", "shuffleDeck", "oncePerTurn", "activeOnly"],
-  // Teal Mask Ogerpon ex
-  "TWM-25#ability:Teal Dance": ["draw", "attachFromHand", "oncePerTurn"],
-  "TWM-25#attack:Myriad Leaf Shower": ["scaleDamage"],
   // Team Rocket's Articuno
   "DRI-51#ability:Repelling Veil": ["preventEffects"],
   "DRI-51#attack:Dark Frost": ["conditionalDamage"],
@@ -419,12 +294,7 @@ export const pending: Record<EffectKey, Primitive[]> = {
   "JTG-31#attack:Scorching Cyclone": ["moveEnergy"],
   // Weedle
   "CRI-1#attack:Surprise Attack": ["flip", "conditionalDamage"],
-  // Wellspring Mask Ogerpon ex
-  "TWM-64#attack:Sob": ["retreatLock", "timedMarker"],
-  "TWM-64#attack:Torrential Pump": ["energyToDeck", "damage", "ignoreWeaknessResistance"],
   // Yveltal
   "30C-100#ability:Life-Locked": ["healLock"],
   "MEG-88#attack:Clutch": ["retreatLock", "timedMarker"],
-  // Zeraora
-  "DRI-78#attack:Thunder Raid": ["discardEnergy", "damage", "ignoreWeaknessResistance"],
 }
