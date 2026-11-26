@@ -30,7 +30,7 @@ export interface Slot {
   /** Turn it last evolved, -1 if never. */
   evolvedTurn: number
   /** Last time an opponent's attack damaged it. */
-  hitBy?: { turn: number; player: PlayerId }
+  hitBy?: { turn: number; player: PlayerId; attacker: number }
 }
 
 export interface TurnFlags {
