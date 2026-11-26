@@ -1,6 +1,6 @@
 # Poketools
 
-A multi-user Pokemon TCG deck tool. Import a decklist (PTCG Live or Limitless) and test draw opening hands, with face-down prizes for prize checking. Decks can also be edited, given custom card art and two cover cards. Built to support simulation jobs and additional tooling in the future.
+A multi-user Pokemon TCG deck tool. Import a decklist (PTCG Live or Limitless) and test draw opening hands, with face-down prizes for prize checking. Decks can also be edited, given custom card art and two cover cards, and played against each other in a full-rules matchup simulator for the LAIC 2026-27 card pool.
 
 ## Stack
 
@@ -111,10 +111,12 @@ make dev-backend     # Build + exec the Go API server (refuses if :8080 is taken
 make dev-frontend    # Vite dev server only (port 5173)
 make kill-stale      # Kill a leftover dev server holding :8080
 make build           # Production build (frontend → binary with embed.FS, version via ldflags)
-make test            # go test -race ./...
+make test            # go test -race ./..., then the frontend tests
+make test-frontend   # Frontend (vitest) tests only: simulator catalog, engine, cards, fuzz
+make catalog         # Rebuild the simulator's card catalog from Limitless + TCGdex
 make test-v          # go test -race -v ./...
 make sqlc            # Regenerate DB query code from SQL
-make deploy-check    # Tests, vet, frontend build, clean tree — ready to push to main
+make deploy-check    # Tests, vet, frontend tests and build, clean tree — ready to push to main
 make deploy-status   # fly status
 make deploy-logs     # fly logs
 make clean           # Remove bin/ and web/dist/
@@ -216,6 +218,20 @@ deck_covers  (deck_id, slot 0|1, entry_id)
 ```
 
 Timestamps are epoch milliseconds. `section` is constrained to `pokemon | trainer | energy`. `image_url` stores per-entry custom art selections (default `''`).
+
+---
+
+## Matchup Simulator
+
+Open **Play matchup** on the home page (or **Play** on a deck tile), pick two decks, and play both sides on one screen. The engine enforces every rule (setup and mulligans, turn limits, costs, Weakness and Resistance, Knock Outs and Prize cards, Special Conditions, win conditions) and runs every card effect in the pool, asking whichever player has a choice to make. Undo steps back one choice at a time, Judge mode fixes mistakes by hand, and the game survives a reload.
+
+The card pool is the 342 distinct cards played at LAIC 2026-27 São Paulo. Decks with other cards can't start a matchup. The simulator is pure TypeScript in `web/src/game/` and keeps no server state; see the "Matchup Simulator" section of `CLAUDE.md` for how it's built and how to add cards.
+
+```bash
+make catalog                 # rebuild web/src/game/catalog from cached responses
+make catalog ARGS=--refresh  # refetch from Limitless and TCGdex
+make test-frontend           # engine, every card, coverage, and a fuzz over all 36 fixture decks
+```
 
 ---
 
