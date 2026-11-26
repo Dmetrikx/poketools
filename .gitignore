@@ -33,3 +33,6 @@ web/dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Catalog builder response cache
+web/scripts/.cache/

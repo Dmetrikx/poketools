@@ -2,8 +2,8 @@ BINARY  := poketools
 MODULE  := github.com/dariomendez/poketools
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 
-.PHONY: dev dev-backend dev-frontend build build-backend build-frontend sqlc test test-v \
-	deploy-check deploy-status deploy-logs kill-stale clean help
+.PHONY: dev dev-backend dev-frontend build build-backend build-frontend sqlc catalog test test-v \
+	test-frontend deploy-check deploy-status deploy-logs kill-stale clean help
 
 # ── Development ────────────────────────────────────────────────────────────────
 
@@ -48,16 +48,26 @@ build-backend:
 sqlc: ## Regenerate sqlc query code
 	sqlc generate
 
+# Rebuilds the simulator's card catalog (web/src/game/catalog) from the LAIC
+# 2026-27 decklists, TCGdex and Limitless. Output is committed; never runs in
+# CI. Responses are cached in web/scripts/.cache: ARGS=--refresh refetches.
+catalog: ## Rebuild the matchup simulator card catalog
+	cd web && npm run catalog -- $(ARGS)
+
 # ── Testing ────────────────────────────────────────────────────────────────────
 
 # -race is on by default: the session cleanup ticker and request handlers share
 # the database pool, so data races are the failure mode most likely to reach
 # production undetected.
-test: ## Run all Go tests
+test: ## Run all Go and frontend tests
 	go test -race ./...
+	cd web && npm test
 
 test-v: ## Run all Go tests (verbose)
 	go test -race -v ./...
+
+test-frontend: ## Run the frontend (vitest) tests
+	cd web && npm test
 
 # ── Deployment ────────────────────────────────────────────────────────────────
 #
@@ -72,7 +82,7 @@ deploy-check: ## Verify the working tree is ready to be pushed to main
 	@echo "==> vet"
 	@go vet ./...
 	@echo "==> frontend"
-	@cd web && npm run build
+	@cd web && npm test && npm run build
 	@echo "==> git"
 	@test -z "$$(git status --porcelain)" || { echo "working tree is dirty"; exit 1; }
 	@echo
