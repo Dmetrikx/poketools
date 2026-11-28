@@ -1,0 +1,36 @@
+/* What a card or zone looks like while something is picked up or asked. */
+
+.glow {
+  border-radius: 8px;
+  box-shadow: 0 0 0 2px #7dd3fc, 0 0 18px 4px rgba(125, 211, 252, 0.55);
+  animation: glowPulse 1.4s ease-in-out infinite;
+  cursor: pointer;
+}
+
+.over {
+  box-shadow: 0 0 0 3px #fde047, 0 0 24px 6px rgba(253, 224, 71, 0.6);
+  animation: none;
+}
+
+.selected {
+  border-radius: 8px;
+  box-shadow: 0 0 0 3px #fde047, 0 0 20px 4px rgba(253, 224, 71, 0.45);
+}
+
+.picked {
+  border-radius: 8px;
+  box-shadow: 0 0 0 3px #4ade80, 0 0 18px 4px rgba(74, 222, 128, 0.5);
+  animation: none;
+}
+
+.dim {
+  filter: brightness(0.5) saturate(0.6);
+}
+
+@keyframes glowPulse {
+  50% { box-shadow: 0 0 0 2px #bae6fd, 0 0 26px 8px rgba(125, 211, 252, 0.35); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow { animation: none; }
+}

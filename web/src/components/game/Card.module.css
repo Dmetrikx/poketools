@@ -1,0 +1,13 @@
+/* A card's size comes from --cw on the wrapper (or one of its ancestors). */
+.wrap {
+  position: relative;
+  width: var(--cw, var(--card-w));
+  aspect-ratio: 63 / 88;
+  flex-shrink: 0;
+}
+
+/* Beats PlayingCard's own fixed width. */
+.fill.fill {
+  width: 100%;
+  height: 100%;
+}

@@ -33,6 +33,9 @@ function save(key: string, signatures: [string, string], game: Game) {
 
 const newSeed = () => Math.floor(Math.random() * 2 ** 32)
 
+/** What produced the current state: board animations only play for 'input'. */
+export type LastChange = 'input' | 'undo' | 'reset'
+
 /**
  * A matchup in progress, saved under `key` after every input and replayed
  * on reload. Inputs that break the rules are refused with an error message.
@@ -41,17 +44,20 @@ export function useGame(key: string, signatures: [string, string], decks: [strin
   const [game, setGame] = useState<Game>(() => load(key, signatures) ?? new Game(gameDb, { seed: newSeed(), decks }))
   const [version, bump] = useReducer((n: number) => n + 1, 0)
   const [error, setError] = useState<string | null>(null)
+  // The saved game replays on load without animating.
+  const [lastChange, setLastChange] = useState<LastChange>('reset')
 
-  const commit = useCallback((g: Game) => {
+  const commit = useCallback((g: Game, change: LastChange) => {
     save(key, signatures, g)
     setError(null)
+    setLastChange(change)
     bump()
   }, [key, signatures])
 
   const dispatch = useCallback((input: Input) => {
     try {
       game.dispatch(input)
-      commit(game)
+      commit(game, 'input')
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
     }
@@ -61,18 +67,18 @@ export function useGame(key: string, signatures: [string, string], decks: [strin
   const answer = useCallback((a: number[]) => dispatch({ answer: a }), [dispatch])
 
   const undo = useCallback(() => {
-    if (game.undo()) commit(game)
+    if (game.undo()) commit(game, 'undo')
   }, [game, commit])
 
   const newGame = useCallback(() => {
     const g = new Game(gameDb, { seed: newSeed(), decks })
     setGame(g)
-    commit(g)
+    commit(g, 'reset')
   }, [decks, commit])
 
   const state = game.state
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const legal = useMemo(() => legalActions({ s: state, db: gameDb }), [state, version])
 
-  return { state, prompt: state.pendingPrompt, legal, act, answer, undo, newGame, error, canUndo: game.record.steps.length > 1 || (game.record.steps[0]?.answers.length ?? 0) > 0 }
+  return { state, version, lastChange, prompt: state.pendingPrompt, legal, act, answer, undo, newGame, error, canUndo: game.record.steps.length > 1 || (game.record.steps[0]?.answers.length ?? 0) > 0 }
 }
