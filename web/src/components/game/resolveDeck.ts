@@ -8,7 +8,7 @@ export interface ResolvedDeck {
   cardIds: string[]
   /** The deck entry each physical card came from. */
   entries: CardEntry[]
-  /** Entries not in the LAIC 2026-27 pool. */
+  /** Entries not in the catalog's card pool. */
   unsupported: CardEntry[]
   /** Card names with effects the simulator doesn't run yet. */
   pendingNames: string[]

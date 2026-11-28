@@ -1,4 +1,4 @@
-// Stadiums in the LAIC 2026-27 pool, each written from its catalog text.
+// Stadiums in the card pool, each written from its catalog text.
 
 import {
   choosePokemon, defineCard, discardFromHand, discardPokemon, draw, endTheTurn, evolveWith, heal, isFirstTurn,
@@ -153,3 +153,11 @@ defineCard('DRI-173', { trainer: { action: {
 // Team Rocket's Watchtower: {C} Pokémon in play (both yours and your opponent's) have no Abilities.
 defineCard('DRI-180', { trainer: { modifiers: { noAbilities: (_src, ctx, slot) => is(ctx, slot, sel.ofType('Colorless')) } } })
 
+
+// ── Standard events after LAIC (5+ lists) ────────────────────────────────
+
+// Postwick: Attacks used by Hop's Pokémon (both yours and your opponent's) do 30 more damage to the
+// opponent's Active Pokémon (before applying Weakness and Resistance).
+defineCard('JTG-154', { trainer: { modifiers: {
+  damageDealt: (_src, ctx, ev) => (ev.toActive && is(ctx, ev.attacker, sel.tagged("Hop's")) ? 30 : 0),
+} } })

@@ -1,17 +1,30 @@
 {
- "tournament": "https://limitlesstcg.com/tournaments/574",
- "lists": 474,
- "total": 342,
- "pokemonNames": 181,
+ "tournaments": [
+  "https://limitlesstcg.com/tournaments/574",
+  "https://limitlesstcg.com/tournaments/585",
+  "https://limitlesstcg.com/tournaments/584",
+  "https://limitlesstcg.com/tournaments/583",
+  "https://limitlesstcg.com/tournaments/582",
+  "https://limitlesstcg.com/tournaments/581",
+  "https://limitlesstcg.com/tournaments/580",
+  "https://limitlesstcg.com/tournaments/579",
+  "https://limitlesstcg.com/tournaments/578"
+ ],
+ "fixtureTournament": "https://limitlesstcg.com/tournaments/574",
+ "lists": 3088,
+ "fixtureLists": 474,
+ "total": 478,
+ "pokemonNames": 270,
  "totals": {
-  "pokemon": 201,
-  "Supporter": 46,
-  "Item": 43,
-  "Tool": 12,
-  "Stadium": 19,
+  "pokemon": 303,
+  "Supporter": 55,
+  "Item": 53,
+  "Tool": 20,
+  "Stadium": 23,
   "Basic Energy": 8,
-  "Special Energy": 13
+  "Special Energy": 16
  },
+ "newCards": 136,
  "archetypes": {
   "Dragapult": 109,
   "Basic Box": 54,

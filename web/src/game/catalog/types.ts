@@ -58,12 +58,31 @@ export interface CatalogCard {
   tcgdexId?: string
   /** Every `SET-number` print with this card's text. */
   prints: string[]
-  /** Number of LAIC lists that played the card. */
+  /** Number of lists that played the card, across every catalog tournament. */
   lists: number
+  /**
+   * The card's art: the TCGdex image (a base URL) of its own print, else of
+   * another print, else the Limitless CDN image (a full .png URL).
+   */
+  image?: string
 }
 
 /** `SET-number` (Limitless / PTCG Live) and TCGdex card ids → catalog id. */
 export type Aliases = Record<string, string>
+
+/**
+ * prints.json: the main app's print → card map, without rules text. Images
+ * are `prefix index:rest` into `prefixes`.
+ */
+export interface PrintsIndex {
+  prefixes: string[]
+  /** Catalog id → the card's canonical image. */
+  images: Record<string, string>
+  /** Print key or TCGdex id → catalog id, or [catalog id, that print's own image]. */
+  prints: Record<string, string | [string, string]>
+  /** Normalized trainer / energy name → catalog id. */
+  names: Record<string, string>
+}
 
 export interface FixtureCard {
   count: number

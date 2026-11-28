@@ -49,8 +49,10 @@ sqlc: ## Regenerate sqlc query code
 	sqlc generate
 
 # Rebuilds the simulator's card catalog (web/src/game/catalog) from the LAIC
-# 2026-27 decklists, TCGdex and Limitless. Output is committed; never runs in
-# CI. Responses are cached in web/scripts/.cache: ARGS=--refresh refetches.
+# 2026-27 decklists and the Standard events after it, Limitless card pages and
+# TCGdex. Ids are stable across rebuilds. Output is committed; never runs in
+# CI. Responses are cached in web/scripts/.cache: ARGS=--refresh refetches,
+# ARGS=--accept writes even if an existing id disappeared.
 catalog: ## Rebuild the matchup simulator card catalog
 	cd web && npm run catalog -- $(ARGS)
 

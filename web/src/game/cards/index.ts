@@ -15,5 +15,6 @@ import './pokemon/rocket'
 import './pokemon/sneak-festival'
 import './pokemon/megas'
 import './pokemon/others'
+import './pokemon/post-laic'
 
 export { cardDefinition, registeredEffects, registryImpls } from './registry'

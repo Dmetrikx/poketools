@@ -3,8 +3,10 @@ import cardsJson from './cards.json'
 import aliasesJson from './aliases.json'
 import decksJson from './fixtures/decks.json'
 import statsJson from './fixtures/pool-stats.json'
+import laicIds from './fixtures/laic-ids.json'
+import printsJson from './prints.json'
 import { createCatalog, normalizeName, printKey, resolveEntry, type EntryRef } from './resolve'
-import type { Aliases, CatalogCard, FixtureDeck } from './types'
+import type { Aliases, CatalogCard, FixtureDeck, PrintsIndex } from './types'
 
 const cards = cardsJson as CatalogCard[]
 const catalog = createCatalog(cards, aliasesJson as Aliases)
@@ -12,13 +14,28 @@ const decks = decksJson as FixtureDeck[]
 
 const entry = (e: Partial<EntryRef>): EntryRef => ({ name: '', setCode: '', number: '', cardId: '', section: 'trainer', ...e })
 
+const kindOf = (c: CatalogCard) => (c.kind === 'pokemon' ? 'pokemon' : c.kind === 'energy' ? `${c.subtype} Energy` : c.subtype)
+
 describe('catalog', () => {
-  it('has the planned pool', () => {
-    expect(cards).toHaveLength(342)
-    expect(statsJson.totals).toEqual({
-      pokemon: 201, Supporter: 46, Item: 43, Tool: 12, Stadium: 19, 'Basic Energy': 8, 'Special Energy': 13,
-    })
+  it('matches the build stats', () => {
+    expect(cards).toHaveLength(statsJson.total)
+    const totals: Record<string, number> = {}
+    for (const c of cards) totals[kindOf(c)] = (totals[kindOf(c)] ?? 0) + 1
+    expect(totals).toEqual(Object.fromEntries(Object.entries(statsJson.totals).filter(([, n]) => n > 0)))
     expect(decks).toHaveLength(36)
+  })
+
+  it('keeps every LAIC id', () => {
+    const ids = new Set(cards.map(c => c.id))
+    expect((laicIds as string[]).filter(id => !ids.has(id))).toEqual([])
+  })
+
+  it('gives every card an image', () => {
+    for (const c of cards) expect(c.image, c.id).toMatch(/^https:\/\//)
+  })
+
+  it('knows the reprints of common trainers', () => {
+    for (const name of ["Boss's Orders", 'Ultra Ball']) expect(cards.find(c => c.name === name)!.prints.length, name).toBeGreaterThan(1)
   })
 
   it('has unique ids, each its own alias', () => {
@@ -71,6 +88,39 @@ describe('resolveEntry', () => {
     expect(resolveEntry(catalog, entry({ name: 'Ultra Ball', setCode: 'XXX', number: '1' }))?.id).toBe(ball.id)
     const fire = cards.find(c => c.name === 'Fire Energy')!
     expect(resolveEntry(catalog, entry({ name: 'Basic {R} Energy', setCode: 'SVE', number: '2', section: 'energy' }))?.id).toBe(fire.id)
+  })
+
+  it('resolves every alternate print to the same card as the main print', () => {
+    for (const c of cards) {
+      for (const pr of c.prints) {
+        const i = pr.lastIndexOf('-')
+        expect(resolveEntry(catalog, entry({ name: c.name, setCode: pr.slice(0, i), number: pr.slice(i + 1), section: c.kind }))?.id, pr).toBe(c.id)
+      }
+    }
+  })
+
+  it('resolves a reprinted trainer by print', () => {
+    const boss = cards.find(c => c.name === "Boss's Orders")!
+    expect(boss.prints).toContain('RCL-154')
+    expect(resolveEntry(catalog, entry({ name: "Boss's Orders", setCode: 'RCL', number: '154' }))?.id).toBe(boss.id)
+  })
+
+  it('keeps a same-name Pokémon with other text apart', () => {
+    const slowpokes = cards.filter(c => c.name === 'Slowpoke')
+    expect(slowpokes.length).toBeGreaterThan(1)
+    expect(resolveEntry(catalog, entry({ name: 'Slowpoke', setCode: 'PBL', number: '29', section: 'pokemon' }))?.id).toBe('PBL-29')
+    for (const s of slowpokes.filter(s => s.id !== 'PBL-29')) expect(s.prints).not.toContain('PBL-29')
+  })
+
+  it('reads PTCG Live promo set codes', () => {
+    expect(printKey('PR-SV', '050')).toBe('SVP-50')
+    expect(printKey('pr-sw', '251')).toBe('SP-251')
+  })
+
+  it('maps every prints.json key to a catalog card', () => {
+    const index = printsJson as unknown as PrintsIndex
+    for (const [key, hit] of Object.entries(index.prints)) expect(catalog.cards.has(typeof hit === 'string' ? hit : hit[0]), key).toBe(true)
+    for (const id of Object.values(index.names)) expect(catalog.cards.has(id), id).toBe(true)
   })
 
   it('never resolves a Pokémon by name alone', () => {

@@ -1,4 +1,4 @@
-// Special Energy in the LAIC 2026-27 pool, each written from its catalog text.
+// Special Energy in the card pool, each written from its catalog text.
 
 import {
   addMarker, attachEnergy, defineCard, defineMarker, draw, log, placeCounters, searchToBench, sel, useOnce,

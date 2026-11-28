@@ -38,7 +38,7 @@ export default function MatchupSetup({ initialA, onStart }: Props) {
   return (
     <div className={styles.setup}>
       <h1 className={styles.setupTitle}>Play a matchup</h1>
-      <p className={ui.muted}>Play both sides on one screen. The card pool is LAIC 2026–27 São Paulo.</p>
+      <p className={ui.muted}>Play both sides on one screen. The card pool is LAIC 2026–27 São Paulo and the Standard events since.</p>
       <div className={styles.setupDecks}>
         {picker('Player 1', a, setA, okA)}
         {picker('Player 2', b, setB, okB)}
@@ -65,7 +65,7 @@ function useSupport(id: string): Support {
     decksApi.get(id).then((deck: Deck) => {
       if (!live) return
       const r = resolveDeck(deck.entries ?? [])
-      if (r.unsupported.length) setS({ state: 'bad', reason: 'Cards outside the LAIC pool:', cards: r.unsupported.map(e => `${e.name} ${e.setCode} ${e.number}`) })
+      if (r.unsupported.length) setS({ state: 'bad', reason: 'Cards the simulator doesn\'t know yet:', cards: r.unsupported.map(e => `${e.name} ${e.setCode} ${e.number}`) })
       else if (r.count !== 60) setS({ state: 'bad', reason: `The deck has ${r.count} cards, not 60.` })
       else setS({ state: 'ok', pending: r.pendingNames })
     }).catch(() => live && setS({ state: 'bad', reason: 'Couldn\'t load the deck.' }))

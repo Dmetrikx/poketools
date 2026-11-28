@@ -11,10 +11,18 @@ export interface Catalog {
 
 export type EntryRef = Pick<CardEntry, 'name' | 'setCode' | 'number' | 'cardId' | 'section'>
 
+/**
+ * PTCG Live set codes that Limitless writes differently. The promo codes are
+ * the ones PTCG Live exports use; Mega-era promos are a guess until one shows
+ * up in a real export.
+ */
+const SET_ALIASES: Record<string, string> = { 'PR-SV': 'SVP', 'PR-SW': 'SP', 'PR-ME': 'MEP' }
+
 /** `SET-number` with the set upper-cased and a numeric number unpadded: "svi", "007" → "SVI-7". */
 export function printKey(set: string, number: string): string {
   const n = number.trim().toUpperCase()
-  return `${set.trim().toUpperCase()}-${/^\d+$/.test(n) ? String(Number(n)) : n}`
+  const code = set.trim().toUpperCase()
+  return `${SET_ALIASES[code] ?? code}-${/^\d+$/.test(n) ? String(Number(n)) : n}`
 }
 
 const SYMBOLS: Record<string, EnergyType> = {
