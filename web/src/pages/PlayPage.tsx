@@ -29,9 +29,11 @@ function Ready({ a, b }: { a: Deck; b: Deck }) {
   const ra = useMemo(() => resolveDeck(a.entries ?? []), [a])
   const rb = useMemo(() => resolveDeck(b.entries ?? []), [b])
   if (ra.unsupported.length || rb.unsupported.length) {
+    const names = [...new Set([...ra.unsupported, ...rb.unsupported].map(e => `${e.name} ${e.setCode} ${e.number}`))]
     return (
       <div className={setupStyles.setup}>
-        <p>These decks have cards outside the LAIC 2026–27 pool.</p>
+        <p>The simulator doesn't know these cards yet:</p>
+        <ul>{names.map(n => <li key={n}>{n}</li>)}</ul>
         <button className={ui.secondary} onClick={() => navigate('/play')}>Choose other decks</button>
       </div>
     )

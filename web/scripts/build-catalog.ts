@@ -1,14 +1,18 @@
-// Builds the matchup simulator's card catalog from the LAIC 2026-27 São Paulo
-// decklists. Run with `make catalog` (vite-node). Never runs in CI or at build
-// time: its output is committed.
+// Builds the matchup simulator's card catalog from the decklists of LAIC
+// 2026-27 São Paulo and the Standard events after it (TOURNAMENTS). Run with
+// `make catalog` (vite-node). Never runs in CI or at build time: its output is
+// committed.
 //
-//   1. Limitless tournament page → every list, deduplicated into the pool.
-//   2. TCGdex → rules text per card.
-//   3. Limitless card page → cross-check, trainer subtype, Tera rule, prints.
+//   1. Limitless tournament pages → every list, deduplicated into the pool.
+//   2. Limitless card page → text, trainer subtype, Tera rule, every print.
+//      Pokémon whose prints overlap are one card.
+//   3. TCGdex → trainer / energy text, cross-check, an image for each print.
 //   4. Limitless search → Ancient / Future / ACE SPEC tags.
 //
-// Responses are cached under scripts/.cache so a rerun is offline. Pass
-// --refresh to refetch, --accept to write totals that differ from the plan.
+// Catalog ids are stable: a card keeps the id it has in the committed
+// cards.json, and the build fails if one disappears. Responses are cached
+// under scripts/.cache so a rerun is offline. Pass --refresh to refetch,
+// --accept to write even though an existing id is gone.
 
 import { mkdirSync, existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
@@ -18,21 +22,25 @@ import type {
   Aliases, CatalogAbility, CatalogAttack, CatalogCard, CardKind, EnergyType,
   FixtureDeck, WeaknessResistance,
 } from '../src/game/catalog/types'
+import { normalizeName } from '../src/game/catalog/resolve'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const CACHE = join(HERE, '.cache')
 const OUT = join(HERE, '../src/game/catalog')
 const REPORT = join(HERE, 'catalog-report.md')
 
-const TOURNAMENT = 'https://limitlesstcg.com/tournaments/574/decklists'
+/** LAIC first: its lists are the fixture decks. */
+const TOURNAMENTS = [574, 585, 584, 583, 582, 581, 580, 579, 578]
+const FIXTURE_TOURNAMENT = 574
 const LIMITLESS = 'https://limitlesstcg.com'
 const TCGDEX = 'https://api.tcgdex.net/v2/en'
 const USER_AGENT = 'Mozilla/5.0 (compatible; deck-tool/1.0)'
 const DELAY_MS = 300
 
-const EXPECTED = {
-  pokemon: 201, Supporter: 46, Item: 43, Tool: 12, Stadium: 19, 'Basic Energy': 8, 'Special Energy': 13,
-}
+const PRINTS = join(OUT, 'prints.json')
+
+/** Fail the build when fewer trainers than this have a second print: print discovery broke. */
+const MIN_REPRINTED_TRAINERS = 0.3
 
 const args = new Set(process.argv.slice(2))
 const REFRESH = args.has('--refresh')
@@ -47,7 +55,7 @@ async function get(url: string): Promise<{ status: number; body: string }> {
   const file = join(CACHE, createHash('sha1').update(url).digest('hex'))
   if (!REFRESH && existsSync(file)) return JSON.parse(readFileSync(file, 'utf8'))
   for (let attempt = 0; ; attempt++) {
-    await sleep(DELAY_MS)
+    await sleep(url.startsWith(TCGDEX) ? 50 : DELAY_MS)
     try {
       const res = await fetch(url, { headers: { 'User-Agent': USER_AGENT } })
       const out = { status: res.status, body: await res.text() }
@@ -114,9 +122,14 @@ const SYMBOL: Record<string, EnergyType> = {
 // ── 1. the pool ─────────────────────────────────────────────────────────────
 
 interface ListCard { limitlessId: string; set: string; number: string; kind: CardKind; name: string; count: number }
-interface List { archetype: string; placing: number; cards: ListCard[] }
+interface List { tournament: number; archetype: string; placing: number; cards: ListCard[] }
 
-function parseLists(html: string): List[] {
+/** `SET-number` with a numeric number unpadded, the form Limitless links use. */
+function pk(set: string, number: string): string {
+  return `${set.toUpperCase()}-${/^\d+$/.test(number) ? String(Number(number)) : number.toUpperCase()}`
+}
+
+function parseLists(html: string, tournament: number): List[] {
   const lists: List[] = []
   const blocks = html.split('<div class="tournament-decklist">').slice(1)
   for (const [i, block] of blocks.entries()) {
@@ -132,8 +145,8 @@ function parseLists(html: string): List[] {
       })
     }
     const total = cards.reduce((n, c) => n + c.count, 0)
-    if (total !== 60) throw new Error(`list ${i} (${decode(title[1])}) has ${total} cards`)
-    lists.push({ archetype: decode(title[1]), placing: toggle ? Number(toggle[1]) : i + 1, cards })
+    if (total !== 60) throw new Error(`tournament ${tournament} list ${i} (${decode(title[1])}) has ${total} cards`)
+    lists.push({ tournament, archetype: decode(title[1]), placing: toggle ? Number(toggle[1]) : i + 1, cards })
   }
   return lists
 }
@@ -144,21 +157,24 @@ interface PoolCard {
   name: string
   /** Prints seen in lists with how often they were played. */
   printsSeen: Map<string, number>
-  lists: number
+  /** Indexes of the lists that play it. */
+  inLists: Set<number>
 }
 
-/** Pokémon deduplicate by Limitless id (one id = one card text), the rest by name. */
+/**
+ * First pass: Pokémon by Limitless id, the rest by name. Pokémon groups are
+ * merged again by their prints once the card pages are in (mergeByPrints).
+ */
 function buildPool(lists: List[]): PoolCard[] {
   const pool = new Map<string, PoolCard>()
-  for (const list of lists) {
-    const seen = new Set<string>()
+  for (const [i, list] of lists.entries()) {
     for (const c of list.cards) {
       const key = c.kind === 'pokemon' ? `p:${c.limitlessId}` : `${c.kind[0]}:${c.name}`
       let p = pool.get(key)
-      if (!p) pool.set(key, p = { key, kind: c.kind, name: c.name, printsSeen: new Map(), lists: 0 })
-      const print = `${c.set}-${c.number}`
+      if (!p) pool.set(key, p = { key, kind: c.kind, name: c.name, printsSeen: new Map(), inLists: new Set() })
+      const print = pk(c.set, c.number)
       p.printsSeen.set(print, (p.printsSeen.get(print) ?? 0) + c.count)
-      if (!seen.has(key)) { seen.add(key); p.lists++ }
+      p.inLists.add(i)
     }
   }
   return [...pool.values()]
@@ -194,6 +210,7 @@ interface TcgdexCard {
 const SET_OVERRIDES: Record<string, string> = {
   MEE: 'mee', MEG: 'me01', PFL: 'me02', ASC: 'me02.5', POR: 'me03', CRI: 'me04', PBL: 'me05',
   DLR: 'me06', '30C': '30th', MEP: 'mep', JTG: 'sv09', TWM: 'sv06', WHT: 'sv10.5w', BLK: 'sv10.5b',
+  SP: 'swshp',
 }
 
 const setIds = new Map<string, string | null>()
@@ -224,6 +241,38 @@ async function fetchTcgdex(print: string): Promise<TcgdexCard | null> {
   return null
 }
 
+const setImages = new Map<string, Map<string, string>>()
+
+/** localId → image for every card of a TCGdex set that has one. */
+async function tcgdexSetImages(set: string): Promise<Map<string, string>> {
+  let images = setImages.get(set)
+  if (!images) {
+    const data = await getJSON<{ cards: { localId: string; image?: string }[] }>(`${TCGDEX}/sets/${set}`)
+    images = new Map((data?.cards ?? []).filter(c => c.image).map(c => [c.localId, c.image!]))
+    setImages.set(set, images)
+  }
+  return images
+}
+
+/** TCGdex image of exactly this print, if TCGdex has one. */
+async function printImage(print: string): Promise<string | undefined> {
+  const [code] = splitPrint(print)
+  const set = await tcgdexSet(code)
+  if (!set) return undefined
+  const images = await tcgdexSetImages(set)
+  for (const id of await tcgdexIds(print)) {
+    const img = images.get(id.slice(set.length + 1))
+    if (img) return img
+  }
+  return undefined
+}
+
+/** The app's basic energy art: the first `swsh` print of that name, as the server picks it. */
+async function basicEnergyImage(name: string): Promise<string | undefined> {
+  const found = await getJSON<{ name: string; image?: string }[]>(`${TCGDEX}/cards?name=${encodeURIComponent(name)}&set=swsh`)
+  return found?.find(c => c.name === name && c.image)?.image
+}
+
 function splitPrint(print: string): [string, string] {
   const i = print.lastIndexOf('-')
   return [print.slice(0, i), print.slice(i + 1)]
@@ -245,6 +294,8 @@ interface LimitlessCard {
   retreat?: number
   regulationMark?: string
   prints: string[]
+  /** Limitless CDN image of this print. */
+  image?: string
 }
 
 function parseLimitlessCard(html: string): LimitlessCard {
@@ -302,19 +353,25 @@ function parseLimitlessCard(html: string): LimitlessCard {
 
   const mark = /<div class="regulation-mark">\s*([A-Z]) Regulation Mark/.exec(html)?.[1]
 
+  // The current print is a row without a link: take it from data-location.
+  // International prints are the rows up to the JP. Prints header; their
+  // links carry extra spaces (`<a  href=`).
   const prints: string[] = []
-  const current = /data-location="([^"]+)"/.exec(html)?.[1]
-  if (current) prints.push(current.replace('/', '-'))
+  const current = /data-location="([^"/]+)\/([^"]+)"/.exec(html)
+  if (current) prints.push(pk(current[1], current[2]))
   const table = /<table class="card-prints-versions">([\s\S]*?)<\/table>/.exec(html)?.[1] ?? ''
-  const intl = table.split(/<th>/).length > 1 ? table.split(/<tr[^>]*>\s*<th>/).find(s => s.startsWith('Int. Prints')) ?? table : table
-  for (const m of intl.matchAll(/<a href="\/cards\/([A-Za-z0-9]+)\/([A-Za-z0-9]+)"/g)) prints.push(`${m[1]}-${m[2]}`)
+  const from = table.indexOf('Int. Prints')
+  const to = table.indexOf('JP. Prints')
+  const intl = from < 0 ? '' : table.slice(from, to > from ? to : undefined)
+  for (const m of intl.matchAll(/<a\s+href="\/cards\/([A-Za-z0-9]+)\/([A-Za-z0-9]+)"/g)) prints.push(pk(m[1], m[2]))
+  const image = /<img class="card shadow[^"]*" src="([^"]+)"/.exec(html)?.[1]
 
   return {
     name, typeLine, attacks, abilities, rules, text: effect,
     hp: hpPart ? Number(hpPart.replace(/\D/g, '')) : undefined,
     types: types.length ? types : undefined,
     weakness: wr('Weakness'), resistance: wr('Resistance'), retreat,
-    regulationMark: mark, prints: [...new Set(prints)],
+    regulationMark: mark, prints: [...new Set(prints)], image,
   }
 }
 
@@ -347,13 +404,13 @@ function damageString(d: string | number | undefined): string {
 
 interface Mismatch { id: string; name: string; field: string; tcgdex: string; limitless: string }
 
-function merge(p: PoolCard, id: string, td: TcgdexCard | null, lc: LimitlessCard, tags: { ancient: Set<string>; future: Set<string>; ace: Set<string> }, mismatches: Mismatch[]): CatalogCard {
+function merge(p: PoolCard, id: string, allPrints: string[], td: TcgdexCard | null, lc: LimitlessCard, tags: { ancient: Set<string>; future: Set<string>; ace: Set<string> }, mismatches: Mismatch[]): CatalogCard {
   const diff = (field: string, a: unknown, b: unknown) => {
     const sa = typeof a === 'string' ? a : JSON.stringify(a)
     const sb = typeof b === 'string' ? b : JSON.stringify(b)
     if (norm(sa) !== norm(sb)) mismatches.push({ id, name: p.name, field, tcgdex: sa, limitless: sb })
   }
-  const prints = [...new Set([id, ...lc.prints, ...p.printsSeen.keys()])]
+  const prints = [...new Set([id, ...allPrints])]
   const stageOf = (s: string | undefined) => s?.replace(/^Stage(\d)$/, 'Stage $1')
   const tagged = (set: Set<string>) => prints.some(pr => set.has(pr))
   const cardTags: string[] = []
@@ -400,7 +457,7 @@ function merge(p: PoolCard, id: string, td: TcgdexCard | null, lc: LimitlessCard
       tags: cardTags,
       regulationMark: lc.regulationMark ?? td?.regulationMark,
       ...(td ? { tcgdexId: td.id } : {}),
-      prints, lists: p.lists,
+      prints, lists: p.inLists.size,
     }
   }
 
@@ -423,7 +480,7 @@ function merge(p: PoolCard, id: string, td: TcgdexCard | null, lc: LimitlessCard
       tags: cardTags,
       regulationMark: td?.regulationMark ?? lc.regulationMark,
       ...(td ? { tcgdexId: td.id } : {}),
-      prints, lists: p.lists,
+      prints, lists: p.inLists.size,
     }
   }
 
@@ -436,17 +493,76 @@ function merge(p: PoolCard, id: string, td: TcgdexCard | null, lc: LimitlessCard
     tags: cardTags,
     regulationMark: td?.regulationMark ?? lc.regulationMark,
     ...(td ? { tcgdexId: td.id } : {}),
-    prints, lists: p.lists,
+    prints, lists: p.inLists.size,
   }
 }
 
 // ── main ────────────────────────────────────────────────────────────────────
 
+interface Merged extends PoolCard {
+  /** Every print known for the card: its pages' print tables plus the lists. */
+  prints: Set<string>
+}
+
+/** Pokémon groups that share a print are one card (one text); trainers and energy are already one per name. */
+function mergeByPrints(groups: PoolCard[], printsOf: Map<PoolCard, Set<string>>): Merged[] {
+  const parent = groups.map((_, i) => i)
+  const find = (i: number): number => (parent[i] === i ? i : (parent[i] = find(parent[i])))
+  const owner = new Map<string, number>()
+  for (const [i, g] of groups.entries()) {
+    if (g.kind !== 'pokemon') continue
+    for (const pr of printsOf.get(g)!) {
+      const j = owner.get(pr)
+      if (j === undefined) owner.set(pr, i)
+      else parent[find(i)] = find(j)
+    }
+  }
+  const out = new Map<number, Merged>()
+  for (const [i, g] of groups.entries()) {
+    const root = find(i)
+    const m = out.get(root)
+    if (!m) {
+      out.set(root, { ...g, printsSeen: new Map(g.printsSeen), inLists: new Set(g.inLists), prints: new Set(printsOf.get(g)) })
+      continue
+    }
+    for (const [pr, n] of g.printsSeen) m.printsSeen.set(pr, (m.printsSeen.get(pr) ?? 0) + n)
+    for (const l of g.inLists) m.inLists.add(l)
+    for (const pr of printsOf.get(g)!) m.prints.add(pr)
+  }
+  return [...out.values()]
+}
+
+/** Image URLs as `prefix index:rest`, the prefix being everything up to the last slash. */
+function imageCodec() {
+  const prefixes: string[] = []
+  const index = new Map<string, number>()
+  return {
+    prefixes,
+    encode(url: string): string {
+      const cut = url.lastIndexOf('/') + 1
+      const prefix = url.slice(0, cut)
+      let i = index.get(prefix)
+      if (i === undefined) { i = prefixes.length; prefixes.push(prefix); index.set(prefix, i) }
+      return `${i}:${url.slice(cut)}`
+    },
+  }
+}
+
 async function main() {
-  const { body: tournament } = await get(TOURNAMENT)
-  const lists = parseLists(tournament)
-  const pool = buildPool(lists)
-  console.log(`${lists.length} lists, ${pool.length} distinct cards`)
+  const lists: List[] = []
+  for (const t of TOURNAMENTS) {
+    const { status, body } = await get(`${LIMITLESS}/tournaments/${t}/decklists`)
+    if (status !== 200) throw new Error(`tournament ${t}: HTTP ${status}`)
+    const found = parseLists(body, t)
+    console.log(`tournament ${t}: ${found.length} lists`)
+    lists.push(...found)
+  }
+  const groups = buildPool(lists)
+  console.log(`${lists.length} lists, ${groups.length} first-pass cards`)
+
+  const previousFile = join(OUT, 'cards.json')
+  const previous: CatalogCard[] = existsSync(previousFile) ? JSON.parse(readFileSync(previousFile, 'utf8')) : []
+  const previousIds = new Set(previous.map(c => c.id))
 
   const tags = {
     ancient: await searchPrints('is:ancient'),
@@ -455,37 +571,94 @@ async function main() {
   }
   console.log(`tags: ${tags.ancient.size} ancient, ${tags.future.size} future, ${tags.ace.size} ACE SPEC prints`)
 
+  const pages = new Map<string, LimitlessCard>()
+  const page = async (print: string): Promise<LimitlessCard> => {
+    let lc = pages.get(print)
+    if (!lc) {
+      const [code, number] = splitPrint(print)
+      const res = await get(`${LIMITLESS}/cards/${code}/${number}`)
+      if (res.status !== 200) throw new Error(`${print}: Limitless page ${res.status}`)
+      pages.set(print, lc = parseLimitlessCard(res.body))
+    }
+    return lc
+  }
+
+  const printsOf = new Map<PoolCard, Set<string>>()
+  for (const [i, g] of groups.entries()) {
+    const lc = await page(mainPrint(g))
+    printsOf.set(g, new Set([...lc.prints, ...g.printsSeen.keys()]))
+    if ((i + 1) % 50 === 0) console.log(`  pages ${i + 1}/${groups.length}`)
+  }
+  const pool = mergeByPrints(groups, printsOf)
+  console.log(`${pool.length} cards after merging Pokémon by prints`)
+
   const cards: CatalogCard[] = []
   const mismatches: Mismatch[] = []
+  const idConflicts: string[] = []
+  const missingImages: string[] = []
+  /** Exact-print TCGdex images. */
+  const ownImage = new Map<string, string>()
+  const imageSource = { tcgdex: 0, otherPrint: 0, limitless: 0, swsh: 0 }
   for (const [i, p] of pool.entries()) {
-    const id = mainPrint(p)
-    const [code, number] = splitPrint(id)
-    const page = await get(`${LIMITLESS}/cards/${code}/${number}`)
-    if (page.status !== 200) throw new Error(`${id}: Limitless page ${page.status}`)
-    const lc = parseLimitlessCard(page.body)
+    const existing = [...p.prints].filter(pr => previousIds.has(pr))
+    if (existing.length > 1) idConflicts.push(`${p.name}: ${existing.join(', ')} are now one card`)
+    const id = existing[0] ?? mainPrint(p)
+    const lc = await page(id)
     if (lc.name !== p.name) mismatches.push({ id, name: p.name, field: 'name', tcgdex: p.name, limitless: lc.name })
-    const td = p.kind === 'energy' && lc.typeLine[1] === 'Basic Energy' ? null : await fetchTcgdex(id)
-    cards.push(merge(p, id, td, lc, tags, mismatches))
-    if ((i + 1) % 25 === 0) console.log(`  ${i + 1}/${pool.length}`)
+    const basic = p.kind === 'energy' && lc.typeLine[1] === 'Basic Energy'
+    const td = basic ? null : await fetchTcgdex(id)
+    const card = merge(p, id, [...p.prints, ...lc.prints], td, lc, tags, mismatches)
+
+    let image: string | undefined
+    if (basic) {
+      image = await basicEnergyImage(card.name)
+      if (image) imageSource.swsh++
+    } else {
+      for (const pr of card.prints) {
+        const img = await printImage(pr)
+        if (img) ownImage.set(pr, img)
+      }
+      const other = card.prints.map(pr => ownImage.get(pr)).find(Boolean)
+      image = ownImage.get(id) ?? other ?? lc.image
+      if (ownImage.has(id)) imageSource.tcgdex++
+      else if (other) imageSource.otherPrint++
+      else if (lc.image) imageSource.limitless++
+    }
+    if (image) card.image = image
+    else missingImages.push(`${card.name} (${id})`)
+    cards.push(card)
+    if ((i + 1) % 25 === 0) console.log(`  cards ${i + 1}/${pool.length}`)
   }
 
   const order: Record<CardKind, number> = { pokemon: 0, trainer: 1, energy: 2 }
   cards.sort((a, b) => order[a.kind] - order[b.kind] || a.name.localeCompare(b.name) || a.id.localeCompare(b.id))
 
   // Aliases: every same-text print, plus its TCGdex id where the set maps.
+  // prints.json carries the same keys for the main app, with each print's art.
   const aliases: Aliases = {}
   const conflicts: string[] = []
-  const alias = (key: string, id: string) => {
-    if (aliases[key] && aliases[key] !== id) conflicts.push(`${key}: ${aliases[key]} vs ${id}`)
-    else aliases[key] = id
+  const codec = imageCodec()
+  const printsOut: Record<string, string | [string, string]> = {}
+  const byId = new Map(cards.map(c => [c.id, c]))
+  const alias = (key: string, id: string, image?: string) => {
+    if (aliases[key] && aliases[key] !== id) { conflicts.push(`${key}: ${aliases[key]} vs ${id}`); return }
+    aliases[key] = id
+    const canonical = byId.get(id)!.image
+    printsOut[key] = image && image !== canonical ? [id, codec.encode(image)] : id
   }
   for (const c of cards) {
     for (const pr of c.prints) {
-      alias(pr, c.id)
-      for (const tid of await tcgdexIds(pr)) alias(tid, c.id)
+      alias(pr, c.id, ownImage.get(pr))
+      for (const tid of await tcgdexIds(pr)) alias(tid, c.id, ownImage.get(pr))
     }
-    if (c.tcgdexId) alias(c.tcgdexId, c.id)
+    if (c.tcgdexId) alias(c.tcgdexId, c.id, ownImage.get(c.id))
   }
+  const names: Record<string, string> = {}
+  for (const c of cards) if (c.kind !== 'pokemon') names[normalizeName(c.name)] = c.id
+  const images: Record<string, string> = {}
+  for (const c of cards) if (c.image) images[c.id] = codec.encode(c.image)
+  const sorted = <T>(o: Record<string, T>) => Object.fromEntries(Object.entries(o).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
+  const printsJson = { prefixes: codec.prefixes, images: sorted(images), prints: sorted(printsOut), names: sorted(names) }
 
   const count = (pred: (c: CatalogCard) => boolean) => cards.filter(pred).length
   const totals = {
@@ -497,12 +670,14 @@ async function main() {
     'Basic Energy': count(c => c.kind === 'energy' && c.subtype === 'Basic'),
     'Special Energy': count(c => c.kind === 'energy' && c.subtype === 'Special'),
   }
-  const archetypes: Record<string, number> = {}
-  for (const l of lists) archetypes[l.archetype] = (archetypes[l.archetype] ?? 0) + 1
 
+  // Fixture decks: the best LAIC list of each archetype.
+  const laic = lists.filter(l => l.tournament === FIXTURE_TOURNAMENT)
+  const archetypes: Record<string, number> = {}
+  for (const l of laic) archetypes[l.archetype] = (archetypes[l.archetype] ?? 0) + 1
   const fixtures: FixtureDeck[] = []
   for (const name of Object.keys(archetypes)) {
-    const best = lists.filter(l => l.archetype === name).sort((a, b) => a.placing - b.placing)[0]
+    const best = laic.filter(l => l.archetype === name).sort((a, b) => a.placing - b.placing)[0]
     fixtures.push({
       archetype: name, placing: best.placing,
       cards: best.cards.map(c => ({ count: c.count, name: c.name, set: c.set, number: c.number, kind: c.kind })),
@@ -510,40 +685,59 @@ async function main() {
   }
   fixtures.sort((a, b) => archetypes[b.archetype] - archetypes[a.archetype] || a.archetype.localeCompare(b.archetype))
 
+  const tournamentUrl = (t: number) => `${LIMITLESS}/tournaments/${t}`
   const stats = {
-    tournament: TOURNAMENT.replace('/decklists', ''),
+    tournaments: TOURNAMENTS.map(tournamentUrl),
+    fixtureTournament: tournamentUrl(FIXTURE_TOURNAMENT),
     lists: lists.length,
+    fixtureLists: laic.length,
     total: cards.length,
     pokemonNames: new Set(cards.filter(c => c.kind === 'pokemon').map(c => c.name)).size,
     totals,
+    newCards: cards.filter(c => !previousIds.has(c.id)).length,
     archetypes: Object.fromEntries(Object.entries(archetypes).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))),
   }
+
+  const ids = new Set(cards.map(c => c.id))
+  const lost = [...previousIds].filter(id => !ids.has(id))
+  const trainers = cards.filter(c => c.kind === 'trainer')
+  const reprinted = trainers.filter(c => c.prints.length > 1).length / trainers.length
 
   const report = [
     '# Catalog build report',
     '',
-    `Generated by \`make catalog\` from ${stats.tournament}. ${cards.length} cards, ${mismatches.length} TCGdex vs Limitless differences, ${conflicts.length} alias conflicts.`,
+    `Generated by \`make catalog\` from Limitless tournaments ${TOURNAMENTS.join(', ')} (${lists.length} lists; fixture decks from ${FIXTURE_TOURNAMENT}), Limitless card pages and TCGdex.`,
+    `${cards.length} cards (${stats.newCards} new), ${Object.keys(printsOut).length} print keys, ${mismatches.length} TCGdex vs Limitless differences, ${conflicts.length} alias conflicts, ${lost.length} lost ids.`,
+    `Images: ${imageSource.tcgdex} from the card's own print on TCGdex, ${imageSource.otherPrint} from another print, ${imageSource.limitless} from Limitless, ${imageSource.swsh} basic energy from \`swsh\`. ${Math.round(reprinted * 100)}% of trainers have more than one print.`,
     '',
     'Differences are listed for manual review before cards are implemented. The catalog takes Pokémon from Limitless and trainer / energy text from TCGdex (the exact print\'s wording), each falling back to the other.',
     '',
+    ...(lost.length ? ['## Lost ids', '', ...lost.map(c => `- ${c}`), ''] : []),
+    ...(idConflicts.length ? ['## Merged ids', '', ...idConflicts.map(c => `- ${c}`), ''] : []),
     ...(conflicts.length ? ['## Alias conflicts', '', ...conflicts.map(c => `- ${c}`), ''] : []),
+    ...(missingImages.length ? ['## Missing images', '', ...missingImages.map(c => `- ${c}`), ''] : []),
     '## Text differences',
     '',
     ...mismatches.flatMap(m => [`### ${m.name} (${m.id}): ${m.field}`, '', `- TCGdex: ${m.tcgdex}`, `- Limitless: ${m.limitless}`, '']),
   ].join('\n')
 
-  console.log('totals', totals, `pokemon names: ${stats.pokemonNames}`)
-  console.log(`${mismatches.length} differences, ${conflicts.length} alias conflicts → ${REPORT}`)
-  const off = Object.entries(EXPECTED).filter(([k, v]) => totals[k as keyof typeof totals] !== v)
+  console.log('totals', totals, `pokemon names: ${stats.pokemonNames}, new cards: ${stats.newCards}`)
+  console.log(`${mismatches.length} differences, ${conflicts.length} alias conflicts, ${lost.length} lost ids → ${REPORT}`)
   writeFileSync(REPORT, report + '\n')
-  if (off.length && !ACCEPT) {
-    console.error(`totals differ from the plan: ${off.map(([k, v]) => `${k} ${totals[k as keyof typeof totals]} (expected ${v})`).join(', ')}. Rerun with --accept to write anyway.`)
+  const problems = [
+    ...(lost.length && !ACCEPT ? [`${lost.length} existing ids disappeared (${lost.join(', ')}); rerun with --accept to write anyway`] : []),
+    ...(missingImages.length ? [`${missingImages.length} cards have no image`] : []),
+    ...(reprinted < MIN_REPRINTED_TRAINERS ? [`only ${Math.round(reprinted * 100)}% of trainers have a second print: print discovery is broken`] : []),
+  ]
+  if (problems.length) {
+    console.error(problems.join('\n'))
     process.exit(1)
   }
 
   mkdirSync(join(OUT, 'fixtures'), { recursive: true })
   writeFileSync(join(OUT, 'cards.json'), JSON.stringify(cards, null, 1) + '\n')
-  writeFileSync(join(OUT, 'aliases.json'), JSON.stringify(Object.fromEntries(Object.entries(aliases).sort()), null, 1) + '\n')
+  writeFileSync(join(OUT, 'aliases.json'), JSON.stringify(sorted(aliases), null, 1) + '\n')
+  writeFileSync(PRINTS, JSON.stringify(printsJson) + '\n')
   writeFileSync(join(OUT, 'fixtures/decks.json'), JSON.stringify(fixtures, null, 1) + '\n')
   writeFileSync(join(OUT, 'fixtures/pool-stats.json'), JSON.stringify(stats, null, 1) + '\n')
   console.log(`wrote ${cards.length} cards, ${Object.keys(aliases).length} aliases, ${fixtures.length} fixture decks`)

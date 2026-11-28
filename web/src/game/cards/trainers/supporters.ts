@@ -1,4 +1,4 @@
-// Supporters in the LAIC 2026-27 pool, each written from its catalog text.
+// Supporters in the card pool, each written from its catalog text.
 
 import {
   addMarker, applyCondition, chooseOption, choosePokemon, defineCard, defineMarker, discardAttached,
@@ -402,3 +402,51 @@ defineCard('DLR-103', { trainer: {
   },
 } })
 
+
+// ── Standard events after LAIC (5+ lists) ────────────────────────────────
+
+// Hassel: You can use this card only if any of your Pokémon were Knocked Out during your opponent's
+// last turn. Look at the top 8 cards of your deck and put up to 3 of them into your hand. Shuffle
+// the other cards back into your deck.
+defineCard('TWM-151', { trainer: {
+  canPlay: x => sel.knockedOutLastTurn(x, x.me),
+  *play(x) {
+    const picks = yield* chooseCards(x, { title: 'Put up to 3 into your hand', options: topCards(x, 8), min: 0, max: 3 })
+    moveCards(x, picks, 'hand')
+    log(x, x.me, `Puts ${picks.length} card${picks.length === 1 ? '' : 's'} into their hand.`)
+    shuffleDeck(x, x.me)
+  },
+} })
+
+// Larry's Skill: Discard your hand and search your deck for a Pokémon, a Supporter card, and a Basic
+// Energy card, reveal them, and put them into your hand. Then, shuffle your deck.
+defineCard('PRE-115', { trainer: { *play(x) {
+  discardHand(x)
+  yield* searchEach(x, [[sel.pokemon, 'Choose a Pokémon'], [sel.trainerOf('Supporter'), 'Choose a Supporter card'], [sel.basicEnergy(), 'Choose a Basic Energy']])
+} } })
+
+// Morty's Conviction: You can use this card only if you discard another card from your hand. Draw a
+// card for each of your opponent's Benched Pokémon.
+defineCard('TEF-155', { trainer: {
+  canPlay: x => x.s.players[x.me].hand.some(u => u !== x.card),
+  *play(x) {
+    yield* discardFromHand(x, { min: 1, max: 1, title: 'Discard a card' })
+    draw(x, bench(x, x.opp).length)
+  },
+} })
+
+// Rust Syndicate Grunt: You can use this card only if any of your Pokémon were Knocked Out during
+// your opponent's last turn. Discard an Energy from 1 of your opponent's Pokémon.
+defineCard('PBL-81', { trainer: {
+  canPlay: x => sel.knockedOutLastTurn(x, x.me),
+  *play(x) {
+    const [uid] = yield* chooseCards(x, { title: 'Discard an Energy from 1 of your opponent\'s Pokémon', options: inPlayOf(x, x.opp).flatMap(s => s.energy) })
+    if (uid !== undefined) yield* discardAttached(x, [uid])
+  },
+} })
+
+// Tarragon: Put up to 4 in any combination of {F} Pokémon and Basic {F} Energy cards from your
+// discard pile into your hand.
+defineCard('POR-85', { trainer: { *play(x) {
+  yield* fromDiscard(x, { filter: sel.or(sel.ofType('Fighting'), sel.basicEnergy('Fighting')), max: 4, title: 'Choose up to 4 {F} Pokémon and Basic {F} Energy' })
+} } })

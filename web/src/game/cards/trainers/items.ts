@@ -1,10 +1,10 @@
-// Items in the LAIC 2026-27 pool, each written from its catalog text.
+// Items in the card pool, each written from its catalog text.
 
 import {
-  addMarker, attachEnergy, bottomCards, chooseCards, chooseOption, choosePokemon, defineCard, defineMarker,
+  addMarker, applyCondition, attachEnergy, bottomCards, chooseCards, chooseOption, choosePokemon, defineCard, defineMarker,
   devolve, discardAttached, discardFromHand, discardStadium, draw, evolveWith, flip, gust, heal, isFirstTurn,
   log, matching, moveCards, moveEnergy, nameOf, removePokemon, searchDeck, searchToBench, searchToHand, sel,
-  shuffleDeck, shuffleHandIntoDeck, shuffleInPlace, switchOwn, topCards, handToDeckBottom, type X,
+  shuffleDeck, shuffleHandIntoDeck, shuffleInPlace, switchOwn, topCards, handToDeckBottom, type Slot, type X,
 } from '../fx'
 import { cardsNamed, fromDiscard, searchEach } from '../helpers'
 import type { CardFilter } from '../../effects/select'
@@ -363,3 +363,73 @@ defineCard('PFL-94', { trainer: {
   },
 } })
 
+
+// ── Standard events after LAIC (5+ lists) ────────────────────────────────
+
+// Dark Bell: Both Active non-{D} Pokémon are now Confused.
+defineCard('PBL-75', { trainer: { *play(x) {
+  for (const p of [x.me, x.opp]) {
+    const slot = active(x, p)
+    if (slot && !is(x, slot, sel.ofType('Darkness'))) applyCondition(x, slot, 'confused')
+  }
+} } })
+
+// Hop's Bag: Search your deck for up to 2 Basic Hop's Pokémon and put them onto your Bench. Then,
+// shuffle your deck.
+defineCard('JTG-147', { trainer: { *play(x) {
+  yield* searchToBench(x, { filter: sel.and(sel.basicPokemon, sel.tagged("Hop's")), max: 2, title: "Put up to 2 Basic Hop's Pokémon onto your Bench" })
+} } })
+
+// Super Potion: Heal 60 damage from 1 of your Pokémon. If you healed any damage in this way, discard
+// an Energy from that Pokémon.
+defineCard('JTG-158', { trainer: {
+  canPlay: x => inPlayOf(x, x.me).some(s => s.damage > 0),
+  *play(x) {
+    const [slot] = yield* choosePokemon(x, { title: 'Heal 60 damage from 1 of your Pokémon', options: inPlayOf(x, x.me).filter(s => s.damage > 0) })
+    if (!slot || !heal(x, slot, 60) || !slot.energy.length) return
+    const [uid] = yield* chooseCards(x, { title: 'Discard an Energy from that Pokémon', options: slot.energy, min: 1, max: 1 })
+    yield* discardAttached(x, [uid])
+  },
+} })
+
+// Tera Orb: Search your deck for a Tera Pokémon, reveal it, and put it into your hand. Then, shuffle your deck.
+defineCard('SSP-189', { trainer: { *play(x) { yield* searchToHand(x, { filter: sel.tera, title: 'Choose a Tera Pokémon' }) } } })
+
+// Transformation Tome: You must play 2 Transformation Tome cards at once. (This effect works one time
+// for 2 cards.) Choose a Basic Pokémon in your discard pile and switch it with 1 of your Basic
+// Pokémon in play. Any attached cards, damage counters, Special Conditions, turns in play, and any
+// other effects remain on the new Pokémon.
+const TOME = 'Transformation Tome'
+const otherTome = (x: X) => x.s.players[x.me].hand.find(u => u !== x.card && nameOf(x, u) === TOME)
+const unevolved = (x: X) => inPlayOf(x, x.me).filter(s => s.stack.length === 1)
+defineCard('CRI-83', { trainer: {
+  canPlay: x => otherTome(x) !== undefined && unevolved(x).length > 0 && matching(x, x.s.players[x.me].discard, sel.basicPokemon).length > 0,
+  *play(x) {
+    moveCards(x, [otherTome(x)!], 'discard')
+    const [uid] = yield* chooseCards(x, { title: 'Choose a Basic Pokémon in your discard pile', options: matching(x, x.s.players[x.me].discard, sel.basicPokemon) })
+    const [slot] = yield* choosePokemon(x, { title: `Switch ${nameOf(x, uid)} with 1 of your Basic Pokémon`, options: unevolved(x) })
+    if (uid === undefined || !slot) return
+    const pl = x.s.players[x.me]
+    const old = slot.stack[0]
+    log(x, x.me, `Switches ${nameOf(x, old)} with ${nameOf(x, uid)} from the discard pile.`)
+    pl.discard.splice(pl.discard.indexOf(uid), 1, old)
+    slot.stack[0] = uid
+    renameSlot(x, slot, uid)
+  },
+} })
+
+/** A slot's id is its bottom card: when that card changes, every reference follows it. */
+function renameSlot(x: X, slot: Slot, id: number): void {
+  const from = slot.id
+  const re = (n: number) => (n === from ? id : n)
+  slot.id = id
+  for (const m of x.s.markers) if (m.slot === from) m.slot = id
+  for (const t of x.s.history) {
+    t.attacks = t.attacks.map(a => ({ ...a, slot: re(a.slot) }))
+    t.abilities = t.abilities.map(a => ({ ...a, slot: re(a.slot) }))
+    t.movedToActive = t.movedToActive.map(re)
+  }
+  for (const pl of x.s.players) {
+    for (const s of [pl.active, ...pl.bench]) if (s?.hitBy?.attacker === from) s.hitBy = { ...s.hitBy, attacker: id }
+  }
+}

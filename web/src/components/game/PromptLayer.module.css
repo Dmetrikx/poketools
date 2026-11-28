@@ -34,6 +34,8 @@
   inset: 0;
   z-index: 350;
   display: grid;
+  /* A fixed-size cell, so the tray's max-height resolves and long lists scroll inside it. */
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   place-items: center;
   padding: 100px 16px 16px;
   background: rgba(2, 6, 15, 0.55);
@@ -61,6 +63,7 @@
   justify-content: center;
   gap: 12px;
   overflow-y: auto;
+  min-height: 0;
   padding: 12px 6px 6px;
 }
 
@@ -93,7 +96,7 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 
-.trayActions { display: flex; align-items: center; gap: 8px; }
+.trayActions { display: flex; flex-shrink: 0; align-items: center; gap: 8px; }
 .spacer { flex: 1; }
 
 .dialog {

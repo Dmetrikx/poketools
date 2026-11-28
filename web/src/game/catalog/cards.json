@@ -34,7 +34,8 @@
   "prints": [
    "MEG-54"
   ],
-  "lists": 21
+  "lists": 190,
+  "image": "https://assets.tcgdex.net/en/me/me01/054"
  },
  {
   "id": "TWM-80",
@@ -76,7 +77,8 @@
   "prints": [
    "TWM-80"
   ],
-  "lists": 9
+  "lists": 85,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/080"
  },
  {
   "id": "MEG-56",
@@ -117,9 +119,12 @@
   "regulationMark": "I",
   "tcgdexId": "me01-056",
   "prints": [
-   "MEG-56"
+   "MEG-56",
+   "MEP-3",
+   "MEP-9"
   ],
-  "lists": 21
+  "lists": 193,
+  "image": "https://assets.tcgdex.net/en/me/me01/056"
  },
  {
   "id": "TWM-82",
@@ -165,7 +170,54 @@
   "prints": [
    "TWM-82"
   ],
-  "lists": 1
+  "lists": 21,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/082"
+ },
+ {
+  "id": "30C-2",
+  "name": "Alolan Exeggutor",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 150,
+  "types": [
+   "Grass"
+  ],
+  "evolveFrom": "Exeggcute",
+  "attacks": [
+   {
+    "name": "Mega Drain",
+    "cost": [
+     "Grass",
+     "Colorless",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "150",
+    "text": "Heal 50 damage from this Pokémon"
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Scale Up",
+    "text": "If this Pokémon has 6 or more {G} Energy attached, it gets +250 HP."
+   }
+  ],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 4,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "30th-002",
+  "prints": [
+   "30C-2",
+   "MEP-94",
+   "30C-129"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/30th/002"
  },
  {
   "id": "PBL-41",
@@ -209,7 +261,8 @@
   "prints": [
    "PBL-41"
   ],
-  "lists": 8
+  "lists": 129,
+  "image": "https://assets.tcgdex.net/en/me/me05/041"
  },
  {
   "id": "SSP-100",
@@ -253,7 +306,43 @@
   "prints": [
    "SSP-100"
   ],
-  "lists": 4
+  "lists": 72,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/100"
+ },
+ {
+  "id": "DRI-16",
+  "name": "Applin",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 40,
+  "types": [
+   "Grass"
+  ],
+  "attacks": [
+   {
+    "name": "Mini Drain",
+    "cost": [
+     "Grass"
+    ],
+    "damage": "10",
+    "text": "Heal 10 damage from this Pokémon."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "sv10-016",
+  "prints": [
+   "DRI-16"
+  ],
+  "lists": 6,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/016"
  },
  {
   "id": "SCR-12",
@@ -285,9 +374,11 @@
   "regulationMark": "H",
   "tcgdexId": "sv07-012",
   "prints": [
-   "SCR-12"
+   "SCR-12",
+   "PRE-9"
   ],
-  "lists": 11
+  "lists": 73,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/012"
  },
  {
   "id": "TWM-126",
@@ -325,9 +416,11 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-126",
   "prints": [
-   "TWM-126"
+   "TWM-126",
+   "TWM-185"
   ],
-  "lists": 11
+  "lists": 102,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/126"
  },
  {
   "id": "TWM-17",
@@ -361,7 +454,8 @@
   "prints": [
    "TWM-17"
   ],
-  "lists": 30
+  "lists": 193,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/017"
  },
  {
   "id": "DRI-23",
@@ -406,9 +500,187 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-023",
   "prints": [
-   "DRI-23"
+   "DRI-23",
+   "DRI-207"
   ],
-  "lists": 2
+  "lists": 24,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/023"
+ },
+ {
+  "id": "PFL-75",
+  "name": "Archaludon",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 180,
+  "types": [
+   "Metal"
+  ],
+  "evolveFrom": "Duraludon",
+  "attacks": [
+   {
+    "name": "Coated Attack",
+    "cost": [
+     "Metal",
+     "Metal",
+     "Metal"
+    ],
+    "damage": "120",
+    "text": "During your opponent's next turn, prevent all damage done to this Pokémon by attacks from Basic Pokémon."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Grass",
+   "value": "-30"
+  },
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "me02-075",
+  "prints": [
+   "PFL-75"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me02/075"
+ },
+ {
+  "id": "SCR-107",
+  "name": "Archaludon",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 180,
+  "types": [
+   "Metal"
+  ],
+  "evolveFrom": "Duraludon",
+  "attacks": [
+   {
+    "name": "Iron Blaster",
+    "cost": [
+     "Metal",
+     "Metal",
+     "Colorless"
+    ],
+    "damage": "160",
+    "text": "During your next turn, this Pokémon can't attack."
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Metal Bridge",
+    "text": "All of your Pokémon that have {M} Energy attached have no Retreat Cost."
+   }
+  ],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Grass",
+   "value": "-30"
+  },
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv07-107",
+  "prints": [
+   "SCR-107",
+   "SCR-155",
+   "PRE-70"
+  ],
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/107"
+ },
+ {
+  "id": "SSP-130",
+  "name": "Archaludon ex",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 300,
+  "types": [
+   "Metal"
+  ],
+  "evolveFrom": "Duraludon",
+  "attacks": [
+   {
+    "name": "Metal Defender",
+    "cost": [
+     "Metal",
+     "Metal",
+     "Metal"
+    ],
+    "damage": "220",
+    "text": "During your opponent's next turn, this Pokémon has no Weakness."
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Assemble Alloy",
+    "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon during your turn, you may attach up to 2 Basic {M} Energy cards from your discard pile to your {M} Pokémon in any way you like."
+   }
+  ],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Grass",
+   "value": "-30"
+  },
+  "retreat": 2,
+  "tags": [
+   "ex"
+  ],
+  "regulationMark": "H",
+  "tcgdexId": "sv08-130",
+  "prints": [
+   "SSP-130",
+   "SSP-224",
+   "SSP-241"
+  ],
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/130"
+ },
+ {
+  "id": "PBL-12",
+  "name": "Armarouge",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 140,
+  "types": [
+   "Fire"
+  ],
+  "evolveFrom": "Charcadet",
+  "attacks": [
+   {
+    "name": "Flame Legion",
+    "cost": [
+     "Fire"
+    ],
+    "damage": "40+",
+    "text": "This attack does 40 more damage for each of your Benched Pokémon that has any {R} Energy attached."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Water",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me05-012",
+  "prints": [
+   "PBL-12",
+   "PBL-86"
+  ],
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/me/me05/012"
  },
  {
   "id": "DLR-80",
@@ -438,9 +710,11 @@
   "regulationMark": "J",
   "tcgdexId": "me06-080",
   "prints": [
-   "DLR-80"
+   "DLR-80",
+   "DLR-115"
   ],
-  "lists": 16
+  "lists": 16,
+  "image": "https://assets.tcgdex.net/en/me/me06/080"
  },
  {
   "id": "PBL-34",
@@ -483,7 +757,100 @@
   "prints": [
    "PBL-34"
   ],
-  "lists": 15
+  "lists": 125,
+  "image": "https://assets.tcgdex.net/en/me/me05/034"
+ },
+ {
+  "id": "POR-43",
+  "name": "Barbaracle",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 130,
+  "types": [
+   "Fighting"
+  ],
+  "evolveFrom": "Binacle",
+  "attacks": [
+   {
+    "name": "Hammer In",
+    "cost": [
+     "Fighting",
+     "Fighting",
+     "Colorless"
+    ],
+    "damage": "80",
+    "text": ""
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Stone Arms",
+    "text": "Once during your turn, you may use this Ability. Attach a Basic {F} Energy card from your hand to 1 of your {F} Pokémon."
+   }
+  ],
+  "weakness": {
+   "type": "Grass",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me03-043",
+  "prints": [
+   "POR-43",
+   "MEP-65"
+  ],
+  "lists": 4,
+  "image": "https://assets.tcgdex.net/en/me/me03/043"
+ },
+ {
+  "id": "PBL-62",
+  "name": "Bastiodon",
+  "kind": "pokemon",
+  "subtype": "Stage 2",
+  "hp": 160,
+  "types": [
+   "Metal"
+  ],
+  "evolveFrom": "Shieldon",
+  "attacks": [
+   {
+    "name": "Hammer In",
+    "cost": [
+     "Metal",
+     "Metal",
+     "Colorless"
+    ],
+    "damage": "160",
+    "text": ""
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Ancient Bulwark",
+    "text": "As long as this Pokémon is on your Bench, prevent all damage done to each of your Pokémon by attacks from your opponent's Pokémon that have 2 or less Energy attached."
+   }
+  ],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Grass",
+   "value": "-30"
+  },
+  "retreat": 4,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me05-062",
+  "prints": [
+   "PBL-62",
+   "MEP-85",
+   "PBL-93"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me05/062"
  },
  {
   "id": "ASC-9",
@@ -519,7 +886,8 @@
   "prints": [
    "ASC-9"
   ],
-  "lists": 7
+  "lists": 39,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/009"
  },
  {
   "id": "MEG-9",
@@ -555,7 +923,8 @@
   "prints": [
    "MEG-9"
   ],
-  "lists": 23
+  "lists": 157,
+  "image": "https://assets.tcgdex.net/en/me/me01/009"
  },
  {
   "id": "CRI-3",
@@ -590,9 +959,50 @@
   "regulationMark": "J",
   "tcgdexId": "me04-003",
   "prints": [
-   "CRI-3"
+   "CRI-3",
+   "CRI-98"
   ],
-  "lists": 1
+  "lists": 7,
+  "image": "https://assets.tcgdex.net/en/me/me04/003"
+ },
+ {
+  "id": "TEF-74",
+  "name": "Beheeyem",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 100,
+  "types": [
+   "Psychic"
+  ],
+  "evolveFrom": "Elgyem",
+  "attacks": [
+   {
+    "name": "Cosmic Beatdown",
+    "cost": [
+     "Psychic"
+    ],
+    "damage": "20×",
+    "text": "This attack does 20 damage for each of your Pokémon in play."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Darkness",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv05-074",
+  "prints": [
+   "TEF-74"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/074"
  },
  {
   "id": "CRI-59",
@@ -638,7 +1048,8 @@
   "prints": [
    "CRI-59"
   ],
-  "lists": 11
+  "lists": 52,
+  "image": "https://assets.tcgdex.net/en/me/me04/059"
  },
  {
   "id": "TEF-113",
@@ -685,7 +1096,101 @@
   "prints": [
    "TEF-113"
   ],
-  "lists": 12
+  "lists": 75,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/113"
+ },
+ {
+  "id": "POR-42",
+  "name": "Binacle",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 80,
+  "types": [
+   "Fighting"
+  ],
+  "attacks": [
+   {
+    "name": "Double Draw",
+    "cost": [
+     "Fighting"
+    ],
+    "damage": "",
+    "text": "Draw 2 cards."
+   },
+   {
+    "name": "Scratch",
+    "cost": [
+     "Fighting",
+     "Fighting"
+    ],
+    "damage": "30",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Grass",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me03-042",
+  "prints": [
+   "POR-42",
+   "MEP-87"
+  ],
+  "lists": 4,
+  "image": "https://assets.tcgdex.net/en/me/me03/042"
+ },
+ {
+  "id": "DRI-42",
+  "name": "Blaziken",
+  "kind": "pokemon",
+  "subtype": "Stage 2",
+  "hp": 170,
+  "types": [
+   "Fire"
+  ],
+  "evolveFrom": "Combusken",
+  "attacks": [
+   {
+    "name": "Heat Blast",
+    "cost": [
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "70",
+    "text": ""
+   },
+   {
+    "name": "Inferno Kick Flurry",
+    "cost": [
+     "Fire",
+     "Fire",
+     "Colorless"
+    ],
+    "damage": "120",
+    "text": "Discard 2 Energy from this Pokémon. This attack also does 120 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Water",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "sv10-042",
+  "prints": [
+   "DRI-42",
+   "DRI-192"
+  ],
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/042"
  },
  {
   "id": "JTG-24",
@@ -728,7 +1233,51 @@
   "prints": [
    "JTG-24"
   ],
-  "lists": 8
+  "lists": 138,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/024"
+ },
+ {
+  "id": "PRE-54",
+  "name": "Bloodmoon Ursaluna",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 150,
+  "types": [
+   "Fighting"
+  ],
+  "attacks": [
+   {
+    "name": "Mad Bite",
+    "cost": [
+     "Fighting",
+     "Fighting",
+     "Colorless"
+    ],
+    "damage": "100+",
+    "text": "This attack does 30 more damage for each damage counter on your opponent's Active Pokémon."
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Battle-Hardened",
+    "text": "When you play this Pokémon from your hand onto your Bench during your turn, you may attach up to 2 Basic {F} Energy cards from your hand to this Pokémon."
+   }
+  ],
+  "weakness": {
+   "type": "Grass",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 4,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv08.5-054",
+  "prints": [
+   "PRE-54",
+   "SFA-25"
+  ],
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/sv/sv08.5/054"
  },
  {
   "id": "TWM-141",
@@ -771,9 +1320,279 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-141",
   "prints": [
-   "TWM-141"
+   "TWM-141",
+   "SVP-177",
+   "TWM-202",
+   "TWM-216",
+   "TWM-222",
+   "PRE-168"
   ],
-  "lists": 18
+  "lists": 145,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/141"
+ },
+ {
+  "id": "SCR-119",
+  "name": "Bouffalant",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 100,
+  "types": [
+   "Colorless"
+  ],
+  "attacks": [
+   {
+    "name": "Boundless Power",
+    "cost": [
+     "Colorless",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "130",
+    "text": "During your next turn, this Pokémon can't attack."
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Curly Wall",
+    "text": "As long as you have at least 1 other Bouffalant in play, all of your Basic {C} Pokémon take 60 less damage from attacks from your opponent's Pokémon (after applying Weakness and Resistance). The effect of Curly Wall doesn't stack."
+   }
+  ],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv07-119",
+  "prints": [
+   "SCR-119",
+   "SVP-136"
+  ],
+  "lists": 8,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/119"
+ },
+ {
+  "id": "SSP-151",
+  "name": "Bouffalant",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 130,
+  "types": [
+   "Colorless"
+  ],
+  "attacks": [
+   {
+    "name": "Ready to Ram",
+    "cost": [
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "40",
+    "text": "During your opponent's next turn, if this Pokémon is damaged by an attack (even if this Pokémon is Knocked Out), put 6 damage counters on the Attacking Pokémon."
+   },
+   {
+    "name": "Smashing Headbutt",
+    "cost": [
+     "Colorless",
+     "Colorless",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "150",
+    "text": "Discard 2 Energy from this Pokémon."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv08-151",
+  "prints": [
+   "SSP-151"
+  ],
+  "lists": 8,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/151"
+ },
+ {
+  "id": "TEF-69",
+  "name": "Bronzong",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 110,
+  "types": [
+   "Psychic"
+  ],
+  "evolveFrom": "Bronzor",
+  "attacks": [
+   {
+    "name": "Evolution Jammer",
+    "cost": [
+     "Psychic"
+    ],
+    "damage": "30",
+    "text": "During your opponent's next turn, they can't play any Pokémon from their hand to evolve their Pokémon."
+   },
+   {
+    "name": "Super Psy Bolt",
+    "cost": [
+     "Psychic",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "100",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Darkness",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 3,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv05-069",
+  "prints": [
+   "TEF-69"
+  ],
+  "lists": 43,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/069"
+ },
+ {
+  "id": "PRE-66",
+  "name": "Bronzor",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 70,
+  "types": [
+   "Metal"
+  ],
+  "attacks": [
+   {
+    "name": "Hammer In",
+    "cost": [
+     "Metal",
+     "Colorless"
+    ],
+    "damage": "20",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Grass",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv08.5-066",
+  "prints": [
+   "PRE-66"
+  ],
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/sv/sv08.5/066"
+ },
+ {
+  "id": "TEF-68",
+  "name": "Bronzor",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 80,
+  "types": [
+   "Psychic"
+  ],
+  "attacks": [
+   {
+    "name": "Mirror Attack",
+    "cost": [
+     "Psychic"
+    ],
+    "damage": "10+",
+    "text": "If your opponent's Active Pokémon is a {P} Pokémon, this attack does 30 more damage."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Darkness",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 3,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv05-068",
+  "prints": [
+   "TEF-68",
+   "TEF-170"
+  ],
+  "lists": 38,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/068"
+ },
+ {
+  "id": "TWM-118",
+  "name": "Brute Bonnet",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 120,
+  "types": [
+   "Darkness"
+  ],
+  "attacks": [
+   {
+    "name": "Poison Spray",
+    "cost": [
+     "Darkness"
+    ],
+    "damage": "",
+    "text": "Your opponent's Active Pokémon is now Poisoned."
+   },
+   {
+    "name": "Relentless Punches",
+    "cost": [
+     "Darkness",
+     "Darkness",
+     "Darkness"
+    ],
+    "damage": "50+",
+    "text": "This attack does 50 more damage for each damage counter on your opponent's Active Pokémon."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Grass",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 3,
+  "tags": [
+   "Ancient"
+  ],
+  "regulationMark": "H",
+  "tcgdexId": "sv06-118",
+  "prints": [
+   "TWM-118"
+  ],
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/118"
  },
  {
   "id": "ASC-16",
@@ -803,9 +1622,12 @@
   "regulationMark": "H",
   "tcgdexId": "me02.5-016",
   "prints": [
-   "ASC-16"
+   "ASC-16",
+   "PRE-4",
+   "ASC-221"
   ],
-  "lists": 202
+  "lists": 1350,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/016"
  },
  {
   "id": "MEG-1",
@@ -837,9 +1659,11 @@
   "regulationMark": "I",
   "tcgdexId": "me01-001",
   "prints": [
-   "MEG-1"
+   "MEG-1",
+   "MEG-133"
   ],
-  "lists": 1
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/me/me01/001"
  },
  {
   "id": "MEG-107",
@@ -881,7 +1705,8 @@
   "prints": [
    "MEG-107"
   ],
-  "lists": 1
+  "lists": 9,
+  "image": "https://assets.tcgdex.net/en/me/me01/107"
  },
  {
   "id": "PFL-83",
@@ -924,7 +1749,8 @@
   "prints": [
    "PFL-83"
   ],
-  "lists": 5
+  "lists": 94,
+  "image": "https://assets.tcgdex.net/en/me/me02/083"
  },
  {
   "id": "DLR-4",
@@ -958,7 +1784,8 @@
   "prints": [
    "DLR-4"
   ],
-  "lists": 1
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me06/004"
  },
  {
   "id": "DLR-5",
@@ -1001,7 +1828,8 @@
   "prints": [
    "DLR-5"
   ],
-  "lists": 1
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me06/005"
  },
  {
   "id": "PFL-60",
@@ -1035,7 +1863,8 @@
   "prints": [
    "PFL-60"
   ],
-  "lists": 8
+  "lists": 49,
+  "image": "https://assets.tcgdex.net/en/me/me02/060"
  },
  {
   "id": "MEG-12",
@@ -1077,7 +1906,172 @@
   "prints": [
    "MEG-12"
   ],
-  "lists": 24
+  "lists": 138,
+  "image": "https://assets.tcgdex.net/en/me/me01/012"
+ },
+ {
+  "id": "SSP-36",
+  "name": "Ceruledge ex",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 270,
+  "types": [
+   "Fire"
+  ],
+  "evolveFrom": "Charcadet",
+  "attacks": [
+   {
+    "name": "Abyssal Flames",
+    "cost": [
+     "Fire"
+    ],
+    "damage": "30+",
+    "text": "This attack does 20 more damage for each Energy card in your discard pile."
+   },
+   {
+    "name": "Raging Amethyst",
+    "cost": [
+     "Fire",
+     "Psychic",
+     "Metal"
+    ],
+    "damage": "280",
+    "text": "Discard all Energy from this Pokémon."
+   }
+  ],
+  "abilities": [],
+  "rules": [
+   "As long as this Pokémon is on your Bench, prevent all damage done to this Pokémon by attacks (both yours and your opponent’s)."
+  ],
+  "weakness": {
+   "type": "Water",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [
+   "ex",
+   "Tera"
+  ],
+  "regulationMark": "H",
+  "tcgdexId": "sv08-036",
+  "prints": [
+   "SSP-36",
+   "PRE-147"
+  ],
+  "lists": 6,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/036"
+ },
+ {
+  "id": "TWM-38",
+  "name": "Chandelure",
+  "kind": "pokemon",
+  "subtype": "Stage 2",
+  "hp": 130,
+  "types": [
+   "Fire"
+  ],
+  "evolveFrom": "Lampent",
+  "attacks": [
+   {
+    "name": "Mind Ruler",
+    "cost": [
+     "Fire"
+    ],
+    "damage": "30×",
+    "text": "This attack does 30 damage for each card in your opponent's hand."
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Alluring Light",
+    "text": "Once during your turn, you may have each player draw a card."
+   }
+  ],
+  "weakness": {
+   "type": "Water",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv06-038",
+  "prints": [
+   "TWM-38"
+  ],
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/038"
+ },
+ {
+  "id": "PBL-11",
+  "name": "Charcadet",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 80,
+  "types": [
+   "Fire"
+  ],
+  "attacks": [
+   {
+    "name": "Best Punch",
+    "cost": [
+     "Fire"
+    ],
+    "damage": "40",
+    "text": "Flip a coin. If tails, this attack does nothing."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Water",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me05-011",
+  "prints": [
+   "PBL-11"
+  ],
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/me/me05/011"
+ },
+ {
+  "id": "SSP-32",
+  "name": "Charcadet",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 70,
+  "types": [
+   "Fire"
+  ],
+  "attacks": [
+   {
+    "name": "Will-O-Wisp",
+    "cost": [
+     "Fire"
+    ],
+    "damage": "20",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Water",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv08-032",
+  "prints": [
+   "SSP-32"
+  ],
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/032"
  },
  {
   "id": "PFL-11",
@@ -1116,7 +2110,8 @@
   "prints": [
    "PFL-11"
   ],
-  "lists": 1
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me02/011"
  },
  {
   "id": "PFL-12",
@@ -1149,9 +2144,11 @@
   "regulationMark": "I",
   "tcgdexId": "me02-012",
   "prints": [
-   "PFL-12"
+   "PFL-12",
+   "MEP-79"
   ],
-  "lists": 1
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me02/012"
  },
  {
   "id": "PBL-59",
@@ -1185,7 +2182,8 @@
   "prints": [
    "PBL-59"
   ],
-  "lists": 1
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/me/me05/059"
  },
  {
   "id": "TWM-39",
@@ -1228,7 +2226,8 @@
   "prints": [
    "TWM-39"
   ],
-  "lists": 17
+  "lists": 118,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/039"
  },
  {
   "id": "SSP-56",
@@ -1267,9 +2266,11 @@
   "regulationMark": "H",
   "tcgdexId": "sv08-056",
   "prints": [
-   "SSP-56"
+   "SSP-56",
+   "SVP-152"
   ],
-  "lists": 58
+  "lists": 334,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/056"
  },
  {
   "id": "ASC-8",
@@ -1312,7 +2313,8 @@
   "prints": [
    "ASC-8"
   ],
-  "lists": 15
+  "lists": 106,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/008"
  },
  {
   "id": "MEG-8",
@@ -1344,9 +2346,137 @@
   "regulationMark": "I",
   "tcgdexId": "me01-008",
   "prints": [
-   "MEG-8"
+   "MEG-8",
+   "MEP-69"
   ],
-  "lists": 15
+  "lists": 72,
+  "image": "https://assets.tcgdex.net/en/me/me01/008"
+ },
+ {
+  "id": "MEP-46",
+  "name": "Chikorita",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 70,
+  "types": [
+   "Grass"
+  ],
+  "attacks": [
+   {
+    "name": "Razor Leaf",
+    "cost": [
+     "Grass",
+     "Colorless"
+    ],
+    "damage": "30",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "mep-046",
+  "prints": [
+   "MEP-46"
+  ],
+  "lists": 6,
+  "image": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/MEP/MEP_046_R_EN_LG.png"
+ },
+ {
+  "id": "CRI-73",
+  "name": "Cinccino ex",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 240,
+  "types": [
+   "Colorless"
+  ],
+  "evolveFrom": "Minccino",
+  "attacks": [
+   {
+    "name": "Energized Slap",
+    "cost": [
+     "Colorless"
+    ],
+    "damage": "40×",
+    "text": "This attack does 40 damage for each Energy attached to this Pokémon."
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Smooth Coat",
+    "text": "If any damage is done to this Pokémon by attacks, flip a coin. If heads, prevent that damage."
+   }
+  ],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [
+   "ex"
+  ],
+  "regulationMark": "J",
+  "tcgdexId": "me04-073",
+  "prints": [
+   "CRI-73",
+   "CRI-105",
+   "CRI-119"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me04/073"
+ },
+ {
+  "id": "POR-30",
+  "name": "Clefairy",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 70,
+  "types": [
+   "Psychic"
+  ],
+  "attacks": [
+   {
+    "name": "Follow Me",
+    "cost": [
+     "Psychic"
+    ],
+    "damage": "",
+    "text": "Switch in 1 of your opponent's Benched Pokémon to the Active Spot."
+   },
+   {
+    "name": "Flop",
+    "cost": [
+     "Psychic",
+     "Psychic"
+    ],
+    "damage": "30",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Metal",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me03-030",
+  "prints": [
+   "POR-30",
+   "POR-94"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me03/030"
  },
  {
   "id": "SSP-83",
@@ -1394,7 +2524,8 @@
   "prints": [
    "SSP-83"
   ],
-  "lists": 2
+  "lists": 19,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/083"
  },
  {
   "id": "DRI-41",
@@ -1438,7 +2569,51 @@
   "prints": [
    "DRI-41"
   ],
-  "lists": 8
+  "lists": 131,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/041"
+ },
+ {
+  "id": "SCR-63",
+  "name": "Comfey",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 70,
+  "types": [
+   "Psychic"
+  ],
+  "attacks": [
+   {
+    "name": "Flower Shower",
+    "cost": [
+     "Psychic"
+    ],
+    "damage": "",
+    "text": "Each player draws 3 cards."
+   },
+   {
+    "name": "Play Rough",
+    "cost": [
+     "Psychic"
+    ],
+    "damage": "20+",
+    "text": "Flip a coin. If heads, this attack does 20 more damage."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Metal",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv07-063",
+  "prints": [
+   "SCR-63"
+  ],
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/063"
  },
  {
   "id": "TWM-112",
@@ -1483,9 +2658,14 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-112",
   "prints": [
-   "TWM-112"
+   "TWM-112",
+   "TWM-199",
+   "TWM-215",
+   "PRE-58",
+   "PRE-160"
   ],
-  "lists": 11
+  "lists": 20,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/112"
  },
  {
   "id": "DRI-12",
@@ -1525,9 +2705,11 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-012",
   "prints": [
-   "DRI-12"
+   "DRI-12",
+   "DRI-186"
   ],
-  "lists": 24
+  "lists": 99,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/012"
  },
  {
   "id": "DRI-103",
@@ -1567,9 +2749,11 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-103",
   "prints": [
-   "DRI-103"
+   "DRI-103",
+   "ASC-110"
   ],
-  "lists": 2
+  "lists": 28,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/103"
  },
  {
   "id": "DRI-104",
@@ -1614,9 +2798,15 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-104",
   "prints": [
-   "DRI-104"
+   "DRI-104",
+   "SVP-204",
+   "DRI-215",
+   "DRI-232",
+   "DRI-241",
+   "ASC-111"
   ],
-  "lists": 2
+  "lists": 28,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/104"
  },
  {
   "id": "DRI-102",
@@ -1650,9 +2840,11 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-102",
   "prints": [
-   "DRI-102"
+   "DRI-102",
+   "ASC-109"
   ],
-  "lists": 2
+  "lists": 28,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/102"
  },
  {
   "id": "DRI-7",
@@ -1688,7 +2880,8 @@
   "prints": [
    "DRI-7"
   ],
-  "lists": 2
+  "lists": 28,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/007"
  },
  {
   "id": "DRI-8",
@@ -1730,9 +2923,11 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-008",
   "prints": [
-   "DRI-8"
+   "DRI-8",
+   "DRI-184"
   ],
-  "lists": 2
+  "lists": 28,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/008"
  },
  {
   "id": "DRI-129",
@@ -1766,9 +2961,12 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-129",
   "prints": [
-   "DRI-129"
+   "DRI-129",
+   "ASC-133",
+   "ASC-244"
   ],
-  "lists": 2
+  "lists": 27,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/129"
  },
  {
   "id": "SSP-87",
@@ -1810,7 +3008,48 @@
   "prints": [
    "SSP-87"
   ],
-  "lists": 1
+  "lists": 34,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/087"
+ },
+ {
+  "id": "CRI-32",
+  "name": "Deoxys",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 120,
+  "types": [
+   "Psychic"
+  ],
+  "attacks": [
+   {
+    "name": "Psyspear",
+    "cost": [
+     "Psychic",
+     "Psychic",
+     "Psychic"
+    ],
+    "damage": "120",
+    "text": "If this Pokémon has at least 2 extra Energy attached (in addition to this attack's cost), this attack also does 120 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Darkness",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me04-032",
+  "prints": [
+   "CRI-32"
+  ],
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/me/me04/032"
  },
  {
   "id": "PBL-39",
@@ -1845,9 +3084,96 @@
   "regulationMark": "J",
   "tcgdexId": "me05-039",
   "prints": [
-   "PBL-39"
+   "PBL-39",
+   "MEP-84",
+   "PBL-91"
   ],
-  "lists": 15
+  "lists": 124,
+  "image": "https://assets.tcgdex.net/en/me/me05/039"
+ },
+ {
+  "id": "MEG-95",
+  "name": "Dialga",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 140,
+  "types": [
+   "Metal"
+  ],
+  "attacks": [
+   {
+    "name": "Beam",
+    "cost": [
+     "Metal"
+    ],
+    "damage": "30",
+    "text": ""
+   },
+   {
+    "name": "Chrono Burst",
+    "cost": [
+     "Metal",
+     "Metal",
+     "Colorless"
+    ],
+    "damage": "80+",
+    "text": "You may shuffle all Energy attached to this Pokémon into your deck and have this attack do 80 more damage."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Grass",
+   "value": "-30"
+  },
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "me01-095",
+  "prints": [
+   "MEG-95"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me01/095"
+ },
+ {
+  "id": "SCR-13",
+  "name": "Dipplin",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 90,
+  "types": [
+   "Grass"
+  ],
+  "evolveFrom": "Applin",
+  "attacks": [
+   {
+    "name": "Coated Attack",
+    "cost": [
+     "Grass"
+    ],
+    "damage": "20",
+    "text": "During your opponent's next turn, prevent all damage done to this Pokémon by attacks from Basic Pokémon."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 3,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv07-013",
+  "prints": [
+   "SCR-13"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/013"
  },
  {
   "id": "TWM-18",
@@ -1885,9 +3211,12 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-018",
   "prints": [
-   "TWM-18"
+   "TWM-18",
+   "TWM-170",
+   "PRE-10"
   ],
-  "lists": 37
+  "lists": 272,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/018"
  },
  {
   "id": "DLR-16",
@@ -1922,7 +3251,8 @@
   "prints": [
    "DLR-16"
   ],
-  "lists": 1
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me06/016"
  },
  {
   "id": "DRI-22",
@@ -1966,7 +3296,8 @@
   "prints": [
    "DRI-22"
   ],
-  "lists": 1
+  "lists": 23,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/022"
  },
  {
   "id": "TWM-130",
@@ -2011,9 +3342,14 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-130",
   "prints": [
-   "TWM-130"
+   "TWM-130",
+   "TWM-200",
+   "PRE-73",
+   "PRE-165",
+   "ASC-160"
   ],
-  "lists": 152
+  "lists": 1013,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/130"
  },
  {
   "id": "TWM-129",
@@ -2049,9 +3385,13 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-129",
   "prints": [
-   "TWM-129"
+   "TWM-129",
+   "PRE-72",
+   "ASC-159",
+   "ASC-248"
   ],
-  "lists": 154
+  "lists": 1020,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/129"
  },
  {
   "id": "POR-52",
@@ -2095,9 +3435,11 @@
   "regulationMark": "J",
   "tcgdexId": "me03-052",
   "prints": [
-   "POR-52"
+   "POR-52",
+   "POR-97"
   ],
-  "lists": 1
+  "lists": 23,
+  "image": "https://assets.tcgdex.net/en/me/me03/052"
  },
  {
   "id": "TWM-128",
@@ -2135,9 +3477,13 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-128",
   "prints": [
-   "TWM-128"
+   "TWM-128",
+   "PRE-71",
+   "ASC-158",
+   "ASC-247"
   ],
-  "lists": 154
+  "lists": 1020,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/128"
  },
  {
   "id": "PBL-46",
@@ -2181,7 +3527,49 @@
   "prints": [
    "PBL-46"
   ],
-  "lists": 21
+  "lists": 105,
+  "image": "https://assets.tcgdex.net/en/me/me05/046"
+ },
+ {
+  "id": "TEF-85",
+  "name": "Drilbur",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 70,
+  "types": [
+   "Fighting"
+  ],
+  "attacks": [
+   {
+    "name": "Sand Spray",
+    "cost": [
+     "Fighting",
+     "Colorless"
+    ],
+    "damage": "20",
+    "text": ""
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Dig Dig Dig",
+    "text": "When you play this Pokémon from your hand onto your Bench during your turn, you may search your deck for up to 3 Basic {F} Energy cards and discard them. Then, shuffle your deck."
+   }
+  ],
+  "weakness": {
+   "type": "Grass",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv05-085",
+  "prints": [
+   "TEF-85"
+  ],
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/085"
  },
  {
   "id": "TEF-129",
@@ -2221,9 +3609,11 @@
   "regulationMark": "H",
   "tcgdexId": "sv05-129",
   "prints": [
-   "TEF-129"
+   "TEF-129",
+   "PRE-80"
   ],
-  "lists": 165
+  "lists": 883,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/129"
  },
  {
   "id": "JTG-121",
@@ -2268,9 +3658,11 @@
   "regulationMark": "I",
   "tcgdexId": "sv09-121",
   "prints": [
-   "JTG-121"
+   "JTG-121",
+   "JTG-178"
   ],
-  "lists": 121
+  "lists": 405,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/121"
  },
  {
   "id": "JTG-120",
@@ -2313,7 +3705,8 @@
   "prints": [
    "JTG-120"
   ],
-  "lists": 40
+  "lists": 403,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/120"
  },
  {
   "id": "TEF-128",
@@ -2354,9 +3747,60 @@
   "regulationMark": "H",
   "tcgdexId": "sv05-128",
   "prints": [
-   "TEF-128"
+   "TEF-128",
+   "PRE-79"
   ],
-  "lists": 135
+  "lists": 558,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/128"
+ },
+ {
+  "id": "SCR-106",
+  "name": "Duraludon",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 130,
+  "types": [
+   "Metal"
+  ],
+  "attacks": [
+   {
+    "name": "Hammer In",
+    "cost": [
+     "Metal"
+    ],
+    "damage": "30",
+    "text": ""
+   },
+   {
+    "name": "Raging Hammer",
+    "cost": [
+     "Metal",
+     "Metal",
+     "Colorless"
+    ],
+    "damage": "80+",
+    "text": "This attack does 10 more damage for each damage counter on this Pokémon."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Grass",
+   "value": "-30"
+  },
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv07-106",
+  "prints": [
+   "SCR-106",
+   "PRE-69"
+  ],
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/106"
  },
  {
   "id": "PRE-36",
@@ -2398,9 +3842,12 @@
   "regulationMark": "H",
   "tcgdexId": "sv08.5-036",
   "prints": [
-   "PRE-36"
+   "PRE-36",
+   "SFA-19",
+   "SFA-69"
   ],
-  "lists": 15
+  "lists": 236,
+  "image": "https://assets.tcgdex.net/en/sv/sv08.5/036"
  },
  {
   "id": "PRE-37",
@@ -2443,9 +3890,12 @@
   "regulationMark": "H",
   "tcgdexId": "sv08.5-037",
   "prints": [
-   "PRE-37"
+   "PRE-37",
+   "SFA-20",
+   "SFA-70"
   ],
-  "lists": 15
+  "lists": 236,
+  "image": "https://assets.tcgdex.net/en/sv/sv08.5/037"
  },
  {
   "id": "PRE-35",
@@ -2489,9 +3939,12 @@
   "regulationMark": "H",
   "tcgdexId": "sv08.5-035",
   "prints": [
-   "PRE-35"
+   "PRE-35",
+   "SFA-18",
+   "SFA-68"
   ],
-  "lists": 15
+  "lists": 238,
+  "image": "https://assets.tcgdex.net/en/sv/sv08.5/035"
  },
  {
   "id": "DRI-11",
@@ -2525,7 +3978,141 @@
   "prints": [
    "DRI-11"
   ],
-  "lists": 24
+  "lists": 99,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/011"
+ },
+ {
+  "id": "ASC-60",
+  "name": "Eelektrik",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 90,
+  "types": [
+   "Lightning"
+  ],
+  "evolveFrom": "Tynamo",
+  "attacks": [
+   {
+    "name": "Electric Ball",
+    "cost": [
+     "Lightning",
+     "Lightning",
+     "Colorless"
+    ],
+    "damage": "50",
+    "text": ""
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Dynamotor",
+    "text": "Once during your turn (before your attack), you may attach a {L} Energy card from your discard pile to 1 of your Benched Pokémon."
+   }
+  ],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "me02.5-060",
+  "prints": [
+   "ASC-60",
+   "NVI-40",
+   "BLK-31",
+   "BLK-114"
+  ],
+  "lists": 4,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/060"
+ },
+ {
+  "id": "SCR-113",
+  "name": "Eevee",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 60,
+  "types": [
+   "Colorless"
+  ],
+  "attacks": [
+   {
+    "name": "Call for Family",
+    "cost": [
+     "Colorless"
+    ],
+    "damage": "",
+    "text": "Search your deck for a Basic Pokémon and put it onto your Bench. Then, shuffle your deck."
+   },
+   {
+    "name": "Gnaw",
+    "cost": [
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "20",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv07-113",
+  "prints": [
+   "SCR-113"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/113"
+ },
+ {
+  "id": "SSP-143",
+  "name": "Eevee",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 50,
+  "types": [
+   "Colorless"
+  ],
+  "attacks": [
+   {
+    "name": "Reckless Charge",
+    "cost": [
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "30",
+    "text": "This Pokémon also does 10 damage to itself."
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Boosted Evolution",
+    "text": "As long as this Pokémon is in the Active Spot, it can evolve during your first turn or the turn you play it."
+   }
+  ],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv08-143",
+  "prints": [
+   "SSP-143",
+   "SVP-173",
+   "PRE-74"
+  ],
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/143"
  },
  {
   "id": "PRE-75",
@@ -2570,9 +4157,96 @@
   "regulationMark": "H",
   "tcgdexId": "sv08.5-075",
   "prints": [
-   "PRE-75"
+   "PRE-75",
+   "SVP-174",
+   "PRE-167"
   ],
-  "lists": 1
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/sv/sv08.5/075"
+ },
+ {
+  "id": "MEG-49",
+  "name": "Electrike",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 70,
+  "types": [
+   "Lightning"
+  ],
+  "attacks": [
+   {
+    "name": "Thunder Jolt",
+    "cost": [
+     "Lightning"
+    ],
+    "damage": "30",
+    "text": "This Pokémon also does 10 damage to itself."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "me01-049",
+  "prints": [
+   "MEG-49"
+  ],
+  "lists": 4,
+  "image": "https://assets.tcgdex.net/en/me/me01/049"
+ },
+ {
+  "id": "BLK-40",
+  "name": "Elgyem",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 60,
+  "types": [
+   "Psychic"
+  ],
+  "attacks": [
+   {
+    "name": "Slight Shift",
+    "cost": [
+     "Psychic"
+    ],
+    "damage": "",
+    "text": "Move an Energy from 1 of your opponent's Pokémon to another of their Pokémon."
+   },
+   {
+    "name": "Beam",
+    "cost": [
+     "Colorless",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "40",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Darkness",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "sv10.5b-040",
+  "prints": [
+   "BLK-40",
+   "BLK-120"
+  ],
+  "lists": 27,
+  "image": "https://assets.tcgdex.net/en/sv/sv10.5b/040"
  },
  {
   "id": "PFL-70",
@@ -2617,9 +4291,11 @@
   "regulationMark": "I",
   "tcgdexId": "me02-070",
   "prints": [
-   "PFL-70"
+   "PFL-70",
+   "PFL-114"
   ],
-  "lists": 11
+  "lists": 38,
+  "image": "https://assets.tcgdex.net/en/me/me02/070"
  },
  {
   "id": "TWM-93",
@@ -2661,9 +4337,104 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-093",
   "prints": [
-   "TWM-93"
+   "TWM-93",
+   "TWM-180"
   ],
-  "lists": 12
+  "lists": 103,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/093"
+ },
+ {
+  "id": "30C-69",
+  "name": "Espeon",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 110,
+  "types": [
+   "Psychic"
+  ],
+  "evolveFrom": "Eevee",
+  "attacks": [
+   {
+    "name": "Miraculous Shine",
+    "cost": [
+     "Psychic",
+     "Colorless"
+    ],
+    "damage": "",
+    "text": "Devolve each of your opponent's evolved Pokémon by putting the highest Stage Evolution card on it into your opponent's hand."
+   },
+   {
+    "name": "Super Psy Bolt",
+    "cost": [
+     "Psychic",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "90",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Darkness",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "30th-069",
+  "prints": [
+   "30C-69"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/30th/069"
+ },
+ {
+  "id": "30C-70",
+  "name": "Espeon ex",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 260,
+  "types": [
+   "Psychic"
+  ],
+  "evolveFrom": "Eevee",
+  "attacks": [
+   {
+    "name": "Solar Beatdown",
+    "cost": [
+     "Psychic",
+     "Colorless"
+    ],
+    "damage": "30×",
+    "text": "This attack does 30 damage for each of your Pokémon in play."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Darkness",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [
+   "ex"
+  ],
+  "regulationMark": "J",
+  "tcgdexId": "30th-070",
+  "prints": [
+   "30C-70",
+   "MEP-108"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/30th/070"
  },
  {
   "id": "DRI-32",
@@ -2699,7 +4470,8 @@
   "prints": [
    "DRI-32"
   ],
-  "lists": 2
+  "lists": 4,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/032"
  },
  {
   "id": "DRI-39",
@@ -2742,9 +4514,14 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-039",
   "prints": [
-   "DRI-39"
+   "DRI-39",
+   "DRI-209",
+   "DRI-230",
+   "DRI-239",
+   "ASC-26"
   ],
-  "lists": 17
+  "lists": 17,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/039"
  },
  {
   "id": "DRI-33",
@@ -2786,7 +4563,8 @@
   "prints": [
    "DRI-33"
   ],
-  "lists": 2
+  "lists": 4,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/033"
  },
  {
   "id": "DRI-34",
@@ -2831,9 +4609,46 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-034",
   "prints": [
-   "DRI-34"
+   "DRI-34",
+   "DRI-190"
   ],
-  "lists": 2
+  "lists": 4,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/034"
+ },
+ {
+  "id": "30C-1",
+  "name": "Exeggcute",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 60,
+  "types": [
+   "Grass"
+  ],
+  "attacks": [
+   {
+    "name": "Hypnosis",
+    "cost": [
+     "Colorless"
+    ],
+    "damage": "",
+    "text": "Your opponent's Active Pokémon is now Asleep."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "30th-001",
+  "prints": [
+   "30C-1"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/30th/001"
  },
  {
   "id": "SCR-118",
@@ -2873,9 +4688,13 @@
   "regulationMark": "H",
   "tcgdexId": "sv07-118",
   "prints": [
-   "SCR-118"
+   "SCR-118",
+   "PRE-85",
+   "ASC-171",
+   "ASC-250"
   ],
-  "lists": 6
+  "lists": 75,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/118"
  },
  {
   "id": "ASC-142",
@@ -2916,9 +4735,68 @@
   "regulationMark": "H",
   "tcgdexId": "me02.5-142",
   "prints": [
-   "ASC-142"
+   "ASC-142",
+   "SFA-38",
+   "SFA-84",
+   "SFA-92",
+   "ASC-288"
   ],
-  "lists": 375
+  "lists": 2302,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/142"
+ },
+ {
+  "id": "PRE-14",
+  "name": "Flareon ex",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 270,
+  "types": [
+   "Fire"
+  ],
+  "evolveFrom": "Eevee",
+  "attacks": [
+   {
+    "name": "Burning Charge",
+    "cost": [
+     "Fire",
+     "Colorless"
+    ],
+    "damage": "130",
+    "text": "Search your deck for up to 2 Basic Energy cards and attach them to 1 of your Pokémon. Then, shuffle your deck."
+   },
+   {
+    "name": "Carnelian",
+    "cost": [
+     "Fire",
+     "Water",
+     "Lightning"
+    ],
+    "damage": "280",
+    "text": "During your next turn, this Pokémon can't attack."
+   }
+  ],
+  "abilities": [],
+  "rules": [
+   "As long as this Pokémon is on your Bench, prevent all damage done to this Pokémon by attacks (both yours and your opponent’s)."
+  ],
+  "weakness": {
+   "type": "Water",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [
+   "ex",
+   "Tera"
+  ],
+  "regulationMark": "H",
+  "tcgdexId": "sv08.5-014",
+  "prints": [
+   "PRE-14",
+   "PRE-146"
+  ],
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/sv/sv08.5/014"
  },
  {
   "id": "TEF-78",
@@ -2959,9 +4837,12 @@
   "regulationMark": "H",
   "tcgdexId": "sv05-078",
   "prints": [
-   "TEF-78"
+   "TEF-78",
+   "SVP-97",
+   "PRE-43"
   ],
-  "lists": 6
+  "lists": 56,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/078"
  },
  {
   "id": "WHT-44",
@@ -2996,9 +4877,11 @@
   "regulationMark": "I",
   "tcgdexId": "sv10.5w-044",
   "prints": [
-   "WHT-44"
+   "WHT-44",
+   "WHT-126"
   ],
-  "lists": 1
+  "lists": 17,
+  "image": "https://assets.tcgdex.net/en/sv/sv10.5w/044"
  },
  {
   "id": "CRI-20",
@@ -3038,9 +4921,11 @@
   "regulationMark": "J",
   "tcgdexId": "me04-020",
   "prints": [
-   "CRI-20"
+   "CRI-20",
+   "CRI-88"
   ],
-  "lists": 4
+  "lists": 14,
+  "image": "https://assets.tcgdex.net/en/me/me04/020"
  },
  {
   "id": "CRI-21",
@@ -3082,9 +4967,11 @@
   "regulationMark": "J",
   "tcgdexId": "me04-021",
   "prints": [
-   "CRI-21"
+   "CRI-21",
+   "CRI-89"
   ],
-  "lists": 4
+  "lists": 13,
+  "image": "https://assets.tcgdex.net/en/me/me04/021"
  },
  {
   "id": "TWM-53",
@@ -3123,9 +5010,97 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-053",
   "prints": [
-   "TWM-53"
+   "TWM-53",
+   "SVP-117",
+   "TWM-174"
   ],
-  "lists": 4
+  "lists": 35,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/053"
+ },
+ {
+  "id": "POR-67",
+  "name": "Furfrou",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 90,
+  "types": [
+   "Colorless"
+  ],
+  "attacks": [
+   {
+    "name": "Hand Trim",
+    "cost": [
+     "Colorless"
+    ],
+    "damage": "",
+    "text": "Discard random cards from your opponent's hand until they have 5 cards in their hand."
+   },
+   {
+    "name": "Headbutt",
+    "cost": [
+     "Colorless"
+    ],
+    "damage": "30",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me03-067",
+  "prints": [
+   "POR-67"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me03/067"
+ },
+ {
+  "id": "SFA-2",
+  "name": "Galvantula",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 100,
+  "types": [
+   "Grass"
+  ],
+  "evolveFrom": "Joltik",
+  "attacks": [
+   {
+    "name": "Shocking Web",
+    "cost": [
+     "Grass",
+     "Colorless"
+    ],
+    "damage": "50+",
+    "text": "If this Pokémon has any {L} Energy attached, this attack does 80 more damage."
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Compound Eyes",
+    "text": "Attacks used by this Pokémon do 50 more damage to your opponent's Active Pokémon that has an Ability (before applying Weakness and Resistance)."
+   }
+  ],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv06.5-002",
+  "prints": [
+   "SFA-2"
+  ],
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/sv/sv06.5/002"
  },
  {
   "id": "SFA-40",
@@ -3169,7 +5144,8 @@
   "prints": [
    "SFA-40"
   ],
-  "lists": 22
+  "lists": 144,
+  "image": "https://assets.tcgdex.net/en/sv/sv06.5/040"
  },
  {
   "id": "BLK-67",
@@ -3213,9 +5189,12 @@
   "regulationMark": "I",
   "tcgdexId": "sv10.5b-067",
   "prints": [
-   "BLK-67"
+   "BLK-67",
+   "BLK-161",
+   "BLK-169"
   ],
-  "lists": 21
+  "lists": 109,
+  "image": "https://assets.tcgdex.net/en/sv/sv10.5b/067"
  },
  {
   "id": "DLR-45",
@@ -3254,7 +5233,54 @@
   "prints": [
    "DLR-45"
   ],
-  "lists": 4
+  "lists": 4,
+  "image": "https://assets.tcgdex.net/en/me/me06/045"
+ },
+ {
+  "id": "TWM-52",
+  "name": "Glalie",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 120,
+  "types": [
+   "Water"
+  ],
+  "evolveFrom": "Snorunt",
+  "attacks": [
+   {
+    "name": "Damage Beat",
+    "cost": [
+     "Water"
+    ],
+    "damage": "20×",
+    "text": "This attack does 20 damage for each damage counter on your opponent's Active Pokémon."
+   },
+   {
+    "name": "Crazy Headbutt",
+    "cost": [
+     "Water",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "140",
+    "text": "Discard an Energy from this Pokémon."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Metal",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv06-052",
+  "prints": [
+   "TWM-52"
+  ],
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/052"
  },
  {
   "id": "PBL-13",
@@ -3287,9 +5313,11 @@
   "regulationMark": "J",
   "tcgdexId": "me05-013",
   "prints": [
-   "PBL-13"
+   "PBL-13",
+   "PBL-87"
   ],
-  "lists": 2
+  "lists": 29,
+  "image": "https://assets.tcgdex.net/en/me/me05/013"
  },
  {
   "id": "TWM-44",
@@ -3327,9 +5355,11 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-044",
   "prints": [
-   "TWM-44"
+   "TWM-44",
+   "PRE-20"
   ],
-  "lists": 16
+  "lists": 161,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/044"
  },
  {
   "id": "30C-21",
@@ -3373,9 +5403,12 @@
   "regulationMark": "J",
   "tcgdexId": "30th-021",
   "prints": [
-   "30C-21"
+   "30C-21",
+   "MEP-99",
+   "30C-148"
   ],
-  "lists": 1
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/me/30th/021"
  },
  {
   "id": "TWM-106",
@@ -3424,9 +5457,12 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-106",
   "prints": [
-   "TWM-106"
+   "TWM-106",
+   "TWM-198",
+   "TWM-214"
   ],
-  "lists": 4
+  "lists": 13,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/106"
  },
  {
   "id": "MEP-52",
@@ -3461,7 +5497,8 @@
   "prints": [
    "MEP-52"
   ],
-  "lists": 1
+  "lists": 37,
+  "image": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/MEP/MEP_052_R_EN_LG.png"
  },
  {
   "id": "TWM-14",
@@ -3504,7 +5541,8 @@
   "prints": [
    "TWM-14"
   ],
-  "lists": 15
+  "lists": 136,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/014"
  },
  {
   "id": "MEG-73",
@@ -3546,7 +5584,8 @@
   "prints": [
    "MEG-73"
   ],
-  "lists": 5
+  "lists": 51,
+  "image": "https://assets.tcgdex.net/en/me/me01/073"
  },
  {
   "id": "BLK-70",
@@ -3587,9 +5626,56 @@
   "regulationMark": "I",
   "tcgdexId": "sv10.5b-070",
   "prints": [
-   "BLK-70"
+   "BLK-70",
+   "BLK-147"
   ],
-  "lists": 1
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/sv/sv10.5b/070"
+ },
+ {
+  "id": "TWM-123",
+  "name": "Heatran",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 140,
+  "types": [
+   "Metal"
+  ],
+  "attacks": [
+   {
+    "name": "Steel Burst",
+    "cost": [
+     "Metal",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "50×",
+    "text": "Discard all {M} Energy from this Pokémon. This attack does 50 damage for each card you discarded in this way."
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Incandescent Body",
+    "text": "If this Pokémon is in the Active Spot and is damaged by an attack from your opponent's Pokémon (even if this Pokémon is Knocked Out), the Attacking Pokémon is now Burned."
+   }
+  ],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Grass",
+   "value": "-30"
+  },
+  "retreat": 4,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv06-123",
+  "prints": [
+   "TWM-123"
+  ],
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/123"
  },
  {
   "id": "SCR-114",
@@ -3626,7 +5712,365 @@
   "prints": [
    "SCR-114"
   ],
-  "lists": 1
+  "lists": 27,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/114"
+ },
+ {
+  "id": "TEF-126",
+  "name": "Hoothoot",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 70,
+  "types": [
+   "Colorless"
+  ],
+  "attacks": [
+   {
+    "name": "Silent Wing",
+    "cost": [
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "20",
+    "text": "Your opponent reveals their hand."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Lightning",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv05-126",
+  "prints": [
+   "TEF-126"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/126"
+ },
+ {
+  "id": "JTG-138",
+  "name": "Hop's Cramorant",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 110,
+  "types": [
+   "Colorless"
+  ],
+  "attacks": [
+   {
+    "name": "Fickle Spitting",
+    "cost": [
+     "Colorless"
+    ],
+    "damage": "120",
+    "text": "If your opponent doesn't have exactly 3 or 4 Prize cards remaining, this attack does nothing."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Lightning",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [
+   "Hop's"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "sv09-138",
+  "prints": [
+   "JTG-138",
+   "ASC-177"
+  ],
+  "lists": 9,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/138"
+ },
+ {
+  "id": "JTG-136",
+  "name": "Hop's Dubwool",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 120,
+  "types": [
+   "Colorless"
+  ],
+  "evolveFrom": "Hop's Wooloo",
+  "attacks": [
+   {
+    "name": "Headbutt",
+    "cost": [
+     "Colorless",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "80",
+    "text": ""
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Defiant Horn",
+    "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon during your turn, you may switch in 1 of your opponent's Benched Pokémon to the Active Spot."
+   }
+  ],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [
+   "Hop's"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "sv09-136",
+  "prints": [
+   "JTG-136"
+  ],
+  "lists": 7,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/136"
+ },
+ {
+  "id": "ASC-95",
+  "name": "Hop's Phantump",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 70,
+  "types": [
+   "Psychic"
+  ],
+  "attacks": [
+   {
+    "name": "Splashing Dodge",
+    "cost": [
+     "Colorless"
+    ],
+    "damage": "10",
+    "text": "Flip a coin. If heads, during your opponent's next turn, prevent all damage from and effects of attacks done to this Pokémon."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Darkness",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 2,
+  "tags": [
+   "Hop's"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "me02.5-095",
+  "prints": [
+   "ASC-95"
+  ],
+  "lists": 9,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/095"
+ },
+ {
+  "id": "JTG-117",
+  "name": "Hop's Snorlax",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 150,
+  "types": [
+   "Colorless"
+  ],
+  "attacks": [
+   {
+    "name": "Dynamic Press",
+    "cost": [
+     "Colorless",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "140",
+    "text": "This Pokémon also does 80 damage to itself."
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Extra Helpings",
+    "text": "Attacks used by your Hop's Pokémon do 30 more damage to your opponent's Active Pokémon (before applying Weakness and Resistance). The effect of Extra Helpings doesn't stack."
+   }
+  ],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 4,
+  "tags": [
+   "Hop's"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "sv09-117",
+  "prints": [
+   "JTG-117",
+   "SVP-184"
+  ],
+  "lists": 9,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/117"
+ },
+ {
+  "id": "ASC-96",
+  "name": "Hop's Trevenant",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 140,
+  "types": [
+   "Psychic"
+  ],
+  "evolveFrom": "Hop's Phantump",
+  "attacks": [
+   {
+    "name": "Horrifying Revenge",
+    "cost": [
+     "Colorless"
+    ],
+    "damage": "30+",
+    "text": "If any of your Hop's Pokémon were Knocked Out by damage from an attack during your opponent's last turn, this attack does 100 more damage."
+   },
+   {
+    "name": "Corner",
+    "cost": [
+     "Psychic",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "90",
+    "text": "During your opponent's next turn, the Defending Pokémon can't retreat."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Darkness",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 2,
+  "tags": [
+   "Hop's"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "me02.5-096",
+  "prints": [
+   "ASC-96",
+   "ASC-237"
+  ],
+  "lists": 9,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/096"
+ },
+ {
+  "id": "JTG-135",
+  "name": "Hop's Wooloo",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 70,
+  "types": [
+   "Colorless"
+  ],
+  "attacks": [
+   {
+    "name": "Smash Kick",
+    "cost": [
+     "Colorless",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "50",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [
+   "Hop's"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "sv09-135",
+  "prints": [
+   "JTG-135",
+   "JTG-170"
+  ],
+  "lists": 7,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/135"
+ },
+ {
+  "id": "JTG-111",
+  "name": "Hop's Zacian ex",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 230,
+  "types": [
+   "Metal"
+  ],
+  "attacks": [
+   {
+    "name": "Insta-Strike",
+    "cost": [
+     "Colorless"
+    ],
+    "damage": "30",
+    "text": "This attack also does 30 damage to 1 of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+   },
+   {
+    "name": "Brave Slash",
+    "cost": [
+     "Metal",
+     "Metal",
+     "Metal",
+     "Colorless"
+    ],
+    "damage": "240",
+    "text": "During your next turn, this Pokémon can't use Brave Slash."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Grass",
+   "value": "-30"
+  },
+  "retreat": 2,
+  "tags": [
+   "Hop's",
+   "ex"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "sv09-111",
+  "prints": [
+   "JTG-111",
+   "SVP-193",
+   "JTG-176",
+   "JTG-186"
+  ],
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/111"
  },
  {
   "id": "SCR-14",
@@ -3667,9 +6111,106 @@
   "regulationMark": "H",
   "tcgdexId": "sv07-014",
   "prints": [
-   "SCR-14"
+   "SCR-14",
+   "SCR-156",
+   "SCR-167",
+   "PRE-11"
   ],
-  "lists": 23
+  "lists": 137,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/014"
+ },
+ {
+  "id": "JTG-55",
+  "name": "Iono's Kilowattrel",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 120,
+  "types": [
+   "Lightning"
+  ],
+  "evolveFrom": "Iono's Wattrel",
+  "attacks": [
+   {
+    "name": "Mach Bolt",
+    "cost": [
+     "Lightning",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "70",
+    "text": ""
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Flashing Draw",
+    "text": "You must discard a Basic {L} Energy from this Pokémon in order to use this Ability. Once during your turn, you may draw cards until you have 6 cards in your hand."
+   }
+  ],
+  "weakness": {
+   "type": "Lightning",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [
+   "Iono's"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "sv09-055",
+  "prints": [
+   "JTG-55",
+   "SVP-182",
+   "JTG-163",
+   "ASC-72"
+  ],
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/055"
+ },
+ {
+  "id": "JTG-54",
+  "name": "Iono's Wattrel",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 60,
+  "types": [
+   "Lightning"
+  ],
+  "attacks": [
+   {
+    "name": "Quick Attack",
+    "cost": [
+     "Lightning"
+    ],
+    "damage": "10+",
+    "text": "Flip a coin. If heads, this attack does 20 more damage."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Lightning",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [
+   "Iono's"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "sv09-054",
+  "prints": [
+   "JTG-54",
+   "ASC-71",
+   "ASC-231"
+  ],
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/054"
  },
  {
   "id": "TEF-81",
@@ -3714,9 +6255,15 @@
   "regulationMark": "H",
   "tcgdexId": "sv05-081",
   "prints": [
-   "TEF-81"
+   "TEF-81",
+   "SVP-146",
+   "TEF-191",
+   "TEF-206",
+   "TEF-216",
+   "PRE-158"
   ],
-  "lists": 14
+  "lists": 199,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/081"
  },
  {
   "id": "TEF-25",
@@ -3758,9 +6305,15 @@
   "regulationMark": "H",
   "tcgdexId": "sv05-025",
   "prints": [
-   "TEF-25"
+   "TEF-25",
+   "SVP-128",
+   "TEF-186",
+   "TEF-203",
+   "TEF-213",
+   "PRE-176"
   ],
-  "lists": 48
+  "lists": 280,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/025"
  },
  {
   "id": "TWM-77",
@@ -3802,9 +6355,12 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-077",
   "prints": [
-   "TWM-77"
+   "TWM-77",
+   "TWM-196",
+   "PRE-32"
   ],
-  "lists": 11
+  "lists": 13,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/077"
  },
  {
   "id": "MEG-2",
@@ -3838,9 +6394,60 @@
   "regulationMark": "I",
   "tcgdexId": "me01-002",
   "prints": [
-   "MEG-2"
+   "MEG-2",
+   "MEG-134"
   ],
-  "lists": 1
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/me/me01/002"
+ },
+ {
+  "id": "WHT-45",
+  "name": "Jellicent ex",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 270,
+  "types": [
+   "Psychic"
+  ],
+  "evolveFrom": "Frillish",
+  "attacks": [
+   {
+    "name": "Power Press",
+    "cost": [
+     "Psychic",
+     "Colorless"
+    ],
+    "damage": "80+",
+    "text": "If this Pokémon has at least 2 extra Energy attached (in addition to this attack's cost), this attack does 80 more damage."
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Oceanic Curse",
+    "text": "As long as this Pokémon is in the Active Spot, your opponent can't play any Item cards or Pokémon Tool cards from their hand."
+   }
+  ],
+  "weakness": {
+   "type": "Darkness",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 3,
+  "tags": [
+   "ex"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "sv10.5w-045",
+  "prints": [
+   "WHT-45",
+   "WHT-160",
+   "WHT-168"
+  ],
+  "lists": 9,
+  "image": "https://assets.tcgdex.net/en/sv/sv10.5w/045"
  },
  {
   "id": "30C-102",
@@ -3887,9 +6494,11 @@
   "regulationMark": "J",
   "tcgdexId": "30th-102",
   "prints": [
-   "30C-102"
+   "30C-102",
+   "30C-155"
   ],
-  "lists": 2
+  "lists": 25,
+  "image": "https://assets.tcgdex.net/en/me/30th/102"
  },
  {
   "id": "PRE-30",
@@ -3939,9 +6548,47 @@
   "regulationMark": "H",
   "tcgdexId": "sv08.5-030",
   "prints": [
-   "PRE-30"
+   "PRE-30",
+   "PRE-153"
   ],
-  "lists": 1
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv08.5/030"
+ },
+ {
+  "id": "SCR-50",
+  "name": "Joltik",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 30,
+  "types": [
+   "Lightning"
+  ],
+  "attacks": [
+   {
+    "name": "Jolting Charge",
+    "cost": [
+     "Colorless"
+    ],
+    "damage": "",
+    "text": "Search your deck for up to 2 Basic {G} Energy cards and up to 2 Basic {L} Energy cards and attach them to your Pokémon in any way you like. Then, shuffle your deck."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv07-050",
+  "prints": [
+   "SCR-50",
+   "SCR-150"
+  ],
+  "lists": 4,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/050"
  },
  {
   "id": "MEG-55",
@@ -3984,7 +6631,8 @@
   "prints": [
    "MEG-55"
   ],
-  "lists": 21
+  "lists": 193,
+  "image": "https://assets.tcgdex.net/en/me/me01/055"
  },
  {
   "id": "CRI-2",
@@ -4024,7 +6672,56 @@
   "prints": [
    "CRI-2"
   ],
-  "lists": 1
+  "lists": 7,
+  "image": "https://assets.tcgdex.net/en/me/me04/002"
+ },
+ {
+  "id": "SSP-116",
+  "name": "Koraidon",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 130,
+  "types": [
+   "Fighting"
+  ],
+  "attacks": [
+   {
+    "name": "Unrelenting Onslaught",
+    "cost": [
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "30+",
+    "text": "If 1 of your other Ancient Pokémon used an attack during your last turn, this attack does 150 more damage."
+   },
+   {
+    "name": "Hammer In",
+    "cost": [
+     "Fighting",
+     "Fighting",
+     "Colorless"
+    ],
+    "damage": "110",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Psychic",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [
+   "Ancient"
+  ],
+  "regulationMark": "H",
+  "tcgdexId": "sv08-116",
+  "prints": [
+   "SSP-116"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/116"
  },
  {
   "id": "ASC-121",
@@ -4075,7 +6772,8 @@
   "prints": [
    "ASC-121"
   ],
-  "lists": 43
+  "lists": 133,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/121"
  },
  {
   "id": "SFA-47",
@@ -4115,7 +6813,47 @@
   "prints": [
    "SFA-47"
   ],
-  "lists": 34
+  "lists": 232,
+  "image": "https://assets.tcgdex.net/en/sv/sv06.5/047"
+ },
+ {
+  "id": "PBL-37",
+  "name": "Lampent",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 90,
+  "types": [
+   "Psychic"
+  ],
+  "evolveFrom": "Litwick",
+  "attacks": [
+   {
+    "name": "Spreading Light",
+    "cost": [
+     "Psychic"
+    ],
+    "damage": "",
+    "text": "Search your deck for up to 3 Lampent and put them onto your Bench. Then, shuffle your deck."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Darkness",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me05-037",
+  "prints": [
+   "PBL-37"
+  ],
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/me/me05/037"
  },
  {
   "id": "SSP-76",
@@ -4159,9 +6897,66 @@
   "regulationMark": "H",
   "tcgdexId": "sv08-076",
   "prints": [
-   "SSP-76"
+   "SSP-76",
+   "SSP-220",
+   "SSP-239"
   ],
-  "lists": 129
+  "lists": 736,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/076"
+ },
+ {
+  "id": "PRE-6",
+  "name": "Leafeon ex",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 270,
+  "types": [
+   "Grass"
+  ],
+  "evolveFrom": "Eevee",
+  "attacks": [
+   {
+    "name": "Verdant Storm",
+    "cost": [
+     "Grass",
+     "Colorless"
+    ],
+    "damage": "60×",
+    "text": "This attack does 60 damage for each Energy attached to all of your opponent's Pokémon."
+   },
+   {
+    "name": "Moss Agate",
+    "cost": [
+     "Grass",
+     "Fire",
+     "Water"
+    ],
+    "damage": "230",
+    "text": "Heal 100 damage from each of your Benched Pokémon."
+   }
+  ],
+  "abilities": [],
+  "rules": [
+   "As long as this Pokémon is on your Bench, prevent all damage done to this Pokémon by attacks (both yours and your opponent’s)."
+  ],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [
+   "ex",
+   "Tera"
+  ],
+  "regulationMark": "H",
+  "tcgdexId": "sv08.5-006",
+  "prints": [
+   "PRE-6",
+   "PRE-144"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv08.5/006"
  },
  {
   "id": "JTG-56",
@@ -4202,9 +6997,96 @@
   "regulationMark": "I",
   "tcgdexId": "sv09-056",
   "prints": [
-   "JTG-56"
+   "JTG-56",
+   "SVP-195",
+   "JTG-173",
+   "JTG-184",
+   "ASC-76",
+   "ASC-280"
   ],
-  "lists": 132
+  "lists": 890,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/056"
+ },
+ {
+  "id": "JTG-7",
+  "name": "Lilligant",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 110,
+  "types": [
+   "Grass"
+  ],
+  "evolveFrom": "Petilil",
+  "attacks": [
+   {
+    "name": "Spinning Attack",
+    "cost": [
+     "Grass",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "60",
+    "text": ""
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Sunny Day",
+    "text": "Attacks used by your {G} Pokémon and {R} Pokémon do 20 more damage to your opponent's Active Pokémon (before applying Weakness and Resistance)."
+   }
+  ],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv09-007",
+  "prints": [
+   "JTG-7"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/007"
+ },
+ {
+  "id": "PBL-36",
+  "name": "Litwick",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 70,
+  "types": [
+   "Psychic"
+  ],
+  "attacks": [
+   {
+    "name": "Will-O-Wisp",
+    "cost": [
+     "Psychic"
+    ],
+    "damage": "20",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Darkness",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me05-036",
+  "prints": [
+   "PBL-36"
+  ],
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/me/me05/036"
  },
  {
   "id": "30C-83",
@@ -4239,9 +7121,11 @@
   "regulationMark": "J",
   "tcgdexId": "30th-083",
   "prints": [
-   "30C-83"
+   "30C-83",
+   "MEP-95"
   ],
-  "lists": 1
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/me/30th/083"
  },
  {
   "id": "30C-121",
@@ -4280,7 +7164,8 @@
   "prints": [
    "30C-121"
   ],
-  "lists": 1
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/30th/121"
  },
  {
   "id": "MEG-74",
@@ -4318,9 +7203,12 @@
   "regulationMark": "I",
   "tcgdexId": "me01-074",
   "prints": [
-   "MEG-74"
+   "MEG-74",
+   "MEP-4",
+   "ASC-105"
   ],
-  "lists": 7
+  "lists": 74,
+  "image": "https://assets.tcgdex.net/en/me/me01/074"
  },
  {
   "id": "MEG-72",
@@ -4361,9 +7249,100 @@
   "regulationMark": "I",
   "tcgdexId": "me01-072",
   "prints": [
-   "MEG-72"
+   "MEG-72",
+   "MEP-68"
   ],
-  "lists": 5
+  "lists": 51,
+  "image": "https://assets.tcgdex.net/en/me/me01/072"
+ },
+ {
+  "id": "PBL-24",
+  "name": "Manectric",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 120,
+  "types": [
+   "Lightning"
+  ],
+  "evolveFrom": "Electrike",
+  "attacks": [
+   {
+    "name": "Flashing Barrier",
+    "cost": [
+     "Lightning",
+     "Lightning"
+    ],
+    "damage": "50",
+    "text": "During your opponent's next turn, prevent all damage done to this Pokémon by attacks from Evolution Pokémon."
+   },
+   {
+    "name": "Sonic Edge",
+    "cost": [
+     "Lightning",
+     "Lightning",
+     "Lightning"
+    ],
+    "damage": "110",
+    "text": "This attack's damage isn't affected by any effects on your opponent's Active Pokémon."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me05-024",
+  "prints": [
+   "PBL-24",
+   "PBL-89"
+  ],
+  "lists": 4,
+  "image": "https://assets.tcgdex.net/en/me/me05/024"
+ },
+ {
+  "id": "JTG-8",
+  "name": "Maractus",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 110,
+  "types": [
+   "Grass"
+  ],
+  "attacks": [
+   {
+    "name": "Corner",
+    "cost": [
+     "Colorless"
+    ],
+    "damage": "20",
+    "text": "During your opponent's next turn, the Defending Pokémon can't retreat."
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Exploding Needles",
+    "text": "If this Pokémon is in the Active Spot and is Knocked Out by damage from an attack from your opponent's Pokémon, put 6 damage counters on the Attacking Pokémon."
+   }
+  ],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "sv09-008",
+  "prints": [
+   "JTG-8",
+   "JTG-160"
+  ],
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/008"
  },
  {
   "id": "DRI-136",
@@ -4405,9 +7384,11 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-136",
   "prints": [
-   "DRI-136"
+   "DRI-136",
+   "ASC-287"
   ],
-  "lists": 2
+  "lists": 23,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/136"
  },
  {
   "id": "DRI-134",
@@ -4451,7 +7432,8 @@
   "prints": [
    "DRI-134"
   ],
-  "lists": 2
+  "lists": 23,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/134"
  },
  {
   "id": "DRI-135",
@@ -4489,7 +7471,198 @@
   "prints": [
    "DRI-135"
   ],
-  "lists": 2
+  "lists": 23,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/135"
+ },
+ {
+  "id": "DRI-137",
+  "name": "Marnie's Morpeko",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 70,
+  "types": [
+   "Darkness"
+  ],
+  "attacks": [
+   {
+    "name": "Spiky Wheel",
+    "cost": [
+     "Colorless",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "20+",
+    "text": "This attack does 40 more damage for each {D} Energy attached to this Pokémon."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Grass",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 0,
+  "tags": [
+   "Marnie's"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "sv10-137",
+  "prints": [
+   "DRI-137",
+   "SVP-206"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/137"
+ },
+ {
+  "id": "MEG-86",
+  "name": "Mega Absol ex",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 280,
+  "types": [
+   "Darkness"
+  ],
+  "attacks": [
+   {
+    "name": "Terminal Period",
+    "cost": [
+     "Darkness",
+     "Colorless"
+    ],
+    "damage": "",
+    "text": "If your opponent's Active Pokémon has exactly 6 damage counters on it, that Pokémon is Knocked Out."
+   },
+   {
+    "name": "Claw of Darkness",
+    "cost": [
+     "Darkness",
+     "Darkness",
+     "Colorless"
+    ],
+    "damage": "200",
+    "text": "Your opponent reveals their hand, and you discard a card you find there."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Grass",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [
+   "ex",
+   "Mega"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "me01-086",
+  "prints": [
+   "MEG-86",
+   "MEG-161",
+   "MEG-180"
+  ],
+  "lists": 7,
+  "image": "https://assets.tcgdex.net/en/me/me01/086"
+ },
+ {
+  "id": "ASC-172",
+  "name": "Mega Audino ex",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 270,
+  "types": [
+   "Colorless"
+  ],
+  "attacks": [
+   {
+    "name": "Kaleidowaltz",
+    "cost": [
+     "Colorless"
+    ],
+    "damage": "",
+    "text": "Flip 3 coins. For each heads, search your deck for up to 2 Basic Energy cards and attach them to your Pokémon in any way you like. Then, shuffle your deck."
+   },
+   {
+    "name": "Ear Force",
+    "cost": [
+     "Colorless",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "20+",
+    "text": "This attack does 80 more damage for each Energy attached to your opponent's Active Pokémon."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [
+   "ex",
+   "Mega"
+  ],
+  "regulationMark": "J",
+  "tcgdexId": "me02.5-172",
+  "prints": [
+   "ASC-172",
+   "ASC-253"
+  ],
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/172"
+ },
+ {
+  "id": "PBL-38",
+  "name": "Mega Chandelure ex",
+  "kind": "pokemon",
+  "subtype": "Stage 2",
+  "hp": 350,
+  "types": [
+   "Psychic"
+  ],
+  "evolveFrom": "Lampent",
+  "attacks": [
+   {
+    "name": "Phantom Maze",
+    "cost": [
+     "Psychic",
+     "Psychic"
+    ],
+    "damage": "130+",
+    "text": "This attack does 50 more damage for each {C} in your opponent's Active Pokémon's Retreat Cost."
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Binding Flame",
+    "text": "Your opponent's Active Pokémon's Retreat Cost is {C} more."
+   }
+  ],
+  "weakness": {
+   "type": "Darkness",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 2,
+  "tags": [
+   "ex",
+   "Mega"
+  ],
+  "regulationMark": "J",
+  "tcgdexId": "me05-038",
+  "prints": [
+   "PBL-38",
+   "PBL-99",
+   "PBL-115"
+  ],
+  "lists": 4,
+  "image": "https://assets.tcgdex.net/en/me/me05/038"
  },
  {
   "id": "PFL-13",
@@ -4526,9 +7699,15 @@
   "regulationMark": "I",
   "tcgdexId": "me02-013",
   "prints": [
-   "PFL-13"
+   "PFL-13",
+   "MEP-23",
+   "MEP-29",
+   "PFL-109",
+   "PFL-125",
+   "PFL-130"
   ],
-  "lists": 1
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me02/013"
  },
  {
   "id": "ASC-22",
@@ -4566,9 +7745,163 @@
   "regulationMark": "J",
   "tcgdexId": "me02.5-022",
   "prints": [
-   "ASC-22"
+   "ASC-22",
+   "MEP-30",
+   "ASC-294"
   ],
-  "lists": 1
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/022"
+ },
+ {
+  "id": "PBL-48",
+  "name": "Mega Darkrai ex",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 280,
+  "types": [
+   "Darkness"
+  ],
+  "attacks": [
+   {
+    "name": "Dusk Raid",
+    "cost": [
+     "Darkness",
+     "Darkness"
+    ],
+    "damage": "110+",
+    "text": "If your Benched Pokémon have any damage counters on them, this attack does 110 more damage."
+   },
+   {
+    "name": "Abyss Eye",
+    "cost": [
+     "Darkness",
+     "Darkness",
+     "Darkness"
+    ],
+    "damage": "",
+    "text": "If your opponent's Active Pokémon is affected by a Special Condition, it is Knocked Out."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Grass",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [
+   "ex",
+   "Mega"
+  ],
+  "regulationMark": "J",
+  "tcgdexId": "me05-048",
+  "prints": [
+   "PBL-48",
+   "MEP-90",
+   "PBL-101",
+   "PBL-116",
+   "PBL-120"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me05/048"
+ },
+ {
+  "id": "PFL-41",
+  "name": "Mega Diancie ex",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 270,
+  "types": [
+   "Psychic"
+  ],
+  "attacks": [
+   {
+    "name": "Garland Ray",
+    "cost": [
+     "Psychic",
+     "Psychic"
+    ],
+    "damage": "120×",
+    "text": "Discard up to 2 Energy cards from this Pokémon, and this attack does 120 damage for each card you discarded in this way."
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Diamond Coat",
+    "text": "This Pokémon takes 30 less damage from attacks (after applying Weakness and Resistance)."
+   }
+  ],
+  "weakness": {
+   "type": "Metal",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [
+   "ex",
+   "Mega"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "me02-041",
+  "prints": [
+   "PFL-41",
+   "ASC-267",
+   "ASC-282"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me02/041"
+ },
+ {
+  "id": "ASC-61",
+  "name": "Mega Eelektross ex",
+  "kind": "pokemon",
+  "subtype": "Stage 2",
+  "hp": 350,
+  "types": [
+   "Lightning"
+  ],
+  "evolveFrom": "Eelektrik",
+  "attacks": [
+   {
+    "name": "Split Bomb",
+    "cost": [
+     "Lightning",
+     "Lightning"
+    ],
+    "damage": "",
+    "text": "This attack does 60 damage to each of 2 of your opponent's Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+   },
+   {
+    "name": "Disaster Shock",
+    "cost": [
+     "Lightning",
+     "Lightning",
+     "Lightning"
+    ],
+    "damage": "190",
+    "text": "You may discard 2 {L} Energy from this Pokémon and make your opponent's Active Pokémon Paralyzed."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [
+   "ex",
+   "Mega"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "me02.5-061",
+  "prints": [
+   "ASC-61",
+   "ASC-266",
+   "ASC-278"
+  ],
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/061"
  },
  {
   "id": "PBL-65",
@@ -4618,9 +7951,11 @@
   "regulationMark": "J",
   "tcgdexId": "me05-065",
   "prints": [
-   "PBL-65"
+   "PBL-65",
+   "PBL-103"
   ],
-  "lists": 21
+  "lists": 105,
+  "image": "https://assets.tcgdex.net/en/me/me05/065"
  },
  {
   "id": "ASC-47",
@@ -4666,9 +8001,12 @@
   "regulationMark": "I",
   "tcgdexId": "me02.5-047",
   "prints": [
-   "ASC-47"
+   "ASC-47",
+   "ASC-265",
+   "ASC-275"
   ],
-  "lists": 7
+  "lists": 28,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/047"
  },
  {
   "id": "CRI-22",
@@ -4710,9 +8048,14 @@
   "regulationMark": "J",
   "tcgdexId": "me04-022",
   "prints": [
-   "CRI-22"
+   "CRI-22",
+   "MEP-81",
+   "CRI-100",
+   "CRI-116",
+   "CRI-122"
   ],
-  "lists": 1
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/me/me04/022"
  },
  {
   "id": "MEG-104",
@@ -4754,9 +8097,13 @@
   "regulationMark": "I",
   "tcgdexId": "me01-104",
   "prints": [
-   "MEG-104"
+   "MEG-104",
+   "MEP-25",
+   "MEG-164",
+   "MEG-182"
   ],
-  "lists": 136
+  "lists": 709,
+  "image": "https://assets.tcgdex.net/en/me/me01/104"
  },
  {
   "id": "MEG-100",
@@ -4798,9 +8145,13 @@
   "regulationMark": "I",
   "tcgdexId": "me01-100",
   "prints": [
-   "MEG-100"
+   "MEG-100",
+   "MEP-11",
+   "MEG-163",
+   "MEG-181"
   ],
-  "lists": 1
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/me/me01/100"
  },
  {
   "id": "PFL-84",
@@ -4845,9 +8196,12 @@
   "regulationMark": "I",
   "tcgdexId": "me02-084",
   "prints": [
-   "PFL-84"
+   "PFL-84",
+   "PFL-115",
+   "PFL-128"
   ],
-  "lists": 5
+  "lists": 95,
+  "image": "https://assets.tcgdex.net/en/me/me02/084"
  },
  {
   "id": "MEG-77",
@@ -4892,9 +8246,163 @@
   "regulationMark": "I",
   "tcgdexId": "me01-077",
   "prints": [
-   "MEG-77"
+   "MEG-77",
+   "MEP-12",
+   "MEP-33",
+   "MEG-160",
+   "MEG-179",
+   "MEG-188",
+   "ASC-113"
   ],
-  "lists": 7
+  "lists": 63,
+  "image": "https://assets.tcgdex.net/en/me/me01/077"
+ },
+ {
+  "id": "MEG-50",
+  "name": "Mega Manectric ex",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 330,
+  "types": [
+   "Lightning"
+  ],
+  "evolveFrom": "Electrike",
+  "attacks": [
+   {
+    "name": "Flash Ray",
+    "cost": [
+     "Lightning",
+     "Lightning"
+    ],
+    "damage": "120",
+    "text": "During your opponent's next turn, prevent all damage done to this Pokémon by attacks from Basic Pokémon."
+   },
+   {
+    "name": "Riotous Blasting",
+    "cost": [
+     "Lightning",
+     "Lightning",
+     "Lightning"
+    ],
+    "damage": "200+",
+    "text": "You may discard all Energy from this Pokémon and have this attack do 130 more damage."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 0,
+  "tags": [
+   "ex",
+   "Mega"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "me01-050",
+  "prints": [
+   "MEG-50",
+   "MEG-158"
+  ],
+  "lists": 4,
+  "image": "https://assets.tcgdex.net/en/me/me01/050"
+ },
+ {
+  "id": "MEG-94",
+  "name": "Mega Mawile ex",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 270,
+  "types": [
+   "Metal"
+  ],
+  "attacks": [
+   {
+    "name": "Gobble Down",
+    "cost": [
+     "Metal",
+     "Metal"
+    ],
+    "damage": "80×",
+    "text": "This attack does 80 damage for each Prize card you have taken."
+   },
+   {
+    "name": "Huge Bite",
+    "cost": [
+     "Metal",
+     "Metal",
+     "Colorless"
+    ],
+    "damage": "260",
+    "text": "If your opponent's Active Pokémon already has any damage counters on it, this attack's base damage is 30."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Grass",
+   "value": "-30"
+  },
+  "retreat": 2,
+  "tags": [
+   "ex",
+   "Mega"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "me01-094",
+  "prints": [
+   "MEG-94",
+   "MEG-162"
+  ],
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/me/me01/094"
+ },
+ {
+  "id": "ASC-10",
+  "name": "Mega Meganium ex",
+  "kind": "pokemon",
+  "subtype": "Stage 2",
+  "hp": 360,
+  "types": [
+   "Grass"
+  ],
+  "evolveFrom": "Bayleef",
+  "attacks": [
+   {
+    "name": "Giant Bouquet",
+    "cost": [
+     "Colorless",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "70+",
+    "text": "This attack does 50 more damage for each {G} Energy attached to this Pokémon."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [
+   "ex",
+   "Mega"
+  ],
+  "regulationMark": "J",
+  "tcgdexId": "me02.5-010",
+  "prints": [
+   "ASC-10",
+   "MEP-34",
+   "ASC-272"
+  ],
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/010"
  },
  {
   "id": "DLR-84",
@@ -4939,9 +8447,12 @@
   "regulationMark": "J",
   "tcgdexId": "me06-084",
   "prints": [
-   "DLR-84"
+   "DLR-84",
+   "DLR-138",
+   "DLR-141"
   ],
-  "lists": 18
+  "lists": 18,
+  "image": "https://assets.tcgdex.net/en/me/me06/084"
  },
  {
   "id": "PFL-61",
@@ -4986,9 +8497,12 @@
   "regulationMark": "I",
   "tcgdexId": "me02-061",
   "prints": [
-   "PFL-61"
+   "PFL-61",
+   "PFL-113",
+   "PFL-127"
   ],
-  "lists": 8
+  "lists": 49,
+  "image": "https://assets.tcgdex.net/en/me/me02/061"
  },
  {
   "id": "POR-55",
@@ -5028,9 +8542,55 @@
   "regulationMark": "J",
   "tcgdexId": "me03-055",
   "prints": [
-   "POR-55"
+   "POR-55",
+   "POR-106"
   ],
-  "lists": 14
+  "lists": 79,
+  "image": "https://assets.tcgdex.net/en/me/me03/055"
+ },
+ {
+  "id": "PBL-31",
+  "name": "Mega Slowbro ex",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 330,
+  "types": [
+   "Psychic"
+  ],
+  "evolveFrom": "Slowpoke",
+  "attacks": [
+   {
+    "name": "Shellnado Spin",
+    "cost": [
+     "Psychic",
+     "Psychic",
+     "Psychic"
+    ],
+    "damage": "180",
+    "text": "During your opponent's next turn, if this Pokémon is damaged by an attack (even if this Pokémon is Knocked Out), place 12 damage counters on the Attacking Pokémon."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Darkness",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 3,
+  "tags": [
+   "ex",
+   "Mega"
+  ],
+  "regulationMark": "J",
+  "tcgdexId": "me05-031",
+  "prints": [
+   "PBL-31"
+  ],
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/me/me05/031"
  },
  {
   "id": "POR-21",
@@ -5076,9 +8636,12 @@
   "regulationMark": "J",
   "tcgdexId": "me03-021",
   "prints": [
-   "POR-21"
+   "POR-21",
+   "POR-102",
+   "POR-118"
   ],
-  "lists": 3
+  "lists": 14,
+  "image": "https://assets.tcgdex.net/en/me/me03/021"
  },
  {
   "id": "MEG-3",
@@ -5122,9 +8685,13 @@
   "regulationMark": "I",
   "tcgdexId": "me01-003",
   "prints": [
-   "MEG-3"
+   "MEG-3",
+   "MEP-13",
+   "MEG-155",
+   "MEG-177"
   ],
-  "lists": 1
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/me/me01/003"
  },
  {
   "id": "MEG-10",
@@ -5165,9 +8732,11 @@
   "regulationMark": "I",
   "tcgdexId": "me01-010",
   "prints": [
-   "MEG-10"
+   "MEG-10",
+   "MEP-1"
   ],
-  "lists": 26
+  "lists": 165,
+  "image": "https://assets.tcgdex.net/en/me/me01/010"
  },
  {
   "id": "POR-62",
@@ -5208,9 +8777,12 @@
   "regulationMark": "J",
   "tcgdexId": "me03-062",
   "prints": [
-   "POR-62"
+   "POR-62",
+   "POR-107",
+   "POR-121"
   ],
-  "lists": 332
+  "lists": 2021,
+  "image": "https://assets.tcgdex.net/en/me/me03/062"
  },
  {
   "id": "CRI-61",
@@ -5259,7 +8831,8 @@
   "prints": [
    "CRI-61"
   ],
-  "lists": 55
+  "lists": 338,
+  "image": "https://assets.tcgdex.net/en/me/me04/061"
  },
  {
   "id": "TEF-114",
@@ -5302,9 +8875,11 @@
   "regulationMark": "H",
   "tcgdexId": "sv05-114",
   "prints": [
-   "TEF-114"
+   "TEF-114",
+   "SVP-90"
   ],
-  "lists": 21
+  "lists": 106,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/114"
  },
  {
   "id": "30C-66",
@@ -5346,9 +8921,47 @@
   "regulationMark": "J",
   "tcgdexId": "30th-066",
   "prints": [
-   "30C-66"
+   "30C-66",
+   "30C-152",
+   "30C-158"
   ],
-  "lists": 36
+  "lists": 260,
+  "image": "https://assets.tcgdex.net/en/me/30th/066"
+ },
+ {
+  "id": "CRI-72",
+  "name": "Minccino",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 70,
+  "types": [
+   "Colorless"
+  ],
+  "attacks": [
+   {
+    "name": "Take Down",
+    "cost": [
+     "Colorless"
+    ],
+    "damage": "30",
+    "text": "This Pokémon also does 10 damage to itself."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me04-072",
+  "prints": [
+   "CRI-72"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me04/072"
  },
  {
   "id": "PFL-14",
@@ -5382,7 +8995,8 @@
   "prints": [
    "PFL-14"
   ],
-  "lists": 28
+  "lists": 390,
+  "image": "https://assets.tcgdex.net/en/me/me02/014"
  },
  {
   "id": "TWM-95",
@@ -5423,9 +9037,13 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-095",
   "prints": [
-   "TWM-95"
+   "TWM-95",
+   "SFA-72",
+   "PRE-44",
+   "ASC-99"
   ],
-  "lists": 215
+  "lists": 1370,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/095"
  },
  {
   "id": "JTG-27",
@@ -5471,9 +9089,12 @@
   "regulationMark": "I",
   "tcgdexId": "sv09-027",
   "prints": [
-   "JTG-27"
+   "JTG-27",
+   "SVP-181",
+   "ASC-33"
   ],
-  "lists": 1
+  "lists": 43,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/027"
  },
  {
   "id": "JTG-26",
@@ -5518,9 +9139,11 @@
   "regulationMark": "I",
   "tcgdexId": "sv09-026",
   "prints": [
-   "JTG-26"
+   "JTG-26",
+   "ASC-32"
   ],
-  "lists": 1
+  "lists": 43,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/026"
  },
  {
   "id": "JTG-96",
@@ -5557,7 +9180,8 @@
   "prints": [
    "JTG-96"
   ],
-  "lists": 9
+  "lists": 77,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/096"
  },
  {
   "id": "JTG-116",
@@ -5600,9 +9224,61 @@
   "regulationMark": "I",
   "tcgdexId": "sv09-116",
   "prints": [
-   "JTG-116"
+   "JTG-116",
+   "JTG-167",
+   "ASC-154"
   ],
-  "lists": 39
+  "lists": 214,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/116"
+ },
+ {
+  "id": "ASC-51",
+  "name": "N's Vanilluxe",
+  "kind": "pokemon",
+  "subtype": "Stage 2",
+  "hp": 150,
+  "types": [
+   "Water"
+  ],
+  "evolveFrom": "N's Vanillish",
+  "attacks": [
+   {
+    "name": "Snow Coating",
+    "cost": [
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "",
+    "text": "Double the number of damage counters on each of your opponent's Pokémon."
+   },
+   {
+    "name": "Blizzard",
+    "cost": [
+     "Water",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "120",
+    "text": "This attack also does 10 damage to each of your opponent's Benched Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Metal",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [
+   "N's"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "me02.5-051",
+  "prints": [
+   "ASC-51"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/051"
  },
  {
   "id": "ASC-155",
@@ -5646,9 +9322,11 @@
   "regulationMark": "I",
   "tcgdexId": "me02.5-155",
   "prints": [
-   "ASC-155"
+   "ASC-155",
+   "MEP-31"
   ],
-  "lists": 47
+  "lists": 258,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/155"
  },
  {
   "id": "JTG-98",
@@ -5690,9 +9368,15 @@
   "regulationMark": "I",
   "tcgdexId": "sv09-098",
   "prints": [
-   "JTG-98"
+   "JTG-98",
+   "JTG-175",
+   "JTG-185",
+   "JTG-189",
+   "ASC-137",
+   "ASC-286"
   ],
-  "lists": 47
+  "lists": 260,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/098"
  },
  {
   "id": "JTG-97",
@@ -5726,9 +9410,12 @@
   "regulationMark": "I",
   "tcgdexId": "sv09-097",
   "prints": [
-   "JTG-97"
+   "JTG-97",
+   "SVP-189",
+   "ASC-136"
   ],
-  "lists": 47
+  "lists": 260,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/097"
  },
  {
   "id": "SCR-115",
@@ -5770,9 +9457,12 @@
   "regulationMark": "H",
   "tcgdexId": "sv07-115",
   "prints": [
-   "SCR-115"
+   "SCR-115",
+   "SVP-141",
+   "PRE-78"
   ],
-  "lists": 1
+  "lists": 28,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/115"
  },
  {
   "id": "TWM-111",
@@ -5810,9 +9500,12 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-111",
   "prints": [
-   "TWM-111"
+   "TWM-111",
+   "SFA-74",
+   "PRE-57"
   ],
-  "lists": 2
+  "lists": 6,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/111"
  },
  {
   "id": "PFL-18",
@@ -5853,9 +9546,12 @@
   "regulationMark": "I",
   "tcgdexId": "me02-018",
   "prints": [
-   "PFL-18"
+   "PFL-18",
+   "MEP-24",
+   "PFL-110"
   ],
-  "lists": 1
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me02/018"
  },
  {
   "id": "SSP-18",
@@ -5899,7 +9595,8 @@
   "prints": [
    "SSP-18"
   ],
-  "lists": 5
+  "lists": 24,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/018"
  },
  {
   "id": "SSP-111",
@@ -5934,7 +9631,8 @@
   "prints": [
    "SSP-111"
   ],
-  "lists": 13
+  "lists": 101,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/111"
  },
  {
   "id": "CRI-70",
@@ -5973,7 +9671,8 @@
   "prints": [
    "CRI-70"
   ],
-  "lists": 4
+  "lists": 72,
+  "image": "https://assets.tcgdex.net/en/me/me04/070"
  },
  {
   "id": "PFL-34",
@@ -6009,7 +9708,8 @@
   "prints": [
    "PFL-34"
   ],
-  "lists": 9
+  "lists": 57,
+  "image": "https://assets.tcgdex.net/en/me/me02/034"
  },
  {
   "id": "SVP-149",
@@ -6047,9 +9747,11 @@
   "regulationMark": "H",
   "tcgdexId": "svp-149",
   "prints": [
-   "SVP-149"
+   "SVP-149",
+   "SVP-129"
   ],
-  "lists": 8
+  "lists": 42,
+  "image": "https://assets.tcgdex.net/en/sv/svp/149"
  },
  {
   "id": "SFA-39",
@@ -6089,9 +9791,112 @@
   "regulationMark": "H",
   "tcgdexId": "sv06.5-039",
   "prints": [
-   "SFA-39"
+   "SFA-39",
+   "SFA-85",
+   "SFA-93",
+   "SFA-95",
+   "PRE-163"
   ],
-  "lists": 54
+  "lists": 321,
+  "image": "https://assets.tcgdex.net/en/sv/sv06.5/039"
+ },
+ {
+  "id": "BLK-6",
+  "name": "Petilil",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 60,
+  "types": [
+   "Grass"
+  ],
+  "attacks": [
+   {
+    "name": "Hide",
+    "cost": [
+     "Colorless"
+    ],
+    "damage": "",
+    "text": "Flip a coin. If heads, during your opponent's next turn, prevent all damage from and effects of attacks done to this Pokémon."
+   },
+   {
+    "name": "Leafage",
+    "cost": [
+     "Grass"
+    ],
+    "damage": "10",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "sv10.5b-006",
+  "prints": [
+   "BLK-6",
+   "BLK-91"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv10.5b/006"
+ },
+ {
+  "id": "SSP-57",
+  "name": "Pikachu ex",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 200,
+  "types": [
+   "Lightning"
+  ],
+  "attacks": [
+   {
+    "name": "Topaz Bolt",
+    "cost": [
+     "Grass",
+     "Lightning",
+     "Metal"
+    ],
+    "damage": "300",
+    "text": "Discard 3 Energy from this Pokémon."
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Resolute Heart",
+    "text": "If this Pokémon has full HP and would be Knocked Out by damage from an attack, it is not Knocked Out, and its remaining HP becomes 10."
+   }
+  ],
+  "rules": [
+   "As long as this Pokémon is on your Bench, prevent all damage done to this Pokémon by attacks (both yours and your opponent’s)."
+  ],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [
+   "ex",
+   "Tera"
+  ],
+  "regulationMark": "H",
+  "tcgdexId": "sv08-057",
+  "prints": [
+   "SSP-57",
+   "SSP-219",
+   "SSP-238",
+   "SSP-247",
+   "PRE-179",
+   "ASC-57",
+   "ASC-277"
+  ],
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/057"
  },
  {
   "id": "PBL-66",
@@ -6128,7 +9933,8 @@
   "prints": [
    "PBL-66"
   ],
-  "lists": 1
+  "lists": 16,
+  "image": "https://assets.tcgdex.net/en/me/me05/066"
  },
  {
   "id": "PFL-27",
@@ -6169,9 +9975,11 @@
   "regulationMark": "I",
   "tcgdexId": "me02-027",
   "prints": [
-   "PFL-27"
+   "PFL-27",
+   "PFL-98"
   ],
-  "lists": 11
+  "lists": 38,
+  "image": "https://assets.tcgdex.net/en/me/me02/027"
  },
  {
   "id": "PBL-5",
@@ -6210,7 +10018,8 @@
   "prints": [
    "PBL-5"
   ],
-  "lists": 15
+  "lists": 119,
+  "image": "https://assets.tcgdex.net/en/me/me05/005"
  },
  {
   "id": "ASC-39",
@@ -6248,9 +10057,12 @@
   "regulationMark": "I",
   "tcgdexId": "me02.5-039",
   "prints": [
-   "ASC-39"
+   "ASC-39",
+   "MEP-7",
+   "ASC-226"
   ],
-  "lists": 7
+  "lists": 229,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/039"
  },
  {
   "id": "TEF-24",
@@ -6290,7 +10102,53 @@
   "prints": [
    "TEF-24"
   ],
-  "lists": 14
+  "lists": 139,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/024"
+ },
+ {
+  "id": "SCR-111",
+  "name": "Raging Bolt",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 130,
+  "types": [
+   "Dragon"
+  ],
+  "attacks": [
+   {
+    "name": "Thunderburst Storm",
+    "cost": [
+     "Lightning",
+     "Fighting"
+    ],
+    "damage": "",
+    "text": "This attack does 30 damage to 1 of your opponent's Pokémon for each Energy attached to this Pokémon. (Don't apply Weakness and Resistance for Benched Pokémon.)"
+   },
+   {
+    "name": "Dragon Headbutt",
+    "cost": [
+     "Lightning",
+     "Fighting",
+     "Colorless"
+    ],
+    "damage": "130",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": null,
+  "resistance": null,
+  "retreat": 3,
+  "tags": [
+   "Ancient"
+  ],
+  "regulationMark": "H",
+  "tcgdexId": "sv07-111",
+  "prints": [
+   "SCR-111"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/111"
  },
  {
   "id": "TEF-123",
@@ -6331,9 +10189,15 @@
   "regulationMark": "H",
   "tcgdexId": "sv05-123",
   "prints": [
-   "TEF-123"
+   "TEF-123",
+   "SVP-145",
+   "TEF-196",
+   "TEF-208",
+   "TEF-218",
+   "PRE-166"
   ],
-  "lists": 43
+  "lists": 236,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/123"
  },
  {
   "id": "PRE-86",
@@ -6370,7 +10234,50 @@
   "prints": [
    "PRE-86"
   ],
-  "lists": 1
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/sv/sv08.5/086"
+ },
+ {
+  "id": "TEF-84",
+  "name": "Relicanth",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 100,
+  "types": [
+   "Fighting"
+  ],
+  "attacks": [
+   {
+    "name": "Razor Fin",
+    "cost": [
+     "Fighting",
+     "Colorless"
+    ],
+    "damage": "30",
+    "text": ""
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Memory Dive",
+    "text": "Each of your evolved Pokémon can use any attack from its previous Evolutions. (You still need the necessary Energy to use each attack.)"
+   }
+  ],
+  "weakness": {
+   "type": "Grass",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv05-084",
+  "prints": [
+   "TEF-84",
+   "TEF-173"
+  ],
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/084"
  },
  {
   "id": "DRI-24",
@@ -6410,9 +10317,11 @@
   "regulationMark": "H",
   "tcgdexId": "sv10-024",
   "prints": [
-   "DRI-24"
+   "DRI-24",
+   "SSP-13"
   ],
-  "lists": 1
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/024"
  },
  {
   "id": "TEF-23",
@@ -6446,7 +10355,8 @@
   "prints": [
    "TEF-23"
   ],
-  "lists": 13
+  "lists": 136,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/023"
  },
  {
   "id": "30C-14",
@@ -6491,7 +10401,8 @@
   "prints": [
    "30C-14"
   ],
-  "lists": 1
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/me/30th/014"
  },
  {
   "id": "WHT-20",
@@ -6536,9 +10447,58 @@
   "regulationMark": "I",
   "tcgdexId": "sv10.5w-020",
   "prints": [
-   "WHT-20"
+   "WHT-20",
+   "WHT-158",
+   "WHT-166",
+   "WHT-173"
   ],
-  "lists": 3
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/sv/sv10.5w/020"
+ },
+ {
+  "id": "TWM-16",
+  "name": "Rillaboom",
+  "kind": "pokemon",
+  "subtype": "Stage 2",
+  "hp": 180,
+  "types": [
+   "Grass"
+  ],
+  "evolveFrom": "Thwackey",
+  "attacks": [
+   {
+    "name": "Drum Beating",
+    "cost": [
+     "Grass"
+    ],
+    "damage": "60",
+    "text": "During your opponent's next turn, attacks used by the Defending Pokémon cost {C} more, and its Retreat Cost is {C} more."
+   },
+   {
+    "name": "Wood Hammer",
+    "cost": [
+     "Grass",
+     "Grass"
+    ],
+    "damage": "180",
+    "text": "This Pokémon also does 50 damage to itself."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 4,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv06-016",
+  "prints": [
+   "TWM-16"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/016"
  },
  {
   "id": "MEG-76",
@@ -6570,9 +10530,12 @@
   "regulationMark": "I",
   "tcgdexId": "me01-076",
   "prints": [
-   "MEG-76"
+   "MEG-76",
+   "MEP-10",
+   "ASC-112"
   ],
-  "lists": 7
+  "lists": 60,
+  "image": "https://assets.tcgdex.net/en/me/me01/076"
  },
  {
   "id": "PRE-50",
@@ -6606,7 +10569,96 @@
   "prints": [
    "PRE-50"
   ],
-  "lists": 2
+  "lists": 11,
+  "image": "https://assets.tcgdex.net/en/sv/sv08.5/050"
+ },
+ {
+  "id": "SCR-81",
+  "name": "Riolu",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 70,
+  "types": [
+   "Fighting"
+  ],
+  "attacks": [
+   {
+    "name": "Punch",
+    "cost": [
+     "Fighting",
+     "Colorless"
+    ],
+    "damage": "30",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Psychic",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv07-081",
+  "prints": [
+   "SCR-81"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/081"
+ },
+ {
+  "id": "TWM-94",
+  "name": "Scream Tail ex",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 190,
+  "types": [
+   "Psychic"
+  ],
+  "attacks": [
+   {
+    "name": "Scream",
+    "cost": [
+     "Colorless"
+    ],
+    "damage": "",
+    "text": "You can use this attack only if you go second, and only during your first turn. Your opponent can't play any Supporter cards from their hand during their next turn."
+   },
+   {
+    "name": "Crunch",
+    "cost": [
+     "Psychic",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "120",
+    "text": "Discard an Energy from your opponent's Active Pokémon."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Darkness",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [
+   "ex",
+   "Ancient"
+  ],
+  "regulationMark": "H",
+  "tcgdexId": "sv06-094",
+  "prints": [
+   "TWM-94",
+   "TWM-197"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/094"
  },
  {
   "id": "PRE-21",
@@ -6646,7 +10698,55 @@
   "prints": [
    "PRE-21"
   ],
-  "lists": 16
+  "lists": 161,
+  "image": "https://assets.tcgdex.net/en/sv/sv08.5/021"
+ },
+ {
+  "id": "30C-84",
+  "name": "Seismitoad",
+  "kind": "pokemon",
+  "subtype": "Stage 2",
+  "hp": 160,
+  "types": [
+   "Fighting"
+  ],
+  "evolveFrom": "Palpitoad",
+  "attacks": [
+   {
+    "name": "Quaking Fist",
+    "cost": [
+     "Fighting"
+    ],
+    "damage": "60",
+    "text": "During your opponent's next turn, whenever they try to use a Trainer card from their hand, they flip a coin. If tails, your opponent discards that Trainer card instead of using it."
+   },
+   {
+    "name": "Mega Punch",
+    "cost": [
+     "Fighting",
+     "Colorless",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "180",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Grass",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 3,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "30th-084",
+  "prints": [
+   "30C-84"
+  ],
+  "lists": 4,
+  "image": "https://assets.tcgdex.net/en/me/30th/084"
  },
  {
   "id": "DRI-10",
@@ -6684,9 +10784,11 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-010",
   "prints": [
-   "DRI-10"
+   "DRI-10",
+   "DRI-185"
   ],
-  "lists": 72
+  "lists": 644,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/010"
  },
  {
   "id": "PBL-33",
@@ -6728,7 +10830,8 @@
   "prints": [
    "PBL-33"
   ],
-  "lists": 15
+  "lists": 125,
+  "image": "https://assets.tcgdex.net/en/me/me05/033"
  },
  {
   "id": "PBL-6",
@@ -6768,7 +10871,8 @@
   "prints": [
    "PBL-6"
   ],
-  "lists": 15
+  "lists": 117,
+  "image": "https://assets.tcgdex.net/en/me/me05/006"
  },
  {
   "id": "SCR-58",
@@ -6817,7 +10921,8 @@
   "prints": [
    "SCR-58"
   ],
-  "lists": 34
+  "lists": 232,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/058"
  },
  {
   "id": "MEP-86",
@@ -6861,7 +10966,99 @@
   "prints": [
    "MEP-86"
   ],
-  "lists": 1
+  "lists": 6,
+  "image": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/tpci/MEP/MEP_086_R_EN_LG.png"
+ },
+ {
+  "id": "PBL-29",
+  "name": "Slowpoke",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 70,
+  "types": [
+   "Psychic"
+  ],
+  "attacks": [
+   {
+    "name": "All-You-Can-Yeet",
+    "cost": [
+     "Psychic"
+    ],
+    "damage": "",
+    "text": "You may discard any number of cards from your hand."
+   },
+   {
+    "name": "Headbutt",
+    "cost": [
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "20",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Darkness",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me05-029",
+  "prints": [
+   "PBL-29"
+  ],
+  "lists": 8,
+  "image": "https://assets.tcgdex.net/en/me/me05/029"
+ },
+ {
+  "id": "PRE-18",
+  "name": "Slowpoke",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 70,
+  "types": [
+   "Water"
+  ],
+  "attacks": [
+   {
+    "name": "Water Gun",
+    "cost": [
+     "Water"
+    ],
+    "damage": "10",
+    "text": ""
+   },
+   {
+    "name": "Tail Whap",
+    "cost": [
+     "Water",
+     "Colorless"
+    ],
+    "damage": "30",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Lightning",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv08.5-018",
+  "prints": [
+   "PRE-18"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv08.5/018"
  },
  {
   "id": "SCR-57",
@@ -6907,7 +11104,8 @@
   "prints": [
    "SCR-57"
   ],
-  "lists": 34
+  "lists": 227,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/057"
  },
  {
   "id": "DLR-15",
@@ -6941,7 +11139,8 @@
   "prints": [
    "DLR-15"
   ],
-  "lists": 1
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me06/015"
  },
  {
   "id": "DRI-21",
@@ -6975,7 +11174,44 @@
   "prints": [
    "DRI-21"
   ],
-  "lists": 1
+  "lists": 23,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/021"
+ },
+ {
+  "id": "SSP-75",
+  "name": "Smoochum",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 30,
+  "types": [
+   "Psychic"
+  ],
+  "attacks": [
+   {
+    "name": "Delightful Kiss",
+    "cost": [],
+    "damage": "",
+    "text": "Search your deck for up to 2 Basic {P} Energy cards and attach them to 1 of your Benched Pokémon. Then, shuffle your deck."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Darkness",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 0,
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv08-075",
+  "prints": [
+   "SSP-75"
+  ],
+  "lists": 34,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/075"
  },
  {
   "id": "ASC-46",
@@ -7007,9 +11243,11 @@
   "regulationMark": "I",
   "tcgdexId": "me02.5-046",
   "prints": [
-   "ASC-46"
+   "ASC-46",
+   "ASC-227"
   ],
-  "lists": 10
+  "lists": 55,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/046"
  },
  {
   "id": "MEG-75",
@@ -7041,9 +11279,59 @@
   "regulationMark": "I",
   "tcgdexId": "me01-075",
   "prints": [
-   "MEG-75"
+   "MEG-75",
+   "ASC-106"
   ],
-  "lists": 7
+  "lists": 74,
+  "image": "https://assets.tcgdex.net/en/me/me01/075"
+ },
+ {
+  "id": "ASC-98",
+  "name": "Spectrier",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 120,
+  "types": [
+   "Psychic"
+  ],
+  "attacks": [
+   {
+    "name": "Spooky Shot",
+    "cost": [
+     "Psychic"
+    ],
+    "damage": "30",
+    "text": ""
+   },
+   {
+    "name": "Phantasmal Barrage",
+    "cost": [
+     "Psychic",
+     "Psychic",
+     "Colorless"
+    ],
+    "damage": "",
+    "text": "Discard all Energy from this Pokémon and place 12 damage counters on 1 of your opponent's Pokémon."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Darkness",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "me02.5-098",
+  "prints": [
+   "ASC-98"
+  ],
+  "lists": 9,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/098"
  },
  {
   "id": "PBL-35",
@@ -7080,7 +11368,8 @@
   "prints": [
    "PBL-35"
   ],
-  "lists": 8
+  "lists": 43,
+  "image": "https://assets.tcgdex.net/en/me/me05/035"
  },
  {
   "id": "POR-20",
@@ -7114,7 +11403,219 @@
   "prints": [
    "POR-20"
   ],
-  "lists": 3
+  "lists": 14,
+  "image": "https://assets.tcgdex.net/en/me/me03/020"
+ },
+ {
+  "id": "DRI-143",
+  "name": "Steven's Beldum",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 70,
+  "types": [
+   "Metal"
+  ],
+  "attacks": [
+   {
+    "name": "Ram",
+    "cost": [
+     "Metal",
+     "Colorless"
+    ],
+    "damage": "30",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Grass",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [
+   "Steven's"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "sv10-143",
+  "prints": [
+   "DRI-143",
+   "SVP-207"
+  ],
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/143"
+ },
+ {
+  "id": "DRI-145",
+  "name": "Steven's Metagross ex",
+  "kind": "pokemon",
+  "subtype": "Stage 2",
+  "hp": 340,
+  "types": [
+   "Metal"
+  ],
+  "evolveFrom": "Steven's Metang",
+  "attacks": [
+   {
+    "name": "Metal Stomp",
+    "cost": [
+     "Metal",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "200",
+    "text": ""
+   }
+  ],
+  "abilities": [
+   {
+    "name": "X-Boot",
+    "text": "Once during your turn, you may search your deck for a Basic {P} Energy card, a Basic {M} Energy card, or 1 of each and attach them to your {P} Pokémon and {M} Pokémon in any way you like. Then, shuffle your deck."
+   }
+  ],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Grass",
+   "value": "-30"
+  },
+  "retreat": 3,
+  "tags": [
+   "Steven's",
+   "ex"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "sv10-145",
+  "prints": [
+   "DRI-145",
+   "ASC-289"
+  ],
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/145"
+ },
+ {
+  "id": "DRI-144",
+  "name": "Steven's Metang",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 100,
+  "types": [
+   "Metal"
+  ],
+  "evolveFrom": "Steven's Beldum",
+  "attacks": [
+   {
+    "name": "Metal Slash",
+    "cost": [
+     "Metal",
+     "Colorless"
+    ],
+    "damage": "70",
+    "text": "During your next turn, this Pokémon can't attack."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fire",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Grass",
+   "value": "-30"
+  },
+  "retreat": 2,
+  "tags": [
+   "Steven's"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "sv10-144",
+  "prints": [
+   "DRI-144"
+  ],
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/144"
+ },
+ {
+  "id": "ASC-62",
+  "name": "Stunfisk",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 110,
+  "types": [
+   "Lightning"
+  ],
+  "attacks": [
+   {
+    "name": "Pouncing Trap",
+    "cost": [
+     "Lightning"
+    ],
+    "damage": "30",
+    "text": "During your opponent's next turn, the Defending Pokémon can't retreat. During your next turn, the Defending Pokémon takes 100 more damage from attacks (after applying Weakness and Resistance)."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "me02.5-062",
+  "prints": [
+   "ASC-62"
+  ],
+  "lists": 12,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/062"
+ },
+ {
+  "id": "30C-71",
+  "name": "Sylveon ex",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 270,
+  "types": [
+   "Psychic"
+  ],
+  "evolveFrom": "Eevee",
+  "attacks": [
+   {
+    "name": "Colorful Harmony",
+    "cost": [
+     "Psychic",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "50×",
+    "text": "This attack does 50 damage for each type of Basic Energy attached to all of your Pokémon."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Metal",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [
+   "ex"
+  ],
+  "regulationMark": "J",
+  "tcgdexId": "30th-071",
+  "prints": [
+   "30C-71",
+   "MEP-100",
+   "30C-153"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/30th/071"
  },
  {
   "id": "DLR-88",
@@ -7158,9 +11659,11 @@
   "regulationMark": "J",
   "tcgdexId": "me06-088",
   "prints": [
-   "DLR-88"
+   "DLR-88",
+   "DLR-124"
   ],
-  "lists": 69
+  "lists": 69,
+  "image": "https://assets.tcgdex.net/en/me/me06/088"
  },
  {
   "id": "SFA-6",
@@ -7195,9 +11698,11 @@
   "regulationMark": "H",
   "tcgdexId": "sv06.5-006",
   "prints": [
-   "SFA-6"
+   "SFA-6",
+   "SFA-65"
   ],
-  "lists": 15
+  "lists": 114,
+  "image": "https://assets.tcgdex.net/en/sv/sv06.5/006"
  },
  {
   "id": "JTG-51",
@@ -7234,7 +11739,8 @@
   "prints": [
    "JTG-51"
   ],
-  "lists": 20
+  "lists": 20,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/051"
  },
  {
   "id": "TWM-131",
@@ -7269,9 +11775,12 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-131",
   "prints": [
-   "TWM-131"
+   "TWM-131",
+   "SVP-118",
+   "TWM-186"
   ],
-  "lists": 21
+  "lists": 202,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/131"
  },
  {
   "id": "TWM-25",
@@ -7316,9 +11825,17 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-025",
   "prints": [
-   "TWM-25"
+   "TWM-25",
+   "SVP-166",
+   "TWM-190",
+   "TWM-211",
+   "TWM-221",
+   "PRE-12",
+   "PRE-145",
+   "PRE-177"
   ],
-  "lists": 78
+  "lists": 457,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/025"
  },
  {
   "id": "DRI-51",
@@ -7364,7 +11881,105 @@
   "prints": [
    "DRI-51"
   ],
-  "lists": 10
+  "lists": 78,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/051"
+ },
+ {
+  "id": "DRI-122",
+  "name": "Team Rocket's Crobat ex",
+  "kind": "pokemon",
+  "subtype": "Stage 2",
+  "hp": 310,
+  "types": [
+   "Darkness"
+  ],
+  "evolveFrom": "Team Rocket's Golbat",
+  "attacks": [
+   {
+    "name": "Assassin's Return",
+    "cost": [
+     "Darkness",
+     "Darkness"
+    ],
+    "damage": "120",
+    "text": "You may put this Pokémon into your hand. (Discard all cards attached to this Pokémon.)"
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Biting Spree",
+    "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon during your turn, you may choose 2 of your opponent's Pokémon and put 2 damage counters on each of them."
+   }
+  ],
+  "weakness": {
+   "type": "Lightning",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [
+   "Team Rocket's",
+   "ex"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "sv10-122",
+  "prints": [
+   "DRI-122",
+   "DRI-217",
+   "DRI-234",
+   "DRI-242"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/122"
+ },
+ {
+  "id": "DRI-121",
+  "name": "Team Rocket's Golbat",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 80,
+  "types": [
+   "Darkness"
+  ],
+  "evolveFrom": "Team Rocket's Zubat",
+  "attacks": [
+   {
+    "name": "Confuse Ray",
+    "cost": [
+     "Darkness"
+    ],
+    "damage": "30",
+    "text": "Your opponent's Active Pokémon is now Confused."
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Sneaky Bite",
+    "text": "When you play this Pokémon from your hand to evolve 1 of your Pokémon during your turn, you may put 2 damage counters on 1 of your opponent's Pokémon."
+   }
+  ],
+  "weakness": {
+   "type": "Lightning",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [
+   "Team Rocket's"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "sv10-121",
+  "prints": [
+   "DRI-121"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/121"
  },
  {
   "id": "ASC-127",
@@ -7415,7 +12030,57 @@
   "prints": [
    "ASC-127"
   ],
-  "lists": 8
+  "lists": 53,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/127"
+ },
+ {
+  "id": "ASC-162",
+  "name": "Team Rocket's Kangaskhan ex",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 230,
+  "types": [
+   "Colorless"
+  ],
+  "attacks": [
+   {
+    "name": "Comet Punch",
+    "cost": [
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "30×",
+    "text": "Flip 4 coins. This attack does 30 damage for each heads."
+   },
+   {
+    "name": "Wicked Impact",
+    "cost": [
+     "Colorless",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "120+",
+    "text": "If you played a Supporter card that has \"Team Rocket\" in its name from your hand during this turn, this attack does 100 more damage."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 2,
+  "tags": [
+   "Team Rocket's",
+   "ex"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "me02.5-162",
+  "prints": [
+   "ASC-162"
+  ],
+  "lists": 9,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/162"
  },
  {
   "id": "DRI-81",
@@ -7460,9 +12125,17 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-081",
   "prints": [
-   "DRI-81"
+   "DRI-81",
+   "SVP-205",
+   "SVP-216",
+   "DRI-213",
+   "DRI-231",
+   "DRI-240",
+   "ASC-79",
+   "ASC-281"
   ],
-  "lists": 2
+  "lists": 17,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/081"
  },
  {
   "id": "DRI-87",
@@ -7500,9 +12173,12 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-087",
   "prints": [
-   "DRI-87"
+   "DRI-87",
+   "ASC-97",
+   "ASC-238"
   ],
-  "lists": 6
+  "lists": 30,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/087"
  },
  {
   "id": "DRI-127",
@@ -7548,9 +12224,12 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-127",
   "prints": [
-   "DRI-127"
+   "DRI-127",
+   "DRI-200",
+   "ASC-126"
   ],
-  "lists": 8
+  "lists": 53,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/127"
  },
  {
   "id": "DRI-153",
@@ -7586,7 +12265,8 @@
   "prints": [
    "DRI-153"
   ],
-  "lists": 8
+  "lists": 53,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/153"
  },
  {
   "id": "DRI-154",
@@ -7625,7 +12305,8 @@
   "prints": [
    "DRI-154"
   ],
-  "lists": 8
+  "lists": 53,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/154"
  },
  {
   "id": "DRI-128",
@@ -7670,7 +12351,8 @@
   "prints": [
    "DRI-128"
   ],
-  "lists": 1
+  "lists": 7,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/128"
  },
  {
   "id": "DRI-20",
@@ -7711,9 +12393,12 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-020",
   "prints": [
-   "DRI-20"
+   "DRI-20",
+   "DRI-187",
+   "ASC-19"
   ],
-  "lists": 2
+  "lists": 17,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/020"
  },
  {
   "id": "DRI-19",
@@ -7747,9 +12432,11 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-019",
   "prints": [
-   "DRI-19"
+   "DRI-19",
+   "ASC-18"
   ],
-  "lists": 2
+  "lists": 17,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/019"
  },
  {
   "id": "DRI-82",
@@ -7797,9 +12484,51 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-082",
   "prints": [
-   "DRI-82"
+   "DRI-82",
+   "SVP-203"
   ],
-  "lists": 1
+  "lists": 4,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/082"
+ },
+ {
+  "id": "DRI-120",
+  "name": "Team Rocket's Zubat",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 50,
+  "types": [
+   "Darkness"
+  ],
+  "attacks": [
+   {
+    "name": "Poison Spray",
+    "cost": [
+     "Darkness"
+    ],
+    "damage": "",
+    "text": "Your opponent's Active Pokémon is now Poisoned."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Lightning",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [
+   "Team Rocket's"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "sv10-120",
+  "prints": [
+   "DRI-120"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/120"
  },
  {
   "id": "SCR-128",
@@ -7848,9 +12577,17 @@
   "regulationMark": "H",
   "tcgdexId": "sv07-128",
   "prints": [
-   "SCR-128"
+   "SCR-128",
+   "SVP-165",
+   "SCR-170",
+   "SCR-173",
+   "PRE-92",
+   "PRE-169",
+   "PRE-180",
+   "ASC-179"
   ],
-  "lists": 2
+  "lists": 10,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/128"
  },
  {
   "id": "TWM-15",
@@ -7889,9 +12626,11 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-015",
   "prints": [
-   "TWM-15"
+   "TWM-15",
+   "SVP-115"
   ],
-  "lists": 16
+  "lists": 161,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/015"
  },
  {
   "id": "DRI-40",
@@ -7933,7 +12672,8 @@
   "prints": [
    "DRI-40"
   ],
-  "lists": 8
+  "lists": 138,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/040"
  },
  {
   "id": "PBL-68",
@@ -7974,9 +12714,11 @@
   "regulationMark": "J",
   "tcgdexId": "me05-068",
   "prints": [
-   "PBL-68"
+   "PBL-68",
+   "PBL-94"
   ],
-  "lists": 1
+  "lists": 16,
+  "image": "https://assets.tcgdex.net/en/me/me05/068"
  },
  {
   "id": "PFL-67",
@@ -8017,9 +12759,11 @@
   "regulationMark": "I",
   "tcgdexId": "me02-067",
   "prints": [
-   "PFL-67"
+   "PFL-67",
+   "MEP-78"
   ],
-  "lists": 8
+  "lists": 51,
+  "image": "https://assets.tcgdex.net/en/me/me02/067"
  },
  {
   "id": "PFL-68",
@@ -8059,9 +12803,88 @@
   "regulationMark": "I",
   "tcgdexId": "me02-068",
   "prints": [
-   "PFL-68"
+   "PFL-68",
+   "MEP-17",
+   "PFL-103"
   ],
-  "lists": 8
+  "lists": 51,
+  "image": "https://assets.tcgdex.net/en/me/me02/068"
+ },
+ {
+  "id": "PBL-67",
+  "name": "Trumbeak",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 90,
+  "types": [
+   "Colorless"
+  ],
+  "evolveFrom": "Pikipek",
+  "attacks": [
+   {
+    "name": "Fly",
+    "cost": [
+     "Colorless"
+    ],
+    "damage": "30",
+    "text": "Flip a coin. If tails, this attack does nothing. If heads, during your opponent's next turn, prevent all damage from and effects of attacks done to this Pokémon."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Lightning",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me05-067",
+  "prints": [
+   "PBL-67"
+  ],
+  "lists": 11,
+  "image": "https://assets.tcgdex.net/en/me/me05/067"
+ },
+ {
+  "id": "ASC-59",
+  "name": "Tynamo",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 40,
+  "types": [
+   "Lightning"
+  ],
+  "attacks": [
+   {
+    "name": "Hold Still",
+    "cost": [
+     "Colorless"
+    ],
+    "damage": "",
+    "text": "Heal 10 damage from this Pokémon."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Fighting",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 0,
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "me02.5-059",
+  "prints": [
+   "ASC-59",
+   "BLK-30",
+   "BLK-113"
+  ],
+  "lists": 4,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/059"
  },
  {
   "id": "30C-72",
@@ -8099,7 +12922,8 @@
   "prints": [
    "30C-72"
   ],
-  "lists": 4
+  "lists": 67,
+  "image": "https://assets.tcgdex.net/en/me/30th/072"
  },
  {
   "id": "SSP-21",
@@ -8139,7 +12963,8 @@
   "prints": [
    "SSP-21"
   ],
-  "lists": 2
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/021"
  },
  {
   "id": "JTG-31",
@@ -8180,9 +13005,12 @@
   "regulationMark": "I",
   "tcgdexId": "sv09-031",
   "prints": [
-   "JTG-31"
+   "JTG-31",
+   "JTG-171",
+   "JTG-182"
   ],
-  "lists": 1
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/031"
  },
  {
   "id": "CRI-1",
@@ -8216,7 +13044,8 @@
   "prints": [
    "CRI-1"
   ],
-  "lists": 1
+  "lists": 7,
+  "image": "https://assets.tcgdex.net/en/me/me04/001"
  },
  {
   "id": "TWM-64",
@@ -8264,9 +13093,113 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-064",
   "prints": [
-   "TWM-64"
+   "TWM-64",
+   "TWM-194",
+   "TWM-213",
+   "PRE-27",
+   "PRE-152"
   ],
-  "lists": 55
+  "lists": 317,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/064"
+ },
+ {
+  "id": "DRI-2",
+  "name": "Yanma",
+  "kind": "pokemon",
+  "subtype": "Basic",
+  "hp": 70,
+  "types": [
+   "Grass"
+  ],
+  "attacks": [
+   {
+    "name": "Whirlwind",
+    "cost": [
+     "Colorless"
+    ],
+    "damage": "",
+    "text": "Switch out your opponent's Active Pokémon to the Bench. (Your opponent chooses the new Active Pokémon.)"
+   },
+   {
+    "name": "Razor Wing",
+    "cost": [
+     "Grass",
+     "Colorless"
+    ],
+    "damage": "30",
+    "text": ""
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Lightning",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "sv10-002",
+  "prints": [
+   "DRI-2",
+   "DRI-183"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/002"
+ },
+ {
+  "id": "DRI-3",
+  "name": "Yanmega ex",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 280,
+  "types": [
+   "Grass"
+  ],
+  "evolveFrom": "Yanma",
+  "attacks": [
+   {
+    "name": "Jet Cyclone",
+    "cost": [
+     "Grass",
+     "Grass",
+     "Grass",
+     "Colorless"
+    ],
+    "damage": "210",
+    "text": "Move 3 Energy from this Pokémon to 1 of your Benched Pokémon."
+   }
+  ],
+  "abilities": [
+   {
+    "name": "Buzzing Boost",
+    "text": "Once during your turn, when this Pokémon moves from your Bench to the Active Spot, you may search your deck for up to 3 Basic {G} Energy cards and attach them to this Pokémon. Then, shuffle your deck."
+   }
+  ],
+  "weakness": {
+   "type": "Lightning",
+   "value": "×2"
+  },
+  "resistance": {
+   "type": "Fighting",
+   "value": "-30"
+  },
+  "retreat": 1,
+  "tags": [
+   "ex"
+  ],
+  "regulationMark": "I",
+  "tcgdexId": "sv10-003",
+  "prints": [
+   "DRI-3",
+   "DRI-206",
+   "DRI-228"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/003"
  },
  {
   "id": "30C-100",
@@ -8310,7 +13243,8 @@
   "prints": [
    "30C-100"
   ],
-  "lists": 1
+  "lists": 11,
+  "image": "https://assets.tcgdex.net/en/me/30th/100"
  },
  {
   "id": "MEG-88",
@@ -8357,7 +13291,8 @@
   "prints": [
    "MEG-88"
   ],
-  "lists": 52
+  "lists": 252,
+  "image": "https://assets.tcgdex.net/en/me/me01/088"
  },
  {
   "id": "DRI-78",
@@ -8401,7 +13336,55 @@
   "prints": [
    "DRI-78"
   ],
-  "lists": 27
+  "lists": 148,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/078"
+ },
+ {
+  "id": "WHT-62",
+  "name": "Zoroark",
+  "kind": "pokemon",
+  "subtype": "Stage 1",
+  "hp": 120,
+  "types": [
+   "Darkness"
+  ],
+  "evolveFrom": "Zorua",
+  "attacks": [
+   {
+    "name": "Mind Jack",
+    "cost": [
+     "Darkness"
+    ],
+    "damage": "30×",
+    "text": "This attack does 30 damage for each of your opponent's Benched Pokémon."
+   },
+   {
+    "name": "Foul Play",
+    "cost": [
+     "Colorless",
+     "Colorless",
+     "Colorless"
+    ],
+    "damage": "",
+    "text": "Choose 1 of your opponent's Active Pokémon's attacks and use it as this attack."
+   }
+  ],
+  "abilities": [],
+  "weakness": {
+   "type": "Grass",
+   "value": "×2"
+  },
+  "resistance": null,
+  "retreat": 1,
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "sv10.5w-062",
+  "prints": [
+   "WHT-62",
+   "WHT-143"
+  ],
+  "lists": 7,
+  "image": "https://assets.tcgdex.net/en/sv/sv10.5w/062"
  },
  {
   "id": "DLR-89",
@@ -8413,9 +13396,12 @@
   "regulationMark": "J",
   "tcgdexId": "me06-089",
   "prints": [
-   "DLR-89"
+   "DLR-89",
+   "DLR-125",
+   "DLR-139"
   ],
-  "lists": 2
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/me/me06/089"
  },
  {
   "id": "SFA-54",
@@ -8429,7 +13415,23 @@
   "prints": [
    "SFA-54"
   ],
-  "lists": 34
+  "lists": 232,
+  "image": "https://assets.tcgdex.net/en/sv/sv06.5/054"
+ },
+ {
+  "id": "TWM-142",
+  "name": "Accompanying Flute",
+  "kind": "trainer",
+  "subtype": "Item",
+  "text": "Reveal the top 5 cards of your opponent's deck. You may choose any number of Basic Pokémon you find there and put those Pokémon onto their Bench. Your opponent shuffles the other cards back into their deck.",
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv06-142",
+  "prints": [
+   "TWM-142"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/142"
  },
  {
   "id": "MEG-113",
@@ -8441,9 +13443,13 @@
   "regulationMark": "I",
   "tcgdexId": "me01-113",
   "prints": [
-   "MEG-113"
+   "MEG-113",
+   "MEG-165",
+   "MEG-183",
+   "ASC-180"
   ],
-  "lists": 1
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/me/me01/113"
  },
  {
   "id": "DLR-90",
@@ -8455,9 +13461,11 @@
   "regulationMark": "J",
   "tcgdexId": "me06-090",
   "prints": [
-   "DLR-90"
+   "DLR-90",
+   "DLR-126"
   ],
-  "lists": 13
+  "lists": 13,
+  "image": "https://assets.tcgdex.net/en/me/me06/090"
  },
  {
   "id": "ASC-181",
@@ -8469,9 +13477,46 @@
   "regulationMark": "I",
   "tcgdexId": "me02.5-181",
   "prints": [
-   "ASC-181"
+   "ASC-181",
+   "SSH-156",
+   "SSH-213",
+   "BLK-79",
+   "MEG-166"
   ],
-  "lists": 54
+  "lists": 544,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/181"
+ },
+ {
+  "id": "SSP-162",
+  "name": "Amulet of Hope",
+  "kind": "trainer",
+  "subtype": "Tool",
+  "text": "If the Pokémon this card is attached to is Knocked Out by damage from an attack from your opponent's Pokémon, search your deck for up to 3 cards and put them into your hand. Then, shuffle your deck.",
+  "tags": [
+   "ACE SPEC"
+  ],
+  "regulationMark": "H",
+  "tcgdexId": "sv08-162",
+  "prints": [
+   "SSP-162"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/162"
+ },
+ {
+  "id": "PBL-72",
+  "name": "Antique Armor Fossil",
+  "kind": "trainer",
+  "subtype": "Item",
+  "text": "Play this card as if it were a 60-HP Basic {C} Pokémon. This card can't be affected by any Special Conditions and can't retreat.\nAt any time during your turn, you may discard this card from play.",
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me05-072",
+  "prints": [
+   "PBL-72"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me05/072"
  },
  {
   "id": "SCR-131",
@@ -8483,9 +13528,12 @@
   "regulationMark": "H",
   "tcgdexId": "sv07-131",
   "prints": [
-   "SCR-131"
+   "SCR-131",
+   "SCR-174",
+   "PRE-94"
   ],
-  "lists": 63
+  "lists": 356,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/131"
  },
  {
   "id": "CRI-76",
@@ -8497,9 +13545,12 @@
   "regulationMark": "J",
   "tcgdexId": "me04-076",
   "prints": [
-   "CRI-76"
+   "CRI-76",
+   "CRI-106",
+   "CRI-120"
   ],
-  "lists": 4
+  "lists": 16,
+  "image": "https://assets.tcgdex.net/en/me/me04/076"
  },
  {
   "id": "PFL-85",
@@ -8511,9 +13562,11 @@
   "regulationMark": "I",
   "tcgdexId": "me02-085",
   "prints": [
-   "PFL-85"
+   "PFL-85",
+   "PFL-116"
   ],
-  "lists": 27
+  "lists": 205,
+  "image": "https://assets.tcgdex.net/en/me/me02/085"
  },
  {
   "id": "TEF-142",
@@ -8525,9 +13578,12 @@
   "regulationMark": "H",
   "tcgdexId": "sv05-142",
   "prints": [
-   "TEF-142"
+   "TEF-142",
+   "TEF-197",
+   "TEF-209"
   ],
-  "lists": 2
+  "lists": 59,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/142"
  },
  {
   "id": "PRE-95",
@@ -8539,9 +13595,11 @@
   "regulationMark": "H",
   "tcgdexId": "sv08.5-095",
   "prints": [
-   "PRE-95"
+   "PRE-95",
+   "SFA-55"
   ],
-  "lists": 49
+  "lists": 265,
+  "image": "https://assets.tcgdex.net/en/sv/sv08.5/095"
  },
  {
   "id": "JTG-143",
@@ -8553,9 +13611,19 @@
   "regulationMark": "H",
   "tcgdexId": "sv09-143",
   "prints": [
-   "JTG-143"
+   "JTG-143",
+   "SVP-219",
+   "SVP-220",
+   "PRE-96",
+   "PRE-97",
+   "PRE-98",
+   "PRE-99",
+   "JTG-144",
+   "JTG-145",
+   "ASC-255"
   ],
-  "lists": 53
+  "lists": 299,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/143"
  },
  {
   "id": "PFL-86",
@@ -8567,9 +13635,11 @@
   "regulationMark": "I",
   "tcgdexId": "me02-086",
   "prints": [
-   "PFL-86"
+   "PFL-86",
+   "PFL-117"
   ],
-  "lists": 5
+  "lists": 6,
+  "image": "https://assets.tcgdex.net/en/me/me02/086"
  },
  {
   "id": "MEG-114",
@@ -8581,9 +13651,22 @@
   "regulationMark": "I",
   "tcgdexId": "me01-114",
   "prints": [
-   "MEG-114"
+   "MEG-114",
+   "SP-251",
+   "RCL-154",
+   "RCL-189",
+   "RCL-200",
+   "SHF-58",
+   "BRS-132",
+   "LOR-TG24",
+   "PAL-172",
+   "PAL-248",
+   "PAL-265",
+   "ASC-183",
+   "ASC-256"
   ],
-  "lists": 423
+  "lists": 2768,
+  "image": "https://assets.tcgdex.net/en/me/me01/114"
  },
  {
   "id": "WHT-80",
@@ -8595,9 +13678,11 @@
   "regulationMark": "I",
   "tcgdexId": "sv10.5w-080",
   "prints": [
-   "WHT-80"
+   "WHT-80",
+   "PBL-104"
   ],
-  "lists": 27
+  "lists": 247,
+  "image": "https://assets.tcgdex.net/en/sv/sv10.5w/080"
  },
  {
   "id": "SCR-132",
@@ -8609,9 +13694,13 @@
   "regulationMark": "H",
   "tcgdexId": "sv07-132",
   "prints": [
-   "SCR-132"
+   "SCR-132",
+   "SCR-163",
+   "SCR-171",
+   "PRE-100"
   ],
-  "lists": 25
+  "lists": 165,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/132"
  },
  {
   "id": "SSP-164",
@@ -8627,7 +13716,8 @@
   "prints": [
    "SSP-164"
   ],
-  "lists": 1
+  "lists": 14,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/164"
  },
  {
   "id": "JTG-146",
@@ -8639,9 +13729,11 @@
   "regulationMark": "I",
   "tcgdexId": "sv09-146",
   "prints": [
-   "JTG-146"
+   "JTG-146",
+   "JTG-179"
   ],
-  "lists": 15
+  "lists": 127,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/146"
  },
  {
   "id": "TEF-144",
@@ -8653,9 +13745,14 @@
   "regulationMark": "H",
   "tcgdexId": "sv05-144",
   "prints": [
-   "TEF-144"
+   "TEF-144",
+   "TWM-223",
+   "PRE-101",
+   "MEG-167",
+   "ASC-184"
   ],
-  "lists": 312
+  "lists": 2079,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/144"
  },
  {
   "id": "TWM-143",
@@ -8667,9 +13764,28 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-143",
   "prints": [
-   "TWM-143"
+   "TWM-143",
+   "PRE-102"
   ],
-  "lists": 39
+  "lists": 255,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/143"
+ },
+ {
+  "id": "ASC-185",
+  "name": "Canari",
+  "kind": "trainer",
+  "subtype": "Supporter",
+  "text": "You can use this card only if you discard another card from your hand.\nSearch your deck for up to 4 {L} Pokémon, reveal them, and put them into your hand. Then, shuffle your deck.",
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "me02.5-185",
+  "prints": [
+   "ASC-185",
+   "ASC-257",
+   "ASC-291"
+  ],
+  "lists": 4,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/185"
  },
  {
   "id": "TWM-145",
@@ -8681,9 +13797,13 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-145",
   "prints": [
-   "TWM-145"
+   "TWM-145",
+   "TWM-204",
+   "TWM-217",
+   "PRE-103"
   ],
-  "lists": 1
+  "lists": 15,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/145"
  },
  {
   "id": "TEF-145",
@@ -8695,9 +13815,12 @@
   "regulationMark": "H",
   "tcgdexId": "sv05-145",
   "prints": [
-   "TEF-145"
+   "TEF-145",
+   "TEF-198",
+   "PRE-104"
   ],
-  "lists": 109
+  "lists": 654,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/145"
  },
  {
   "id": "SFA-57",
@@ -8709,9 +13832,11 @@
   "regulationMark": "H",
   "tcgdexId": "sv06.5-057",
   "prints": [
-   "SFA-57"
+   "SFA-57",
+   "SFA-87"
   ],
-  "lists": 4
+  "lists": 16,
+  "image": "https://assets.tcgdex.net/en/sv/sv06.5/057"
  },
  {
   "id": "TWM-146",
@@ -8725,7 +13850,28 @@
   "prints": [
    "TWM-146"
   ],
-  "lists": 6
+  "lists": 12,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/146"
+ },
+ {
+  "id": "SSP-169",
+  "name": "Counter Gain",
+  "kind": "trainer",
+  "subtype": "Tool",
+  "text": "If you have more Prize cards remaining than your opponent, attacks used by the Pokémon this card is attached to cost {C} less.",
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv08-169",
+  "prints": [
+   "SSP-169",
+   "LOT-170",
+   "LOT-230",
+   "SSP-249",
+   "ASC-186",
+   "ASC-259"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/169"
  },
  {
   "id": "SCR-133",
@@ -8737,9 +13883,13 @@
   "regulationMark": "H",
   "tcgdexId": "sv07-133",
   "prints": [
-   "SCR-133"
+   "SCR-133",
+   "SCR-164",
+   "PRE-105",
+   "PRE-171"
   ],
-  "lists": 234
+  "lists": 1393,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/133"
  },
  {
   "id": "POR-71",
@@ -8751,9 +13901,20 @@
   "regulationMark": "J",
   "tcgdexId": "me03-071",
   "prints": [
-   "POR-71"
+   "POR-71",
+   "EPO-92",
+   "LTR-111",
+   "KSS-34",
+   "GEN-60",
+   "SUM-115",
+   "UPR-166",
+   "SSH-159",
+   "CRZ-125",
+   "SVI-168",
+   "PBL-105"
   ],
-  "lists": 121
+  "lists": 750,
+  "image": "https://assets.tcgdex.net/en/me/me03/071"
  },
  {
   "id": "DRI-162",
@@ -8767,7 +13928,8 @@
   "prints": [
    "DRI-162"
   ],
-  "lists": 2
+  "lists": 28,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/162"
  },
  {
   "id": "SSP-170",
@@ -8779,9 +13941,27 @@
   "regulationMark": "H",
   "tcgdexId": "sv08-170",
   "prints": [
-   "SSP-170"
+   "SSP-170",
+   "SSP-230"
   ],
-  "lists": 122
+  "lists": 596,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/170"
+ },
+ {
+  "id": "PBL-75",
+  "name": "Dark Bell",
+  "kind": "trainer",
+  "subtype": "Item",
+  "text": "Both Active non-{D} Pokémon are now Confused.",
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me05-075",
+  "prints": [
+   "PBL-75",
+   "PBL-106"
+  ],
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/me/me05/075"
  },
  {
   "id": "PFL-87",
@@ -8793,9 +13973,30 @@
   "regulationMark": "I",
   "tcgdexId": "me02-087",
   "prints": [
-   "PFL-87"
+   "PFL-87",
+   "PFL-118",
+   "PFL-129"
   ],
-  "lists": 66
+  "lists": 573,
+  "image": "https://assets.tcgdex.net/en/me/me02/087"
+ },
+ {
+  "id": "SSP-174",
+  "name": "Drayton",
+  "kind": "trainer",
+  "subtype": "Supporter",
+  "text": "Look at the top 7 cards of your deck. You may reveal a Pokémon and a Trainer card you find there and put them into your hand. Shuffle the other cards back into your deck.",
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv08-174",
+  "prints": [
+   "SSP-174",
+   "SSP-232",
+   "SSP-244",
+   "PRE-172"
+  ],
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/174"
  },
  {
   "id": "SSP-175",
@@ -8807,9 +14008,12 @@
   "regulationMark": "H",
   "tcgdexId": "sv08-175",
   "prints": [
-   "SSP-175"
+   "SSP-175",
+   "MT-110",
+   "MD-80"
   ],
-  "lists": 5
+  "lists": 28,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/175"
  },
  {
   "id": "DRI-164",
@@ -8821,9 +14025,15 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-164",
   "prints": [
-   "DRI-164"
+   "DRI-164",
+   "AOR-72",
+   "GRI-123",
+   "FLI-143",
+   "BST-124",
+   "POR-108"
   ],
-  "lists": 20
+  "lists": 100,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/164"
  },
  {
   "id": "SVI-171",
@@ -8835,9 +14045,24 @@
   "regulationMark": "G",
   "tcgdexId": "sv01-171",
   "prints": [
-   "SVI-171"
+   "SVI-171",
+   "BS-81",
+   "BS2-110",
+   "LC-107",
+   "BLW-92",
+   "PLB-80",
+   "PRC-126",
+   "AOR-99",
+   "EVO-77",
+   "SUM-116",
+   "SLG-59",
+   "SSH-160",
+   "CRZ-127",
+   "WHT-82",
+   "CRI-108"
   ],
-  "lists": 3
+  "lists": 38,
+  "image": "https://assets.tcgdex.net/en/sv/sv01/171"
  },
  {
   "id": "POR-72",
@@ -8849,9 +14074,37 @@
   "regulationMark": "J",
   "tcgdexId": "me03-072",
   "prints": [
-   "POR-72"
+   "POR-72",
+   "FO-59",
+   "E1-153",
+   "RS-90",
+   "UF-94",
+   "CG-86",
+   "DP-117",
+   "MD-90",
+   "BLW-93",
+   "BCR-128",
+   "SSH-161",
+   "CRZ-128",
+   "SVI-172"
   ],
-  "lists": 1
+  "lists": 14,
+  "image": "https://assets.tcgdex.net/en/me/me03/072"
+ },
+ {
+  "id": "POR-73",
+  "name": "Energy Swatter",
+  "kind": "trainer",
+  "subtype": "Item",
+  "text": "Your opponent reveals their hand, and you choose an Energy card you find there and put it on the bottom of their deck.",
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me03-073",
+  "prints": [
+   "POR-73"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me03/073"
  },
  {
   "id": "MEG-115",
@@ -8863,9 +14116,30 @@
   "regulationMark": "I",
   "tcgdexId": "me01-115",
   "prints": [
-   "MEG-115"
+   "MEG-115",
+   "E2-120",
+   "RS-82",
+   "RG-90",
+   "UF-84",
+   "PK-75",
+   "DP-107",
+   "SF-84",
+   "HS-91",
+   "BLW-94",
+   "LTR-112",
+   "FFI-89",
+   "ROS-109",
+   "GEN-61",
+   "SUM-117",
+   "CES-129",
+   "SSH-162",
+   "SIT-212",
+   "CRZ-129",
+   "SVI-173",
+   "PBL-107"
   ],
-  "lists": 79
+  "lists": 406,
+  "image": "https://assets.tcgdex.net/en/me/me01/115"
  },
  {
   "id": "TWM-148",
@@ -8877,9 +14151,17 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-148",
   "prints": [
-   "TWM-148"
+   "TWM-148",
+   "DEX-94",
+   "PHF-94",
+   "PRC-162",
+   "GRI-124A",
+   "GRI-124",
+   "GRI-162",
+   "TWM-224"
   ],
-  "lists": 5
+  "lists": 73,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/148"
  },
  {
   "id": "TEF-146",
@@ -8891,9 +14173,13 @@
   "regulationMark": "H",
   "tcgdexId": "sv05-146",
   "prints": [
-   "TEF-146"
+   "TEF-146",
+   "TEF-199",
+   "TEF-210",
+   "PRE-136"
   ],
-  "lists": 25
+  "lists": 181,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/146"
  },
  {
   "id": "DRI-165",
@@ -8905,9 +14191,12 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-165",
   "prints": [
-   "DRI-165"
+   "DRI-165",
+   "DRI-221",
+   "DRI-236"
   ],
-  "lists": 6
+  "lists": 8,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/165"
  },
  {
   "id": "TEF-147",
@@ -8919,9 +14208,28 @@
   "regulationMark": "H",
   "tcgdexId": "sv05-147",
   "prints": [
-   "TEF-147"
+   "TEF-147",
+   "TEF-200",
+   "PRE-107"
   ],
-  "lists": 14
+  "lists": 89,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/147"
+ },
+ {
+  "id": "BLK-82",
+  "name": "Fennel",
+  "kind": "trainer",
+  "subtype": "Supporter",
+  "text": "Heal 40 damage from each of your Pokémon.",
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "sv10.5b-082",
+  "prints": [
+   "BLK-82",
+   "BLK-162"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/sv/sv10.5b/082"
  },
  {
   "id": "TWM-149",
@@ -8933,9 +14241,11 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-149",
   "prints": [
-   "TWM-149"
+   "TWM-149",
+   "PRE-108"
   ],
-  "lists": 31
+  "lists": 210,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/149"
  },
  {
   "id": "MEG-116",
@@ -8947,9 +14257,12 @@
   "regulationMark": "I",
   "tcgdexId": "me01-116",
   "prints": [
-   "MEG-116"
+   "MEG-116",
+   "MEG-168",
+   "ASC-187"
   ],
-  "lists": 9
+  "lists": 102,
+  "image": "https://assets.tcgdex.net/en/me/me01/116"
  },
  {
   "id": "PFL-89",
@@ -8961,9 +14274,11 @@
   "regulationMark": "I",
   "tcgdexId": "me02-089",
   "prints": [
-   "PFL-89"
+   "PFL-89",
+   "PFL-119"
   ],
-  "lists": 1
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me02/089"
  },
  {
   "id": "MEG-117",
@@ -8975,9 +14290,27 @@
   "regulationMark": "I",
   "tcgdexId": "me01-117",
   "prints": [
-   "MEG-117"
+   "MEG-117",
+   "ASC-188",
+   "POR-109"
   ],
-  "lists": 31
+  "lists": 222,
+  "image": "https://assets.tcgdex.net/en/me/me01/117"
+ },
+ {
+  "id": "PBL-76",
+  "name": "Fossil Quarry",
+  "kind": "trainer",
+  "subtype": "Stadium",
+  "text": "Once during each player's turn, that player may search their deck for up to 2 Item cards that have \"Antique\" in their name and put them onto their Bench. Then, that player shuffles their deck.",
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me05-076",
+  "prints": [
+   "PBL-76"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me05/076"
  },
  {
   "id": "PBL-77",
@@ -8989,9 +14322,12 @@
   "regulationMark": "J",
   "tcgdexId": "me05-077",
   "prints": [
-   "PBL-77"
+   "PBL-77",
+   "PBL-108",
+   "PBL-118"
   ],
-  "lists": 16
+  "lists": 161,
+  "image": "https://assets.tcgdex.net/en/me/me05/077"
  },
  {
   "id": "SCR-135",
@@ -9003,9 +14339,13 @@
   "regulationMark": "H",
   "tcgdexId": "sv07-135",
   "prints": [
-   "SCR-135"
+   "SCR-135",
+   "PRE-110",
+   "ASC-189",
+   "ASC-260"
   ],
-  "lists": 47
+  "lists": 241,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/135"
  },
  {
   "id": "SCR-136",
@@ -9021,7 +14361,8 @@
   "prints": [
    "SCR-136"
   ],
-  "lists": 3
+  "lists": 10,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/136"
  },
  {
   "id": "SCR-137",
@@ -9035,7 +14376,8 @@
   "prints": [
    "SCR-137"
   ],
-  "lists": 3
+  "lists": 7,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/137"
  },
  {
   "id": "SSP-177",
@@ -9047,9 +14389,26 @@
   "regulationMark": "H",
   "tcgdexId": "sv08-177",
   "prints": [
-   "SSP-177"
+   "SSP-177",
+   "SSP-250"
   ],
-  "lists": 43
+  "lists": 190,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/177"
+ },
+ {
+  "id": "CRI-78",
+  "name": "Great Haul Net",
+  "kind": "trainer",
+  "subtype": "Item",
+  "text": "Choose 1 or both:\n• Shuffle up to 3 {W} Pokémon from your discard pile into your deck.\n• Shuffle up to 3 Basic {W} Energy cards from your discard pile into your deck.",
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me04-078",
+  "prints": [
+   "CRI-78"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me04/078"
  },
  {
   "id": "DLR-93",
@@ -9063,7 +14422,8 @@
   "prints": [
    "DLR-93"
   ],
-  "lists": 2
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/me/me06/093"
  },
  {
   "id": "PBL-78",
@@ -9075,9 +14435,12 @@
   "regulationMark": "J",
   "tcgdexId": "me05-078",
   "prints": [
-   "PBL-78"
+   "PBL-78",
+   "PBL-109",
+   "PBL-119"
   ],
-  "lists": 18
+  "lists": 222,
+  "image": "https://assets.tcgdex.net/en/me/me05/078"
  },
  {
   "id": "TEF-150",
@@ -9091,7 +14454,8 @@
   "prints": [
    "TEF-150"
   ],
-  "lists": 2
+  "lists": 20,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/150"
  },
  {
   "id": "TWM-150",
@@ -9105,7 +14469,8 @@
   "prints": [
    "TWM-150"
   ],
-  "lists": 12
+  "lists": 119,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/150"
  },
  {
   "id": "WHT-83",
@@ -9117,9 +14482,27 @@
   "regulationMark": "I",
   "tcgdexId": "sv10.5w-083",
   "prints": [
-   "WHT-83"
+   "WHT-83",
+   "WHT-163"
   ],
-  "lists": 1
+  "lists": 9,
+  "image": "https://assets.tcgdex.net/en/sv/sv10.5w/083"
+ },
+ {
+  "id": "TWM-151",
+  "name": "Hassel",
+  "kind": "trainer",
+  "subtype": "Supporter",
+  "text": "You can use this card only if any of your Pokémon were Knocked Out during your opponent's last turn.\nLook at the top 8 cards of your deck and put up to 3 of them into your hand. Shuffle the other cards back into your deck.",
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv06-151",
+  "prints": [
+   "TWM-151",
+   "TWM-205"
+  ],
+  "lists": 16,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/151"
  },
  {
   "id": "TEF-152",
@@ -9135,7 +14518,8 @@
   "prints": [
    "TEF-152"
   ],
-  "lists": 65
+  "lists": 302,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/152"
  },
  {
   "id": "WHT-84",
@@ -9147,9 +14531,42 @@
   "regulationMark": "I",
   "tcgdexId": "sv10.5w-084",
   "prints": [
-   "WHT-84"
+   "WHT-84",
+   "WHT-164",
+   "WHT-171"
   ],
-  "lists": 63
+  "lists": 457,
+  "image": "https://assets.tcgdex.net/en/sv/sv10.5w/084"
+ },
+ {
+  "id": "JTG-147",
+  "name": "Hop's Bag",
+  "kind": "trainer",
+  "subtype": "Item",
+  "text": "Search your deck for up to 2 Basic Hop's Pokémon and put them onto your Bench. Then, shuffle your deck.",
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "sv09-147",
+  "prints": [
+   "JTG-147"
+  ],
+  "lists": 9,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/147"
+ },
+ {
+  "id": "JTG-148",
+  "name": "Hop's Choice Band",
+  "kind": "trainer",
+  "subtype": "Tool",
+  "text": "Attacks used by the Hop's Pokémon this card is attached to cost {C} less and do 30 more damage to your opponent's Active Pokémon (before applying Weakness and Resistance).",
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "sv09-148",
+  "prints": [
+   "JTG-148"
+  ],
+  "lists": 9,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/148"
  },
  {
   "id": "JTG-149",
@@ -9161,9 +14578,13 @@
   "regulationMark": "I",
   "tcgdexId": "sv09-149",
   "prints": [
-   "JTG-149"
+   "JTG-149",
+   "JTG-180",
+   "ASC-190",
+   "ASC-292"
   ],
-  "lists": 1
+  "lists": 6,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/149"
  },
  {
   "id": "MEG-118",
@@ -9175,9 +14596,11 @@
   "regulationMark": "I",
   "tcgdexId": "me01-118",
   "prints": [
-   "MEG-118"
+   "MEG-118",
+   "PBL-110"
   ],
-  "lists": 3
+  "lists": 7,
+  "image": "https://assets.tcgdex.net/en/me/me01/118"
  },
  {
   "id": "TWM-153",
@@ -9189,9 +14612,12 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-153",
   "prints": [
-   "TWM-153"
+   "TWM-153",
+   "DRI-243",
+   "ASC-261"
   ],
-  "lists": 43
+  "lists": 249,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/153"
  },
  {
   "id": "PRE-112",
@@ -9203,9 +14629,13 @@
   "regulationMark": "H",
   "tcgdexId": "sv08.5-112",
   "prints": [
-   "PRE-112"
+   "PRE-112",
+   "SFA-59",
+   "SFA-88",
+   "PRE-173"
   ],
-  "lists": 32
+  "lists": 141,
+  "image": "https://assets.tcgdex.net/en/sv/sv08.5/112"
  },
  {
   "id": "POR-76",
@@ -9217,9 +14647,20 @@
   "regulationMark": "J",
   "tcgdexId": "me03-076",
   "prints": [
-   "POR-76"
+   "POR-76",
+   "UL-78",
+   "BKT-143",
+   "FLI-108",
+   "LOT-209",
+   "FST-235",
+   "SIT-TG25",
+   "SVI-176",
+   "PAF-228",
+   "DRI-167",
+   "DRI-222"
   ],
-  "lists": 312
+  "lists": 1603,
+  "image": "https://assets.tcgdex.net/en/me/me03/076"
  },
  {
   "id": "PFL-91",
@@ -9231,9 +14672,11 @@
   "regulationMark": "I",
   "tcgdexId": "me02-091",
   "prints": [
-   "PFL-91"
+   "PFL-91",
+   "CRI-109"
   ],
-  "lists": 43
+  "lists": 206,
+  "image": "https://assets.tcgdex.net/en/me/me02/091"
  },
  {
   "id": "TWM-154",
@@ -9245,9 +14688,14 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-154",
   "prints": [
-   "TWM-154"
+   "TWM-154",
+   "TWM-206",
+   "TWM-218",
+   "PRE-113",
+   "PRE-174"
   ],
-  "lists": 32
+  "lists": 237,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/154"
  },
  {
   "id": "TWM-155",
@@ -9259,9 +14707,28 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-155",
   "prints": [
-   "TWM-155"
+   "TWM-155",
+   "TWM-207",
+   "TWM-219"
   ],
-  "lists": 46
+  "lists": 359,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/155"
+ },
+ {
+  "id": "PRE-115",
+  "name": "Larry's Skill",
+  "kind": "trainer",
+  "subtype": "Supporter",
+  "text": "Discard your hand and search your deck for a Pokémon, a Supporter card, and a Basic Energy card, reveal them, and put them into your hand. Then, shuffle your deck.",
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv08.5-115",
+  "prints": [
+   "PRE-115",
+   "PRE-139"
+  ],
+  "lists": 11,
+  "image": "https://assets.tcgdex.net/en/sv/sv08.5/115"
  },
  {
   "id": "DLR-94",
@@ -9276,7 +14743,23 @@
    "DLR-94",
    "DLR-95"
   ],
-  "lists": 23
+  "lists": 23,
+  "image": "https://assets.tcgdex.net/en/me/me06/094"
+ },
+ {
+  "id": "ASC-191",
+  "name": "Light Ball",
+  "kind": "trainer",
+  "subtype": "Tool",
+  "text": "Attacks used by the Pikachu ex this card is attached to do 50 more damage to your opponent's Active Pokémon ex (before applying Weakness and Resistance).",
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "me02.5-191",
+  "prints": [
+   "ASC-191"
+  ],
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/191"
  },
  {
   "id": "MEG-119",
@@ -9288,9 +14771,13 @@
   "regulationMark": "I",
   "tcgdexId": "me01-119",
   "prints": [
-   "MEG-119"
+   "MEG-119",
+   "MEG-169",
+   "MEG-184",
+   "ASC-192"
   ],
-  "lists": 378
+  "lists": 2493,
+  "image": "https://assets.tcgdex.net/en/me/me01/119"
  },
  {
   "id": "JTG-151",
@@ -9304,7 +14791,8 @@
   "prints": [
    "JTG-151"
   ],
-  "lists": 22
+  "lists": 82,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/151"
  },
  {
   "id": "SSP-179",
@@ -9316,9 +14804,27 @@
   "regulationMark": "H",
   "tcgdexId": "sv08-179",
   "prints": [
-   "SSP-179"
+   "SSP-179",
+   "SSP-234",
+   "SSP-246"
   ],
-  "lists": 2
+  "lists": 6,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/179"
+ },
+ {
+  "id": "SSP-180",
+  "name": "Lively Stadium",
+  "kind": "trainer",
+  "subtype": "Stadium",
+  "text": "Each Basic Pokémon in play (both yours and your opponent's) gets +30 HP.",
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv08-180",
+  "prints": [
+   "SSP-180"
+  ],
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/180"
  },
  {
   "id": "TWM-157",
@@ -9330,9 +14836,11 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-157",
   "prints": [
-   "TWM-157"
+   "TWM-157",
+   "TWM-208"
   ],
-  "lists": 1
+  "lists": 6,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/157"
  },
  {
   "id": "TWM-158",
@@ -9344,9 +14852,11 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-158",
   "prints": [
-   "TWM-158"
+   "TWM-158",
+   "AOR-77"
   ],
-  "lists": 32
+  "lists": 191,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/158"
  },
  {
   "id": "POR-77",
@@ -9358,9 +14868,11 @@
   "regulationMark": "J",
   "tcgdexId": "me03-077",
   "prints": [
-   "POR-77"
+   "POR-77",
+   "POR-111"
   ],
-  "lists": 25
+  "lists": 106,
+  "image": "https://assets.tcgdex.net/en/me/me03/077"
  },
  {
   "id": "PRE-116",
@@ -9376,7 +14888,26 @@
   "prints": [
    "PRE-116"
   ],
-  "lists": 1
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/sv/sv08.5/116"
+ },
+ {
+  "id": "TEF-154",
+  "name": "Maximum Belt",
+  "kind": "trainer",
+  "subtype": "Tool",
+  "text": "Attacks used by the Pokémon this card is attached to do 50 more damage to your opponent's Active Pokémon ex (before applying Weakness and Resistance).",
+  "tags": [
+   "ACE SPEC"
+  ],
+  "regulationMark": "H",
+  "tcgdexId": "sv05-154",
+  "prints": [
+   "TEF-154",
+   "PRE-117"
+  ],
+  "lists": 18,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/154"
  },
  {
   "id": "MEG-121",
@@ -9388,9 +14919,12 @@
   "regulationMark": "I",
   "tcgdexId": "me01-121",
   "prints": [
-   "MEG-121"
+   "MEG-121",
+   "MEG-171",
+   "ASC-193"
   ],
-  "lists": 1
+  "lists": 16,
+  "image": "https://assets.tcgdex.net/en/me/me01/121"
  },
  {
   "id": "SSP-183",
@@ -9406,7 +14940,42 @@
   "prints": [
    "SSP-183"
   ],
-  "lists": 8
+  "lists": 52,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/183"
+ },
+ {
+  "id": "TEF-155",
+  "name": "Morty's Conviction",
+  "kind": "trainer",
+  "subtype": "Supporter",
+  "text": "You can use this card only if you discard another card from your hand.\nDraw a card for each of your opponent's Benched Pokémon.",
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv05-155",
+  "prints": [
+   "TEF-155",
+   "TEF-201",
+   "TEF-211"
+  ],
+  "lists": 6,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/155"
+ },
+ {
+  "id": "MEG-122",
+  "name": "Mystery Garden",
+  "kind": "trainer",
+  "subtype": "Stadium",
+  "text": "Once during each player's turn, that player may discard an Energy card from their hand in order to draw cards until they have as many cards in their hand as they have {P} Pokémon in play.",
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "me01-122",
+  "prints": [
+   "MEG-122",
+   "MEG-172",
+   "ASC-194"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me01/122"
  },
  {
   "id": "JTG-152",
@@ -9420,7 +14989,8 @@
   "prints": [
    "JTG-152"
   ],
-  "lists": 46
+  "lists": 195,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/152"
  },
  {
   "id": "BLK-83",
@@ -9432,9 +15002,12 @@
   "regulationMark": "I",
   "tcgdexId": "sv10.5b-083",
   "prints": [
-   "BLK-83"
+   "BLK-83",
+   "BLK-163",
+   "BLK-170"
   ],
-  "lists": 4
+  "lists": 20,
+  "image": "https://assets.tcgdex.net/en/sv/sv10.5b/083"
  },
  {
   "id": "JTG-153",
@@ -9446,9 +15019,12 @@
   "regulationMark": "I",
   "tcgdexId": "sv09-153",
   "prints": [
-   "JTG-153"
+   "JTG-153",
+   "ASC-195",
+   "ASC-262"
   ],
-  "lists": 47
+  "lists": 258,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/153"
  },
  {
   "id": "POR-79",
@@ -9460,9 +15036,11 @@
   "regulationMark": "J",
   "tcgdexId": "me03-079",
   "prints": [
-   "POR-79"
+   "POR-79",
+   "POR-112"
   ],
-  "lists": 5
+  "lists": 22,
+  "image": "https://assets.tcgdex.net/en/me/me03/079"
  },
  {
   "id": "ASC-196",
@@ -9474,9 +15052,13 @@
   "regulationMark": "H",
   "tcgdexId": "me02.5-196",
   "prints": [
-   "ASC-196"
+   "ASC-196",
+   "SFA-61",
+   "SSP-251",
+   "MEG-173"
   ],
-  "lists": 392
+  "lists": 2745,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/196"
  },
  {
   "id": "ASC-197",
@@ -9490,7 +15072,74 @@
   "prints": [
    "ASC-197"
   ],
-  "lists": 2
+  "lists": 57,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/197"
+ },
+ {
+  "id": "SCR-141",
+  "name": "Payapa Berry",
+  "kind": "trainer",
+  "subtype": "Tool",
+  "text": "If the Pokémon this card is attached to is damaged by an attack from your opponent's {P} Pokémon, it takes 60 less damage (after applying Weakness and Resistance), and discard this card.",
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv07-141",
+  "prints": [
+   "SCR-141"
+  ],
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/141"
+ },
+ {
+  "id": "CRI-79",
+  "name": "Philippe",
+  "kind": "trainer",
+  "subtype": "Supporter",
+  "text": "Attach up to 2 Basic {M} Energy cards from your discard pile to 1 of your {M} Pokémon.",
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me04-079",
+  "prints": [
+   "CRI-79",
+   "CRI-110"
+  ],
+  "lists": 4,
+  "image": "https://assets.tcgdex.net/en/me/me04/079"
+ },
+ {
+  "id": "POR-80",
+  "name": "Poké Ball",
+  "kind": "trainer",
+  "subtype": "Item",
+  "text": "Flip a coin. If heads, search your deck for a Pokémon, reveal it, and put it into your hand. Then, shuffle your deck.",
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me03-080",
+  "prints": [
+   "POR-80",
+   "JU-64",
+   "BS2-121",
+   "RS-86",
+   "RG-95",
+   "UF-87",
+   "CG-82",
+   "DP-110",
+   "MD-85",
+   "PL-113",
+   "HS-95",
+   "BLW-97",
+   "BCR-131",
+   "KSS-35",
+   "GEN-67",
+   "SUM-125",
+   "SP-146",
+   "RCL-164",
+   "CPA-59",
+   "CRZ-137",
+   "SVI-185"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me03/080"
  },
  {
   "id": "POR-81",
@@ -9502,9 +15151,13 @@
   "regulationMark": "J",
   "tcgdexId": "me03-081",
   "prints": [
-   "POR-81"
+   "POR-81",
+   "ASC-198",
+   "POR-113",
+   "30C-126"
   ],
-  "lists": 352
+  "lists": 2511,
+  "image": "https://assets.tcgdex.net/en/me/me03/081"
  },
  {
   "id": "SVI-186",
@@ -9516,9 +15169,17 @@
   "regulationMark": "G",
   "tcgdexId": "sv01-186",
   "prints": [
-   "SVI-186"
+   "SVI-186",
+   "HS-96",
+   "UNB-182A",
+   "UNB-182",
+   "UNB-182B",
+   "UNB-233",
+   "SSH-174",
+   "BLK-84"
   ],
-  "lists": 44
+  "lists": 319,
+  "image": "https://assets.tcgdex.net/en/sv/sv01/186"
  },
  {
   "id": "POR-82",
@@ -9530,9 +15191,21 @@
   "regulationMark": "J",
   "tcgdexId": "me03-082",
   "prints": [
-   "POR-82"
+   "POR-82",
+   "EPO-95",
+   "DEX-111",
+   "PLB-83",
+   "KSS-36",
+   "BKP-105",
+   "SUM-126",
+   "SLG-64",
+   "SSH-175",
+   "CRZ-138",
+   "SVI-187",
+   "DLR-129"
   ],
-  "lists": 2
+  "lists": 22,
+  "image": "https://assets.tcgdex.net/en/me/me03/082"
  },
  {
   "id": "MEG-123",
@@ -9544,9 +15217,32 @@
   "regulationMark": "I",
   "tcgdexId": "me01-123",
   "prints": [
-   "MEG-123"
+   "MEG-123",
+   "FLF-93",
+   "FLF-105",
+   "GEN-68",
+   "HIF-64",
+   "SSH-176",
+   "CPA-60",
+   "VIV-185"
   ],
-  "lists": 10
+  "lists": 81,
+  "image": "https://assets.tcgdex.net/en/me/me01/123"
+ },
+ {
+  "id": "JTG-154",
+  "name": "Postwick",
+  "kind": "trainer",
+  "subtype": "Stadium",
+  "text": "Attacks used by Hop's Pokémon (both yours and your opponent's) do 30 more damage to the opponent's Active Pokémon (before applying Weakness and Resistance).",
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "sv09-154",
+  "prints": [
+   "JTG-154"
+  ],
+  "lists": 9,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/154"
  },
  {
   "id": "SFA-63",
@@ -9558,9 +15254,11 @@
   "regulationMark": "H",
   "tcgdexId": "sv06.5-063",
   "prints": [
-   "SFA-63"
+   "SFA-63",
+   "SFA-97"
   ],
-  "lists": 2
+  "lists": 20,
+  "image": "https://assets.tcgdex.net/en/sv/sv06.5/063"
  },
  {
   "id": "SSP-185",
@@ -9576,7 +15274,8 @@
   "prints": [
    "SSP-185"
   ],
-  "lists": 12
+  "lists": 54,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/185"
  },
  {
   "id": "MEG-124",
@@ -9588,9 +15287,12 @@
   "regulationMark": "I",
   "tcgdexId": "me01-124",
   "prints": [
-   "MEG-124"
+   "MEG-124",
+   "MEG-174",
+   "ASC-199"
   ],
-  "lists": 9
+  "lists": 89,
+  "image": "https://assets.tcgdex.net/en/me/me01/124"
  },
  {
   "id": "TEF-157",
@@ -9604,9 +15306,11 @@
   "regulationMark": "H",
   "tcgdexId": "sv05-157",
   "prints": [
-   "TEF-157"
+   "TEF-157",
+   "PRE-119"
   ],
-  "lists": 26
+  "lists": 254,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/157"
  },
  {
   "id": "CRI-80",
@@ -9618,9 +15322,11 @@
   "regulationMark": "J",
   "tcgdexId": "me04-080",
   "prints": [
-   "CRI-80"
+   "CRI-80",
+   "CRI-111"
   ],
-  "lists": 36
+  "lists": 201,
+  "image": "https://assets.tcgdex.net/en/me/me04/080"
  },
  {
   "id": "PFL-92",
@@ -9632,9 +15338,11 @@
   "regulationMark": "I",
   "tcgdexId": "me02-092",
   "prints": [
-   "PFL-92"
+   "PFL-92",
+   "PFL-121"
   ],
-  "lists": 8
+  "lists": 58,
+  "image": "https://assets.tcgdex.net/en/me/me02/092"
  },
  {
   "id": "MEG-125",
@@ -9646,9 +15354,31 @@
   "regulationMark": "I",
   "tcgdexId": "me01-125",
   "prints": [
-   "MEG-125"
+   "MEG-125",
+   "SS-88",
+   "EM-83",
+   "HP-90",
+   "P5-7",
+   "GE-102",
+   "P8-10",
+   "UL-82",
+   "DEX-100",
+   "PLB-85",
+   "PLB-105",
+   "PRC-135",
+   "SUM-129",
+   "GRI-165",
+   "CES-142",
+   "SSH-180",
+   "PGO-69",
+   "CRZ-141",
+   "SVI-191",
+   "SVI-256",
+   "PAF-89",
+   "MEG-175"
   ],
-  "lists": 56
+  "lists": 512,
+  "image": "https://assets.tcgdex.net/en/me/me01/125"
  },
  {
   "id": "JTG-156",
@@ -9662,7 +15392,8 @@
   "prints": [
    "JTG-156"
   ],
-  "lists": 3
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/156"
  },
  {
   "id": "MEG-127",
@@ -9676,7 +15407,8 @@
   "prints": [
    "MEG-127"
   ],
-  "lists": 140
+  "lists": 811,
+  "image": "https://assets.tcgdex.net/en/me/me01/127"
  },
  {
   "id": "POR-84",
@@ -9688,9 +15420,12 @@
   "regulationMark": "J",
   "tcgdexId": "me03-084",
   "prints": [
-   "POR-84"
+   "POR-84",
+   "POR-114",
+   "POR-123"
   ],
-  "lists": 140
+  "lists": 846,
+  "image": "https://assets.tcgdex.net/en/me/me03/084"
  },
  {
   "id": "PRE-127",
@@ -9704,7 +15439,8 @@
   "prints": [
    "PRE-127"
   ],
-  "lists": 8
+  "lists": 52,
+  "image": "https://assets.tcgdex.net/en/sv/sv08.5/127"
  },
  {
   "id": "JTG-157",
@@ -9716,9 +15452,27 @@
   "regulationMark": "I",
   "tcgdexId": "sv09-157",
   "prints": [
-   "JTG-157"
+   "JTG-157",
+   "JTG-181"
   ],
-  "lists": 2
+  "lists": 30,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/157"
+ },
+ {
+  "id": "PBL-81",
+  "name": "Rust Syndicate Grunt",
+  "kind": "trainer",
+  "subtype": "Supporter",
+  "text": "You can use this card only if any of your Pokémon were Knocked Out during your opponent's last turn.\nDiscard an Energy from 1 of your opponent's Pokémon.",
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me05-081",
+  "prints": [
+   "PBL-81",
+   "PBL-112"
+  ],
+  "lists": 5,
+  "image": "https://assets.tcgdex.net/en/me/me05/081"
  },
  {
   "id": "DRI-168",
@@ -9730,9 +15484,28 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-168",
   "prints": [
-   "DRI-168"
+   "DRI-168",
+   "FLF-96",
+   "POR-115"
   ],
-  "lists": 33
+  "lists": 323,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/168"
+ },
+ {
+  "id": "PFL-93",
+  "name": "Sacred Charm",
+  "kind": "trainer",
+  "subtype": "Tool",
+  "text": "The Pokémon this card is attached to takes 30 less damage from attacks from your opponent's Pokémon that have an Ability (after applying Weakness and Resistance).",
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "me02-093",
+  "prints": [
+   "PFL-93",
+   "PFL-122"
+  ],
+  "lists": 3,
+  "image": "https://assets.tcgdex.net/en/me/me02/093"
  },
  {
   "id": "TEF-160",
@@ -9744,9 +15517,12 @@
   "regulationMark": "H",
   "tcgdexId": "sv05-160",
   "prints": [
-   "TEF-160"
+   "TEF-160",
+   "TEF-202",
+   "TEF-212"
   ],
-  "lists": 2
+  "lists": 20,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/160"
  },
  {
   "id": "TWM-162",
@@ -9760,9 +15536,12 @@
   "regulationMark": "H",
   "tcgdexId": "sv06-162",
   "prints": [
-   "TWM-162"
+   "TWM-162",
+   "PLB-95",
+   "PRE-128"
   ],
-  "lists": 1
+  "lists": 10,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/162"
  },
  {
   "id": "TWM-163",
@@ -9778,7 +15557,26 @@
   "prints": [
    "TWM-163"
   ],
-  "lists": 69
+  "lists": 559,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/163"
+ },
+ {
+  "id": "SCR-142",
+  "name": "Sparkling Crystal",
+  "kind": "trainer",
+  "subtype": "Tool",
+  "text": "When the Tera Pokémon this card is attached to uses an attack, that attack costs 1 Energy less. (The Energy can be of any type.)",
+  "tags": [
+   "ACE SPEC"
+  ],
+  "regulationMark": "H",
+  "tcgdexId": "sv07-142",
+  "prints": [
+   "SCR-142",
+   "PRE-129"
+  ],
+  "lists": 6,
+  "image": "https://assets.tcgdex.net/en/sv/sv07/142"
  },
  {
   "id": "CRI-82",
@@ -9790,9 +15588,11 @@
   "regulationMark": "J",
   "tcgdexId": "me04-082",
   "prints": [
-   "CRI-82"
+   "CRI-82",
+   "CRI-113"
   ],
-  "lists": 133
+  "lists": 1250,
+  "image": "https://assets.tcgdex.net/en/me/me04/082"
  },
  {
   "id": "DRI-169",
@@ -9806,7 +15606,8 @@
   "prints": [
    "DRI-169"
   ],
-  "lists": 2
+  "lists": 23,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/169"
  },
  {
   "id": "MEG-128",
@@ -9820,7 +15621,27 @@
   "prints": [
    "MEG-128"
   ],
-  "lists": 1
+  "lists": 59,
+  "image": "https://assets.tcgdex.net/en/me/me01/128"
+ },
+ {
+  "id": "JTG-158",
+  "name": "Super Potion",
+  "kind": "trainer",
+  "subtype": "Item",
+  "text": "Heal 60 damage from 1 of your Pokémon. If you healed any damage in this way, discard an Energy from that Pokémon.",
+  "tags": [],
+  "regulationMark": "I",
+  "tcgdexId": "sv09-158",
+  "prints": [
+   "JTG-158",
+   "BS-90",
+   "BS2-117",
+   "XY-128",
+   "EVO-87"
+  ],
+  "lists": 9,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/158"
  },
  {
   "id": "SSP-187",
@@ -9832,9 +15653,13 @@
   "regulationMark": "H",
   "tcgdexId": "sv08-187",
   "prints": [
-   "SSP-187"
+   "SSP-187",
+   "SSP-235",
+   "ASC-200",
+   "ASC-293"
   ],
-  "lists": 10
+  "lists": 93,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/187"
  },
  {
   "id": "MEG-129",
@@ -9846,9 +15671,11 @@
   "regulationMark": "I",
   "tcgdexId": "me01-129",
   "prints": [
-   "MEG-129"
+   "MEG-129",
+   "CRI-114"
   ],
-  "lists": 2
+  "lists": 6,
+  "image": "https://assets.tcgdex.net/en/me/me01/129"
  },
  {
   "id": "TWM-164",
@@ -9864,7 +15691,8 @@
   "prints": [
    "TWM-164"
   ],
-  "lists": 1
+  "lists": 4,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/164"
  },
  {
   "id": "MEG-130",
@@ -9876,9 +15704,53 @@
   "regulationMark": "I",
   "tcgdexId": "me01-130",
   "prints": [
-   "MEG-130"
+   "MEG-130",
+   "BS-95",
+   "BS2-123",
+   "E1-157",
+   "RS-92",
+   "RG-102",
+   "DS-102",
+   "DF-83",
+   "DP-119",
+   "SW-128",
+   "SF-93",
+   "HS-102",
+   "BLW-104",
+   "BCR-135",
+   "KSS-38",
+   "PRC-163",
+   "ROS-91",
+   "EVO-88",
+   "SUM-132",
+   "SUM-160",
+   "SLG-67",
+   "CES-147",
+   "SSH-183",
+   "CRZ-144",
+   "SVI-194",
+   "MEW-206",
+   "PFL-123",
+   "30C-127"
   ],
-  "lists": 114
+  "lists": 712,
+  "image": "https://assets.tcgdex.net/en/me/me01/130"
+ },
+ {
+  "id": "POR-85",
+  "name": "Tarragon",
+  "kind": "trainer",
+  "subtype": "Supporter",
+  "text": "Put up to 4 in any combination of {F} Pokémon and Basic {F} Energy cards from your discard pile into your hand.",
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me03-085",
+  "prints": [
+   "POR-85",
+   "POR-116"
+  ],
+  "lists": 8,
+  "image": "https://assets.tcgdex.net/en/me/me03/085"
  },
  {
   "id": "DLR-101",
@@ -9892,7 +15764,8 @@
   "prints": [
    "DLR-101"
   ],
-  "lists": 15
+  "lists": 15,
+  "image": "https://assets.tcgdex.net/en/me/me06/101"
  },
  {
   "id": "DRI-170",
@@ -9904,9 +15777,12 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-170",
   "prints": [
-   "DRI-170"
+   "DRI-170",
+   "DRI-223",
+   "ASC-201"
   ],
-  "lists": 10
+  "lists": 65,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/170"
  },
  {
   "id": "DRI-171",
@@ -9918,9 +15794,13 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-171",
   "prints": [
-   "DRI-171"
+   "DRI-171",
+   "DRI-224",
+   "DRI-237",
+   "ASC-202"
   ],
-  "lists": 10
+  "lists": 70,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/171"
  },
  {
   "id": "DRI-173",
@@ -9932,9 +15812,11 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-173",
   "prints": [
-   "DRI-173"
+   "DRI-173",
+   "ASC-203"
   ],
-  "lists": 22
+  "lists": 158,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/173"
  },
  {
   "id": "DRI-174",
@@ -9946,9 +15828,13 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-174",
   "prints": [
-   "DRI-174"
+   "DRI-174",
+   "DRI-225",
+   "DRI-238",
+   "ASC-204"
   ],
-  "lists": 10
+  "lists": 70,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/174"
  },
  {
   "id": "DRI-176",
@@ -9960,9 +15846,12 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-176",
   "prints": [
-   "DRI-176"
+   "DRI-176",
+   "DRI-226",
+   "ASC-207"
   ],
-  "lists": 73
+  "lists": 466,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/176"
  },
  {
   "id": "DRI-177",
@@ -9974,9 +15863,12 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-177",
   "prints": [
-   "DRI-177"
+   "DRI-177",
+   "DRI-227",
+   "ASC-208"
   ],
-  "lists": 10
+  "lists": 70,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/177"
  },
  {
   "id": "DRI-178",
@@ -9988,9 +15880,12 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-178",
   "prints": [
-   "DRI-178"
+   "DRI-178",
+   "ASC-209",
+   "ASC-263"
   ],
-  "lists": 22
+  "lists": 123,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/178"
  },
  {
   "id": "DRI-180",
@@ -10002,9 +15897,26 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-180",
   "prints": [
-   "DRI-180"
+   "DRI-180",
+   "ASC-210"
   ],
-  "lists": 91
+  "lists": 664,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/180"
+ },
+ {
+  "id": "SSP-189",
+  "name": "Tera Orb",
+  "kind": "trainer",
+  "subtype": "Item",
+  "text": "Search your deck for a Tera Pokémon, reveal it, and put it into your hand. Then, shuffle your deck.",
+  "tags": [],
+  "regulationMark": "H",
+  "tcgdexId": "sv08-189",
+  "prints": [
+   "SSP-189"
+  ],
+  "lists": 11,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/189"
  },
  {
   "id": "ASC-212",
@@ -10016,9 +15928,30 @@
   "regulationMark": "I",
   "tcgdexId": "me02.5-212",
   "prints": [
-   "ASC-212"
+   "ASC-212",
+   "DRX-116",
+   "RCL-168",
+   "RCL-208",
+   "WHT-85",
+   "CRI-115"
   ],
-  "lists": 19
+  "lists": 177,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/212"
+ },
+ {
+  "id": "CRI-83",
+  "name": "Transformation Tome",
+  "kind": "trainer",
+  "subtype": "Item",
+  "text": "You must play 2 Transformation Tome cards at once. (This effect works one time for 2 cards.)\nChoose a Basic Pokémon in your discard pile and switch it with 1 of your Basic Pokémon in play. Any attached cards, damage counters, Special Conditions, turns in play, and any other effects remain on the new Pokémon.",
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me04-083",
+  "prints": [
+   "CRI-83"
+  ],
+  "lists": 26,
+  "image": "https://assets.tcgdex.net/en/me/me04/083"
  },
  {
   "id": "MEG-131",
@@ -10030,9 +15963,28 @@
   "regulationMark": "I",
   "tcgdexId": "me01-131",
   "prints": [
-   "MEG-131"
+   "MEG-131",
+   "DEX-102",
+   "PLF-122",
+   "PLB-90",
+   "FLF-99",
+   "ROS-93",
+   "FCO-113",
+   "SUM-135",
+   "SUM-161",
+   "SLG-68A",
+   "SLG-68",
+   "BRS-150",
+   "BRS-186",
+   "CRZ-146",
+   "SVI-196",
+   "PAF-91",
+   "ASC-213",
+   "ASC-264",
+   "30C-128"
   ],
-  "lists": 431
+  "lists": 2742,
+  "image": "https://assets.tcgdex.net/en/me/me01/131"
  },
  {
   "id": "TWM-165",
@@ -10048,7 +16000,8 @@
   "prints": [
    "TWM-165"
   ],
-  "lists": 247
+  "lists": 1447,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/165"
  },
  {
   "id": "MEG-132",
@@ -10060,9 +16013,12 @@
   "regulationMark": "I",
   "tcgdexId": "me01-132",
   "prints": [
-   "MEG-132"
+   "MEG-132",
+   "MEG-176",
+   "MEG-186"
   ],
-  "lists": 13
+  "lists": 113,
+  "image": "https://assets.tcgdex.net/en/me/me01/132"
  },
  {
   "id": "PFL-94",
@@ -10074,9 +16030,11 @@
   "regulationMark": "I",
   "tcgdexId": "me02-094",
   "prints": [
-   "PFL-94"
+   "PFL-94",
+   "POR-117"
   ],
-  "lists": 56
+  "lists": 345,
+  "image": "https://assets.tcgdex.net/en/me/me02/094"
  },
  {
   "id": "SFA-64",
@@ -10088,9 +16046,11 @@
   "regulationMark": "H",
   "tcgdexId": "sv06.5-064",
   "prints": [
-   "SFA-64"
+   "SFA-64",
+   "SFA-89"
   ],
-  "lists": 28
+  "lists": 224,
+  "image": "https://assets.tcgdex.net/en/sv/sv06.5/064"
  },
  {
   "id": "DLR-103",
@@ -10102,9 +16062,12 @@
   "regulationMark": "J",
   "tcgdexId": "me06-103",
   "prints": [
-   "DLR-103"
+   "DLR-103",
+   "DLR-131",
+   "DLR-140"
   ],
-  "lists": 1
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me06/103"
  },
  {
   "id": "TWM-166",
@@ -10118,7 +16081,8 @@
   "prints": [
    "TWM-166"
   ],
-  "lists": 29
+  "lists": 214,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/166"
  },
  {
   "id": "CRI-84",
@@ -10130,9 +16094,11 @@
   "regulationMark": "J",
   "tcgdexId": "me04-084",
   "prints": [
-   "CRI-84"
+   "CRI-84",
+   "DLR-132"
   ],
-  "lists": 7
+  "lists": 17,
+  "image": "https://assets.tcgdex.net/en/me/me04/084"
  },
  {
   "id": "MEE-15",
@@ -10142,9 +16108,29 @@
   "energyType": "Darkness",
   "tags": [],
   "prints": [
-   "MEE-15"
+   "MEE-15",
+   "DP-129",
+   "HS-121",
+   "CL-94",
+   "BLW-111",
+   "XY-138",
+   "GEN-81",
+   "EVO-97",
+   "SUM-D",
+   "BUS-168",
+   "TEU-D",
+   "SSH-D",
+   "EVS-236",
+   "BRS-D",
+   "CRZ-158",
+   "SVE-7",
+   "SVE-15",
+   "SVE-23",
+   "SFA-98",
+   "MEE-7"
   ],
-  "lists": 218
+  "lists": 1383,
+  "image": "https://assets.tcgdex.net/en/swsh/swsh12.5/158"
  },
  {
   "id": "SSP-191",
@@ -10160,7 +16146,8 @@
   "prints": [
    "SSP-191"
   ],
-  "lists": 22
+  "lists": 205,
+  "image": "https://assets.tcgdex.net/en/sv/sv08/191"
  },
  {
   "id": "MEE-14",
@@ -10170,9 +16157,39 @@
   "energyType": "Fighting",
   "tags": [],
   "prints": [
-   "MEE-14"
+   "MEE-14",
+   "BS-97",
+   "BS2-125",
+   "G1-127",
+   "G2-127",
+   "N1-106",
+   "E1-160",
+   "RS-105",
+   "EM-106",
+   "HP-110",
+   "PK-108",
+   "DP-128",
+   "HS-120",
+   "CL-93",
+   "BLW-110",
+   "XY-137",
+   "GEN-80",
+   "EVO-96",
+   "SUM-F",
+   "GRI-169",
+   "TEU-F",
+   "SSH-F",
+   "CRE-233",
+   "BRS-F",
+   "CRZ-157",
+   "SVE-6",
+   "SVE-14",
+   "SVE-22",
+   "SVI-258",
+   "MEE-6"
   ],
-  "lists": 68
+  "lists": 413,
+  "image": "https://assets.tcgdex.net/en/swsh/swsh12.5/157"
  },
  {
   "id": "MEE-10",
@@ -10182,9 +16199,39 @@
   "energyType": "Fire",
   "tags": [],
   "prints": [
-   "MEE-10"
+   "MEE-10",
+   "BS-98",
+   "BS2-126",
+   "G1-128",
+   "G2-128",
+   "N1-107",
+   "E1-161",
+   "RS-108",
+   "EM-102",
+   "HP-106",
+   "PK-104",
+   "DP-124",
+   "HS-116",
+   "CL-89",
+   "BLW-106",
+   "XY-133",
+   "GEN-76",
+   "EVO-92",
+   "SUM-R",
+   "BUS-167",
+   "TEU-R",
+   "SSH-R",
+   "FST-284",
+   "BRS-R",
+   "CRZ-153",
+   "SVE-2",
+   "SVE-10",
+   "SVE-18",
+   "OBF-230",
+   "MEE-2"
   ],
-  "lists": 180
+  "lists": 1115,
+  "image": "https://assets.tcgdex.net/en/swsh/swsh12.5/153"
  },
  {
   "id": "MEE-9",
@@ -10194,9 +16241,39 @@
   "energyType": "Grass",
   "tags": [],
   "prints": [
-   "MEE-9"
+   "MEE-9",
+   "BS-99",
+   "BS2-127",
+   "G1-129",
+   "G2-129",
+   "N1-108",
+   "E1-162",
+   "RS-104",
+   "EM-101",
+   "HP-105",
+   "PK-103",
+   "DP-123",
+   "HS-115",
+   "CL-88",
+   "BLW-105",
+   "XY-132",
+   "GEN-75",
+   "EVO-91",
+   "SUM-G",
+   "GRI-167",
+   "TEU-G",
+   "SSH-G",
+   "FST-283",
+   "BRS-G",
+   "CRZ-152",
+   "SVE-1",
+   "SVE-9",
+   "SVE-17",
+   "PAL-278",
+   "MEE-1"
   ],
-  "lists": 103
+  "lists": 703,
+  "image": "https://assets.tcgdex.net/en/swsh/swsh12.5/152"
  },
  {
   "id": "POR-86",
@@ -10208,9 +16285,11 @@
   "regulationMark": "J",
   "tcgdexId": "me03-086",
   "prints": [
-   "POR-86"
+   "POR-86",
+   "DLR-133"
   ],
-  "lists": 38
+  "lists": 221,
+  "image": "https://assets.tcgdex.net/en/me/me03/086"
  },
  {
   "id": "WHT-86",
@@ -10222,9 +16301,11 @@
   "regulationMark": "I",
   "tcgdexId": "sv10.5w-086",
   "prints": [
-   "WHT-86"
+   "WHT-86",
+   "PFL-124"
   ],
-  "lists": 17
+  "lists": 78,
+  "image": "https://assets.tcgdex.net/en/sv/sv10.5w/086"
  },
  {
   "id": "TWM-167",
@@ -10240,7 +16321,8 @@
   "prints": [
    "TWM-167"
   ],
-  "lists": 15
+  "lists": 122,
+  "image": "https://assets.tcgdex.net/en/sv/sv06/167"
  },
  {
   "id": "MEE-12",
@@ -10250,9 +16332,54 @@
   "energyType": "Lightning",
   "tags": [],
   "prints": [
-   "MEE-12"
+   "MEE-12",
+   "BS-100",
+   "BS2-128",
+   "G1-130",
+   "G2-130",
+   "N1-109",
+   "E1-163",
+   "RS-109",
+   "EM-104",
+   "HP-108",
+   "PK-106",
+   "DP-126",
+   "HS-118",
+   "CL-91",
+   "BLW-108",
+   "XY-135",
+   "GEN-78",
+   "EVO-94",
+   "SUM-L",
+   "GRI-168",
+   "TEU-L",
+   "SSH-L",
+   "EVS-235",
+   "BRS-L",
+   "CRZ-155",
+   "SVE-4",
+   "SVE-12",
+   "SVE-20",
+   "SVI-257",
+   "MEE-4"
   ],
-  "lists": 68
+  "lists": 274,
+  "image": "https://assets.tcgdex.net/en/swsh/swsh12.5/155"
+ },
+ {
+  "id": "CRI-85",
+  "name": "Magnetic Metal Energy",
+  "kind": "energy",
+  "subtype": "Special",
+  "text": "As long as this card is attached to a Pokémon, it provides {M} Energy.\nThe {M} Pokémon this card is attached to has no Retreat Cost.",
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me04-085",
+  "prints": [
+   "CRI-85"
+  ],
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/me/me04/085"
  },
  {
   "id": "MEE-16",
@@ -10262,9 +16389,29 @@
   "energyType": "Metal",
   "tags": [],
   "prints": [
-   "MEE-16"
+   "MEE-16",
+   "DP-130",
+   "HS-122",
+   "CL-95",
+   "BLW-112",
+   "XY-139",
+   "GEN-82",
+   "EVO-98",
+   "SUM-163",
+   "SUM-M",
+   "TEU-M",
+   "SSH-M",
+   "EVS-237",
+   "BRS-M",
+   "CRZ-159",
+   "SVE-8",
+   "SVE-16",
+   "SVE-24",
+   "SFA-99",
+   "MEE-8"
   ],
-  "lists": 21
+  "lists": 114,
+  "image": "https://assets.tcgdex.net/en/swsh/swsh12.5/159"
  },
  {
   "id": "TEF-161",
@@ -10278,7 +16425,8 @@
   "prints": [
    "TEF-161"
   ],
-  "lists": 55
+  "lists": 266,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/161"
  },
  {
   "id": "TEF-162",
@@ -10294,7 +16442,8 @@
   "prints": [
    "TEF-162"
   ],
-  "lists": 3
+  "lists": 26,
+  "image": "https://assets.tcgdex.net/en/sv/sv05/162"
  },
  {
   "id": "ASC-216",
@@ -10306,9 +16455,12 @@
   "regulationMark": "I",
   "tcgdexId": "me02.5-216",
   "prints": [
-   "ASC-216"
+   "ASC-216",
+   "NXD-93",
+   "BLK-86"
   ],
-  "lists": 9
+  "lists": 63,
+  "image": "https://assets.tcgdex.net/en/me/me02.5/216"
  },
  {
   "id": "MEE-13",
@@ -10318,9 +16470,39 @@
   "energyType": "Psychic",
   "tags": [],
   "prints": [
-   "MEE-13"
+   "MEE-13",
+   "BS-101",
+   "BS2-129",
+   "G1-131",
+   "G2-131",
+   "N1-110",
+   "E1-164",
+   "RS-107",
+   "EM-105",
+   "HP-109",
+   "PK-107",
+   "DP-127",
+   "HS-119",
+   "CL-92",
+   "BLW-109",
+   "XY-136",
+   "GEN-79",
+   "EVO-95",
+   "SUM-162",
+   "SUM-P",
+   "TEU-P",
+   "SSH-P",
+   "CRE-232",
+   "BRS-P",
+   "CRZ-156",
+   "SVE-5",
+   "SVE-13",
+   "SVE-21",
+   "MEW-207",
+   "MEE-5"
   ],
-  "lists": 280
+  "lists": 1932,
+  "image": "https://assets.tcgdex.net/en/swsh/swsh12.5/156"
  },
  {
   "id": "POR-87",
@@ -10334,7 +16516,23 @@
   "prints": [
    "POR-87"
   ],
-  "lists": 14
+  "lists": 74,
+  "image": "https://assets.tcgdex.net/en/me/me03/087"
+ },
+ {
+  "id": "PBL-83",
+  "name": "Shadowy Darkness Energy",
+  "kind": "energy",
+  "subtype": "Special",
+  "text": "As long as this card is attached to a Pokémon, it provides {D} Energy.\nAs long as the {D} Pokémon this card is attached to is on your Bench, prevent all damage done to it by attacks from your opponent's Pokémon.",
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me05-083",
+  "prints": [
+   "PBL-83"
+  ],
+  "lists": 1,
+  "image": "https://assets.tcgdex.net/en/me/me05/083"
  },
  {
   "id": "JTG-159",
@@ -10346,9 +16544,11 @@
   "regulationMark": "I",
   "tcgdexId": "sv09-159",
   "prints": [
-   "JTG-159"
+   "JTG-159",
+   "JTG-190"
   ],
-  "lists": 24
+  "lists": 102,
+  "image": "https://assets.tcgdex.net/en/sv/sv09/159"
  },
  {
   "id": "DRI-182",
@@ -10360,9 +16560,11 @@
   "regulationMark": "I",
   "tcgdexId": "sv10-182",
   "prints": [
-   "DRI-182"
+   "DRI-182",
+   "ASC-217"
   ],
-  "lists": 10
+  "lists": 71,
+  "image": "https://assets.tcgdex.net/en/sv/sv10/182"
  },
  {
   "id": "POR-88",
@@ -10376,7 +16578,23 @@
   "prints": [
    "POR-88"
   ],
-  "lists": 76
+  "lists": 668,
+  "image": "https://assets.tcgdex.net/en/me/me03/088"
+ },
+ {
+  "id": "PBL-84",
+  "name": "Voltaic Lightning Energy",
+  "kind": "energy",
+  "subtype": "Special",
+  "text": "As long as this card is attached to a Pokémon, it provides {L} Energy.\nAttacks used by the {L} Pokémon this card is attached to do 20 more damage to your opponent's Active Pokémon (before applying Weakness and Resistance).",
+  "tags": [],
+  "regulationMark": "J",
+  "tcgdexId": "me05-084",
+  "prints": [
+   "PBL-84"
+  ],
+  "lists": 2,
+  "image": "https://assets.tcgdex.net/en/me/me05/084"
  },
  {
   "id": "MEE-11",
@@ -10386,8 +16604,38 @@
   "energyType": "Water",
   "tags": [],
   "prints": [
-   "MEE-11"
+   "MEE-11",
+   "BS-102",
+   "BS2-130",
+   "G1-132",
+   "G2-132",
+   "N1-111",
+   "E1-165",
+   "RS-106",
+   "EM-103",
+   "HP-107",
+   "PK-105",
+   "DP-125",
+   "HS-117",
+   "CL-90",
+   "BLW-107",
+   "XY-134",
+   "GEN-77",
+   "EVO-93",
+   "SUM-W",
+   "CIN-124",
+   "TEU-W",
+   "SSH-W",
+   "CRE-231",
+   "BRS-W",
+   "CRZ-154",
+   "SVE-3",
+   "SVE-11",
+   "SVE-19",
+   "PAL-279",
+   "MEE-3"
   ],
-  "lists": 65
+  "lists": 343,
+  "image": "https://assets.tcgdex.net/en/swsh/swsh12.5/154"
  }
 ]

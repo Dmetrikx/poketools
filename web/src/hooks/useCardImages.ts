@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { resolveCard } from '@/api/cards'
+import { canonical } from '@/cards/canon'
 import type { CardEntry } from '@/types/deck'
 
 type EntryRef = Pick<CardEntry, 'cardId' | 'name' | 'setCode' | 'number' | 'section' | 'imageUrl'>
@@ -103,9 +104,13 @@ export function useCardImages(
       fetchedRef.current.add(key)
 
       const fetchImage = async (): Promise<string | undefined> => {
-        // A picked art wins; otherwise the exact card's image (the server
-        // swaps basic energy to a print that has one).
+        // A picked art wins; then the catalog's art for the print (every
+        // known print of a catalog card has one, no lookup needed); else the
+        // exact card from TCGdex (the server swaps basic energy to a print
+        // that has an image).
         if (entry.imageUrl) return entry.imageUrl
+        const canon = await canonical(entry).catch(() => null)
+        if (canon) return canon.image
         return (await resolveCard(entry))?.image
       }
 

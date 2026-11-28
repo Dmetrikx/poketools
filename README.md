@@ -1,6 +1,6 @@
 # Poketools
 
-A multi-user Pokemon TCG deck tool. Import a decklist (PTCG Live or Limitless) and test draw opening hands, with face-down prizes for prize checking. Decks can also be edited, given custom card art and two cover cards, and played against each other in a full-rules matchup simulator for the LAIC 2026-27 card pool.
+A multi-user Pokemon TCG deck tool. Import a decklist (PTCG Live or Limitless) and test draw opening hands, with face-down prizes for prize checking. Decks can also be edited, given custom card art and two cover cards, and played against each other in a full-rules matchup simulator for the cards of LAIC 2026-27 and the Standard events after it.
 
 ## Stack
 
@@ -225,7 +225,7 @@ Timestamps are epoch milliseconds. `section` is constrained to `pokemon | traine
 
 Open **Play matchup** on the home page (or **Play** on a deck tile), pick two decks, and play both sides on one screen. The engine enforces every rule (setup and mulligans, turn limits, costs, Weakness and Resistance, Knock Outs and Prize cards, Special Conditions, win conditions) and runs every card effect in the pool, asking whichever player has a choice to make. Undo steps back one choice at a time, Judge mode fixes mistakes by hand, and the game survives a reload.
 
-The card pool is the 342 distinct cards played at LAIC 2026-27 São Paulo. Decks with other cards can't start a matchup. The simulator is pure TypeScript in `web/src/game/` and keeps no server state; see the "Matchup Simulator" section of `CLAUDE.md` for how it's built and how to add cards.
+The card pool is the 478 distinct cards played at LAIC 2026-27 São Paulo and the 8 Standard events after it, in any of their prints. Every card played in 5+ lists runs its effects; rarer ones may still be pending (the setup page lists them). Decks with other cards can't start a matchup. The simulator is pure TypeScript in `web/src/game/` and keeps no server state; see the "Matchup Simulator" section of `CLAUDE.md` for how it's built and how to add cards.
 
 ```bash
 make catalog                 # rebuild web/src/game/catalog from cached responses

@@ -1,9 +1,12 @@
-// Pokémon Tools in the LAIC 2026-27 pool, each written from its catalog text.
+// Pokémon Tools in the card pool, each written from its catalog text.
 
 import {
   attachEnergy, chooseCards, choosePokemon, defineCard, draw, log, matching, may, moveEnergy, placeCounters,
   sel, type Source,
 } from '../fx'
+
+import type { EnergyType } from '../../catalog/types'
+import { canPay } from '../../engine/rules'
 
 const { isActive, is, ownerOfSlot } = sel
 const on = (src: Source, slotId: number) => src.slot?.id === slotId
@@ -90,5 +93,38 @@ defineCard('TWM-164', { trainer: { modifiers: {
       log(ctx, src.player, 'Survival Brace is discarded.')
     }
     return true
+  },
+} } })
+
+// ── Standard events after LAIC (5+ lists) ────────────────────────────────
+
+/** An attack cost with one symbol removed: the first of `prefer`, else any. */
+function withoutOne(cost: EnergyType[], prefer: (t: EnergyType) => boolean, anyType: boolean): EnergyType[] {
+  let i = cost.findIndex(prefer)
+  if (i < 0 && anyType) i = cost.length - 1
+  return i < 0 ? cost : [...cost.slice(0, i), ...cost.slice(i + 1)]
+}
+
+// Hop's Choice Band: Attacks used by the Hop's Pokémon this card is attached to cost {C} less and do
+// 30 more damage to your opponent's Active Pokémon (before applying Weakness and Resistance).
+defineCard('JTG-148', { trainer: { modifiers: {
+  attackCost: (src, ctx, slot, _attack, cost) => (on(src, slot.id) && is(ctx, slot, sel.tagged("Hop's")) ? withoutOne(cost, t => t === 'Colorless', false) : cost),
+  damageDealt: (src, ctx, ev) => (ev.toActive && on(src, ev.attacker.id) && is(ctx, ev.attacker, sel.tagged("Hop's")) ? 30 : 0),
+} } })
+
+// Maximum Belt: Attacks used by the Pokémon this card is attached to do 50 more damage to your
+// opponent's Active Pokémon ex (before applying Weakness and Resistance).
+defineCard('TEF-154', { trainer: { modifiers: {
+  damageDealt: (src, ctx, ev) => (ev.toActive && on(src, ev.attacker.id) && is(ctx, ev.target, sel.ex) ? 50 : 0),
+} } })
+
+// Sparkling Crystal: When the Tera Pokémon this card is attached to uses an attack, that attack costs
+// 1 Energy less. (The Energy can be of any type.) The symbol dropped is one whose removal lets the
+// attached Energy pay, else a typed one: the player picks the type, so the cost is the cheapest.
+defineCard('SCR-142', { trainer: { modifiers: {
+  attackCost: (src, ctx, slot, _attack, cost) => {
+    if (!on(src, slot.id) || !is(ctx, slot, sel.tera) || !cost.length) return cost
+    const options = [...new Set(cost)].map(t => withoutOne(cost, x => x === t, false))
+    return options.find(c => canPay(ctx, slot, c)) ?? withoutOne(cost, t => t !== 'Colorless', true)
   },
 } } })
