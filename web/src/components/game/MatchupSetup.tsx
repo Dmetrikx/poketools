@@ -3,7 +3,8 @@ import { decksApi } from '@/api/decks'
 import { useDecks } from '@/hooks/useDecks'
 import type { Deck } from '@/types/deck'
 import { resolveDeck } from './resolveDeck'
-import styles from './Game.module.css'
+import ui from './ui.module.css'
+import styles from './MatchupSetup.module.css'
 
 interface Props {
   initialA: string | null
@@ -18,8 +19,8 @@ export default function MatchupSetup({ initialA, onStart }: Props) {
   const okA = useSupport(a)
   const okB = useSupport(b)
 
-  if (loading) return <p className={styles.muted}>Loading decks…</p>
-  if (decks.length === 0) return <p className={styles.muted}>Import two decks to play a matchup.</p>
+  if (loading) return <p className={ui.muted}>Loading decks…</p>
+  if (decks.length === 0) return <p className={ui.muted}>Import two decks to play a matchup.</p>
 
   const picker = (label: string, value: string, set: (v: string) => void, status: Support) => (
     <div className={styles.setupDeck}>
@@ -37,12 +38,12 @@ export default function MatchupSetup({ initialA, onStart }: Props) {
   return (
     <div className={styles.setup}>
       <h1 className={styles.setupTitle}>Play a matchup</h1>
-      <p className={styles.muted}>Play both sides on one screen. The card pool is LAIC 2026–27 São Paulo.</p>
+      <p className={ui.muted}>Play both sides on one screen. The card pool is LAIC 2026–27 São Paulo.</p>
       <div className={styles.setupDecks}>
         {picker('Player 1', a, setA, okA)}
         {picker('Player 2', b, setB, okB)}
       </div>
-      <button className={styles.primary} disabled={!a || !b || okA.state !== 'ok' || okB.state !== 'ok'} onClick={() => onStart(a, b)}>
+      <button className={ui.primary} disabled={!a || !b || okA.state !== 'ok' || okB.state !== 'ok'} onClick={() => onStart(a, b)}>
         Start
       </button>
     </div>
@@ -75,7 +76,7 @@ function useSupport(id: string): Support {
 
 function SupportNote({ status }: { status: Support }) {
   if (status.state === 'none') return null
-  if (status.state === 'loading') return <p className={styles.muted}>Checking…</p>
+  if (status.state === 'loading') return <p className={ui.muted}>Checking…</p>
   if (status.state === 'bad') {
     return (
       <div className={styles.setupBad}>
@@ -90,7 +91,7 @@ function SupportNote({ status }: { status: Support }) {
       {status.pending.length > 0 && (
         <details>
           <summary>{status.pending.length} cards' effects aren't automated yet</summary>
-          <p className={styles.muted}>They play with their printed damage only; use Judge to apply the rest.</p>
+          <p className={ui.muted}>They play with their printed damage only; use Judge to apply the rest.</p>
           <ul>{status.pending.map(n => <li key={n}>{n}</li>)}</ul>
         </details>
       )}

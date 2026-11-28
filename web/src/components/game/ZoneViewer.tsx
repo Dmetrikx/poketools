@@ -1,7 +1,8 @@
 import type { JudgeOp, PlayerId } from '@/game/engine/types'
-import { GameCard } from './Board'
+import Card from './Card'
 import { useView } from './view'
-import styles from './Game.module.css'
+import ui from './ui.module.css'
+import styles from './Overlays.module.css'
 
 interface Props {
   player: PlayerId
@@ -16,29 +17,31 @@ const MOVES: { to: Extract<JudgeOp, { op: 'moveCard' }>['to']; label: string }[]
   { to: 'discard', label: 'Discard' }, { to: 'prizes', label: 'Prizes' },
 ]
 
-/** A discard pile, or (judge only) a deck in order. */
+/** A discard pile (newest first), or (Judge only) a deck from the top. */
 export default function ZoneViewer({ player, zone, judge, onJudge, onClose }: Props) {
   const v = useView()
-  const cards = v.state.players[player][zone]
+  const list = v.state.players[player][zone]
+  const cards = zone === 'discard' ? [...list].reverse() : list
   const hidden = zone === 'deck' && !judge
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.panel} onClick={e => e.stopPropagation()}>
-        <div className={styles.menuTitle}>
-          <span>{v.names[player]}: {zone === 'deck' ? 'Deck' : 'Discard pile'} ({cards.length})</span>
-          <button className={styles.iconBtn} onClick={onClose} aria-label="Close">×</button>
+    <div className={styles.scrim} onClick={e => { e.stopPropagation(); onClose() }}>
+      <div className={`${ui.panel} ${styles.viewer}`} role="dialog" aria-label={`${v.names[player]}: ${zone}`} onClick={e => e.stopPropagation()}>
+        <div className={ui.panelTitle}>
+          <span>{v.names[player]}: {zone === 'deck' ? 'Deck, from the top' : 'Discard pile, newest first'} ({cards.length})</span>
+          <button className={ui.iconBtn} onClick={onClose} aria-label="Close" autoFocus>×</button>
         </div>
         {hidden ? (
-          <p className={styles.muted}>The deck is face down. Turn on Judge to look through it.</p>
+          <p className={ui.muted}>The deck is face down. Turn on Judge to look through it.</p>
         ) : (
           <div className={styles.zoneGrid}>
             {cards.map(uid => (
               <div key={uid} className={styles.zoneCard}>
-                <GameCard uid={uid} />
+                <Card uid={uid} />
                 {judge && (
                   <select
-                    className={styles.judgeSelect}
+                    className={styles.select}
                     value=""
+                    aria-label={`Move ${v.card(uid).name}`}
                     onChange={e => e.target.value && onJudge({ op: 'moveCard', uid, to: e.target.value as never })}
                   >
                     <option value="">Move to…</option>
@@ -47,11 +50,11 @@ export default function ZoneViewer({ player, zone, judge, onJudge, onClose }: Pr
                 )}
               </div>
             ))}
-            {cards.length === 0 && <p className={styles.muted}>Empty.</p>}
+            {cards.length === 0 && <p className={ui.muted}>Empty.</p>}
           </div>
         )}
         {judge && zone === 'deck' && (
-          <button className={styles.secondary} onClick={() => onJudge({ op: 'shuffleDeck', player })}>Shuffle deck</button>
+          <div><button className={ui.secondary} onClick={() => onJudge({ op: 'shuffleDeck', player })}>Shuffle deck</button></div>
         )}
       </div>
     </div>

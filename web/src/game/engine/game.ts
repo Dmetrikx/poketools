@@ -31,7 +31,7 @@ export function initialState(record: Pick<GameRecord, 'seed' | 'decks'>): GameSt
   const s: GameState = {
     cards: [], players: [emptyPlayer(), emptyPlayer()], stadium: null,
     turn: 0, turnPlayer: 0, firstPlayer: 0, phase: 'setup', winner: null,
-    rng: record.seed >>> 0, pendingPrompt: null, log: [],
+    rng: record.seed >>> 0, coins: [], pendingPrompt: null, log: [],
     markers: [], nextMarkerId: 1, history: [], resolving: [], usedOnce: [],
   }
   for (const p of [0, 1] as PlayerId[]) {

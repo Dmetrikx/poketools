@@ -23,15 +23,3 @@ export function actionLabel(s: GameState, a: Action): string {
     default: return a.type
   }
 }
-
-/** Does the action start from this hand card? */
-export function fromHandCard(a: Action, uid: number): boolean {
-  return ('card' in a && a.card === uid) || (a.type === 'useAbility' && a.source === uid)
-}
-
-/** Does the action start from this Pokémon in play? */
-export function fromSlot(a: Action, id: number, isActive: boolean): boolean {
-  if (a.type === 'useAbility') return a.source === id
-  if (a.type === 'attack' || a.type === 'retreat') return isActive
-  return false
-}

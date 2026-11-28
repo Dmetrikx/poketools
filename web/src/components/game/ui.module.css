@@ -1,0 +1,69 @@
+/* Chrome shared by the table, its dialogs and the deck picker. */
+
+.primary, .secondary, .ghost {
+  padding: 7px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--color-text);
+  background: var(--color-surface);
+  white-space: nowrap;
+}
+
+.primary {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+}
+
+.ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+.primary:hover:not(:disabled) { background: var(--color-primary-hover); }
+.secondary:hover:not(:disabled), .ghost:hover:not(:disabled) { border-color: var(--color-primary); }
+.primary:disabled, .secondary:disabled, .ghost:disabled { opacity: 0.45; cursor: default; }
+
+.primary:focus-visible, .secondary:focus-visible, .ghost:focus-visible, .iconBtn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.iconBtn:hover { color: var(--color-text); }
+
+.muted { color: var(--color-text-muted); font-size: 0.85rem; }
+.error { color: var(--color-danger); font-size: 0.85rem; }
+
+/* A dialog surface. */
+.panel {
+  background: color-mix(in srgb, var(--color-surface) 96%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55);
+  color: var(--color-text);
+}
+
+.panelTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-weight: 700;
+}
+
+@media (pointer: coarse) {
+  .primary, .secondary, .ghost { padding: 10px 16px; }
+}

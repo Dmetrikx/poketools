@@ -1,0 +1,316 @@
+/* The matchup table covers the whole viewport, app shell included. */
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  background: #070a12;
+  color: var(--color-text);
+  user-select: none;
+}
+
+.bar {
+  flex: none;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  background: rgba(10, 13, 22, 0.96);
+  border-bottom: 1px solid var(--color-border);
+  position: relative;
+  z-index: 320;
+}
+
+.title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+  margin-left: 8px;
+}
+
+.names {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.95rem;
+}
+
+.vs { color: var(--color-text-muted); font-size: 0.8rem; margin: 0 2px; }
+
+.status {
+  flex: none;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.spacer { flex: 1; }
+
+.menuWrap { position: relative; }
+
+.menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 230px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--color-text);
+  font-size: 0.88rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menuItem:hover:not(:disabled) { background: var(--color-bg); }
+.menuItem:disabled { opacity: 0.45; cursor: default; }
+
+.toast {
+  position: absolute;
+  z-index: 330;
+  top: 54px;
+  right: 14px;
+  max-width: 360px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #450a0a;
+  border: 1px solid var(--color-danger);
+  color: #fecaca;
+  font-size: 0.85rem;
+}
+
+/* ── the grid on the mat ──────────────────────────────────────────────── */
+
+.grid {
+  /* One size drives every card: a Bench card's height. */
+  --card-h: clamp(56px, min(14.4cqh, 9.4cqw), 180px);
+  --card-w: calc(var(--card-h) * 63 / 88);
+  position: relative;
+  height: 100%;
+  display: grid;
+  /* Minimums add up to 12.6 card widths; --card-h keeps that inside the mat. */
+  grid-template-columns:
+    minmax(calc(var(--card-w) * 1.6), 1fr)
+    minmax(calc(var(--card-w) * 1.1), 1fr)
+    auto
+    minmax(calc(var(--card-w) * 1.4), 1fr)
+    minmax(calc(var(--card-w) * 2.1), 1fr);
+  /* Spare height goes between the two Active Spots. */
+  grid-template-rows:
+    calc(var(--card-h) * 0.42)
+    calc(var(--card-h) * 1.14)
+    calc(var(--card-h) * 1.42)
+    minmax(calc(var(--card-h) * 0.08), 1fr)
+    calc(var(--card-h) * 1.42)
+    calc(var(--card-h) * 1.14)
+    calc(var(--card-h) * 0.92);
+  grid-template-areas:
+    "fhand   fhand   fhand   fhand  fhand"
+    "fprizes .       fbench  .      fpiles"
+    "fprizes stadium factive center fpiles"
+    ".       stadium .       center ."
+    "nprizes stadium nactive center npiles"
+    "nprizes .       nbench  .      npiles"
+    "nhand   nhand   nhand   nhand  nhand";
+  row-gap: 0.6cqh;
+  column-gap: 1.2cqw;
+  padding: 0 2cqw;
+  animation: swap 0.3s ease-out;
+}
+
+/* A new viewer: the sides cross-fade into their new places. */
+@keyframes swap {
+  from { opacity: 0.25; }
+}
+
+.fhand { grid-area: fhand; }
+.nhand { grid-area: nhand; z-index: 20; }
+
+.prizes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.fprizes { grid-area: fprizes; flex-direction: column-reverse; justify-content: flex-start; }
+.nprizes { grid-area: nprizes; justify-content: flex-end; }
+
+.plate {
+  max-width: 100%;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.plateNear { border-color: rgba(96, 165, 250, 0.45); }
+.plateFar { border-color: rgba(248, 113, 113, 0.45); }
+.plateTurn.plateNear { background: #1d4ed8; border-color: #60a5fa; }
+.plateTurn.plateFar { background: #b91c1c; border-color: #f87171; }
+
+.bench {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: calc(var(--card-w) * 0.3 * var(--bench-scale, 1));
+  width: calc(var(--card-w) * 6.4);
+  padding: 0 calc(var(--card-w) * 0.1);
+  border-radius: 14px;
+}
+
+.fbench { grid-area: fbench; align-items: flex-start; padding-top: 4px; }
+.nbench { grid-area: nbench; align-items: flex-end; padding-bottom: 6px; }
+
+.emptySlot {
+  width: calc(var(--card-w) * var(--bench-scale, 1));
+  aspect-ratio: 63 / 88;
+  border: 2px dashed rgba(255, 255, 255, 0.13);
+  border-radius: 8px;
+}
+
+.emptySlot:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+.activeCell {
+  display: flex;
+  justify-content: center;
+}
+
+.factive { grid-area: factive; align-items: flex-end; }
+.nactive { grid-area: nactive; align-items: flex-start; }
+
+.emptyActive {
+  width: calc(var(--card-w) * 1.3);
+  aspect-ratio: 63 / 88;
+  border: 2px dashed rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.piles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--card-w) * 0.2);
+}
+
+.fpiles { grid-area: fpiles; align-items: flex-start; padding-top: 4px; }
+.npiles { grid-area: npiles; align-items: flex-end; padding-bottom: 6px; }
+
+.stadium {
+  grid-area: stadium;
+  align-self: center;
+  justify-self: end;
+}
+
+.center {
+  grid-area: center;
+  align-self: center;
+  justify-self: start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  z-index: 10;
+}
+
+.endTurn {
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: 2px solid #fde047;
+  background: linear-gradient(to bottom, #facc15, #ca8a04);
+  color: #1c1917;
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
+}
+
+.endTurn:hover { filter: brightness(1.08); }
+.endTurn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+/* Nothing left to do but end the turn. */
+.pulse { animation: pulse 1.3s ease-in-out infinite; }
+
+@keyframes pulse {
+  50% { box-shadow: 0 0 0 6px rgba(253, 224, 71, 0.25), 0 0 28px rgba(253, 224, 71, 0.55); }
+}
+
+/* ── overlays ─────────────────────────────────────────────────────────── */
+
+.dragGhost {
+  position: fixed;
+  z-index: 500;
+  pointer-events: none;
+  transform: rotate(-4deg) scale(1.04);
+  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.6));
+}
+
+.ghostCard { --cw: 100%; }
+
+.curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: none;
+  background: radial-gradient(ellipse at 50% 40%, #1e293b, #020617);
+  color: #fff;
+  cursor: pointer;
+}
+
+.curtain strong { font-size: 2rem; }
+.curtain span { font-size: 1.1rem; color: #cbd5e1; }
+.curtain small { margin-top: 18px; color: var(--color-text-muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .grid, .pulse { animation: none; }
+}
+
+/* Narrow or short screens (phones are out of scope): fixed card size, the mat scrolls. */
+@media (max-width: 700px), (max-height: 520px) {
+  .grid {
+    --card-h: 64px;
+    width: max-content;
+    min-width: 100%;
+    height: auto;
+    min-height: 100%;
+  }
+
+  .title .status { display: none; }
+}
