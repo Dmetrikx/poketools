@@ -7,6 +7,7 @@ import type { Action, PlayerId } from '@/game/engine/types'
 import { deckSignature } from '@/practice/deal'
 import type { CardEntry, Deck } from '@/types/deck'
 import ActionPopover, { choicePop, sourcePop, type Pop, type Rect } from './ActionPopover'
+import Announcer, { WinScreen } from './Announcer'
 import { BoardContext, useBoard, type Board, type Hit } from './board'
 import Card from './Card'
 import GameLog from './GameLog'
@@ -19,6 +20,7 @@ import PromptLayer from './PromptLayer'
 import { answersOnClick, canAdd, placement, toggle } from './promptPicks'
 import type { ResolvedDeck } from './resolveDeck'
 import { dropTargets, sameSource, tableActions, type Source } from './targets'
+import { useBoardMotion } from './useBoardMotion'
 import { useDrag } from './useDrag'
 import { makeView, useView, ViewContext } from './view'
 import ZoneViewer from './ZoneViewer'
@@ -70,6 +72,7 @@ export default function Table({ a, b, ra, rb }: Props) {
   const me = viewer(s)
   const them = other(me)
   const view = useMemo(() => makeView(s, entries, imageMap, names, me), [s, entries, imageMap, names, me])
+  const news = useBoardMotion(view, g.lastChange, g.version)
 
   const [selection, setSelection] = useState<Source | null>(null)
   const [pop, setPop] = useState<Pop | null>(null)
@@ -81,8 +84,16 @@ export default function Table({ a, b, ra, rb }: Props) {
   const [curtainOn, setCurtainOn] = useStoredFlag(CURTAIN_KEY)
   const [revealed, setRevealed] = useState<PlayerId>(me)
 
-  // Whatever was picked up belongs to the state it was picked up in.
-  useEffect(() => { setSelection(null); setPop(null) }, [g.version])
+  // Whatever was picked up belongs to the state it was picked up in. Judge
+  // keeps its target across fixes, for as long as the card is still there.
+  useEffect(() => {
+    setPop(null)
+    if (!judge) setSelection(null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [g.version])
+  const judgeTarget = judge && selection && (selection.kind === 'slot'
+    ? findSlot({ s, db: view.ctx.db }, selection.id) !== null
+    : s.players.some(pl => pl.hand.includes(selection.uid))) ? selection : null
   useEffect(() => { if (!curtainOn) setRevealed(me) }, [curtainOn, me])
   const curtain = curtainOn && revealed !== me && s.phase !== 'over'
 
@@ -166,7 +177,7 @@ export default function Table({ a, b, ra, rb }: Props) {
       if (holding && targets) {
         const acts = targets.get(`slot:${id}`)
         if (acts) return { glow: true, onClick: el => fire(acts, toRect(el), slotName(view.ctx, f.slot)) }
-        if (sameSource(holding, self)) return { selected: true, onClick: clear, onPointerDown }
+        if (sameSource(holding, self)) return { selected: true, dim: !!drag, onClick: clear, onPointerDown }
       }
       if (!mine) return { dim: !!holding }
       return { dim: !!holding, onClick: el => openSource(self, el), onPointerDown }
@@ -188,7 +199,7 @@ export default function Table({ a, b, ra, rb }: Props) {
       if (!live) return {}
       const self: Source = { kind: 'hand', uid }
       const onPointerDown = dragFrom(self, uid)
-      if (sameSource(holding, self)) return { selected: true, onClick: clear, onPointerDown }
+      if (sameSource(holding, self)) return { selected: true, dim: !!drag, onClick: clear, onPointerDown }
       return { dim: !!holding, onClick: el => openSource(self, el), onPointerDown }
     },
 
@@ -275,7 +286,7 @@ export default function Table({ a, b, ra, rb }: Props) {
             playTarget={!!drag && !!targets?.has('play')}
             over={drag?.over === 'play'}
           >
-            <div key={me} className={styles.grid}>
+            <div key={me} className={styles.grid} data-board>
               <div className={styles.fhand}><Hand player={them} near={false} faceUp={showBoth || s.phase === 'over'} /></div>
               <Side player={them} pos="far" onZone={z => setZone({ player: them, zone: z })} />
               <div className={styles.stadium}><StadiumSlot /></div>
@@ -306,8 +317,8 @@ export default function Table({ a, b, ra, rb }: Props) {
 
           {judge && !prompt && s.phase !== 'setup' && (
             <JudgePanel
-              slotId={selection?.kind === 'slot' ? selection.id : null}
-              handCard={selection?.kind === 'hand' ? selection.uid : null}
+              slotId={judgeTarget?.kind === 'slot' ? judgeTarget.id : null}
+              handCard={judgeTarget?.kind === 'hand' ? judgeTarget.uid : null}
               onJudge={op => g.act({ type: 'judge', judge: op })}
               onClose={() => { setJudge(false); clear() }}
             />
@@ -315,6 +326,18 @@ export default function Table({ a, b, ra, rb }: Props) {
           {showLog && <GameLog onClose={() => setShowLog(false)} />}
           {zone && (
             <ZoneViewer player={zone.player} zone={zone.zone} judge={judge} onJudge={op => g.act({ type: 'judge', judge: op })} onClose={() => setZone(null)} />
+          )}
+          <Announcer news={news} names={names} />
+          {s.phase === 'over' && (
+            <WinScreen
+              key={g.version}
+              state={s}
+              names={names}
+              canUndo={g.canUndo}
+              onNewGame={g.newGame}
+              onUndo={g.undo}
+              onDecks={() => navigate('/play')}
+            />
           )}
           {curtain && (
             <button className={styles.curtain} onClick={e => { e.stopPropagation(); setRevealed(me) }} autoFocus>

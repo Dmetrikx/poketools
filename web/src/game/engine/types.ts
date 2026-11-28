@@ -106,6 +106,8 @@ export interface GameState {
   winner: PlayerId | 'draw' | null
   /** mulberry32 state. */
   rng: number
+  /** Every coin flip so far, in order (true = heads). Display only: no rule reads it. */
+  coins: boolean[]
   /** The question the current step is waiting on. */
   pendingPrompt: Prompt | null
   log: LogEntry[]

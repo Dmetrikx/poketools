@@ -10,9 +10,11 @@ export function random(s: GameState): number {
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296
 }
 
-/** true = heads. */
+/** true = heads. Every result is kept in `s.coins`, so the board can show the flips. */
 export function coin(s: GameState): boolean {
-  return random(s) < 0.5
+  const heads = random(s) < 0.5
+  s.coins.push(heads)
+  return heads
 }
 
 /** Fisher-Yates in place. */
