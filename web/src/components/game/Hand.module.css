@@ -81,3 +81,10 @@
 @media (prefers-reduced-motion: reduce) {
   .slot { transition: none; }
 }
+
+/* On a scrolling mat the hand sits fully inside its row. */
+@media (max-width: 700px), (max-height: 520px) {
+  .near { --avail: 92vw; }
+  .near .slot { transform: none; }
+  .far .slot { transform: translateY(-30%); }
+}

@@ -101,17 +101,18 @@
 
 .grid {
   /* One size drives every card: a Bench card's height. */
-  --card-h: clamp(56px, min(14.4cqh, 10.2cqw), 180px);
+  --card-h: clamp(56px, min(14.4cqh, 9.4cqw), 180px);
   --card-w: calc(var(--card-h) * 63 / 88);
   position: relative;
   height: 100%;
   display: grid;
+  /* Minimums add up to 12.6 card widths; --card-h keeps that inside the mat. */
   grid-template-columns:
-    minmax(calc(var(--card-w) * 1.7), 1fr)
-    minmax(calc(var(--card-w) * 1.3), 1fr)
-    auto
     minmax(calc(var(--card-w) * 1.6), 1fr)
-    minmax(calc(var(--card-w) * 2.2), 1fr);
+    minmax(calc(var(--card-w) * 1.1), 1fr)
+    auto
+    minmax(calc(var(--card-w) * 1.4), 1fr)
+    minmax(calc(var(--card-w) * 2.1), 1fr);
   /* Spare height goes between the two Active Spots. */
   grid-template-rows:
     calc(var(--card-h) * 0.42)
@@ -299,4 +300,17 @@
 
 @media (prefers-reduced-motion: reduce) {
   .grid, .pulse { animation: none; }
+}
+
+/* Narrow or short screens (phones are out of scope): fixed card size, the mat scrolls. */
+@media (max-width: 700px), (max-height: 520px) {
+  .grid {
+    --card-h: 64px;
+    width: max-content;
+    min-width: 100%;
+    height: auto;
+    min-height: 100%;
+  }
+
+  .title .status { display: none; }
 }

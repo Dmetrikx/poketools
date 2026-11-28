@@ -78,3 +78,7 @@
 }
 
 .dropOver { border-color: #fde047; color: #fef9c3; }
+
+@media (max-width: 700px), (max-height: 520px) {
+  .mat { overflow: auto; }
+}
